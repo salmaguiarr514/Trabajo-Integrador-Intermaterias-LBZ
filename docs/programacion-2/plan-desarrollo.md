@@ -251,18 +251,18 @@ src/
 
 ## 7. Fases y orden de trabajo
 
-| Fase | Entregable | Depende de |
-| --- | --- | --- |
-| **0. Acuerdo** | Este documento revisado por los 3; dudas cerradas | — |
-| **1. Base de datos** | Scripts 01–08 corriendo en Supabase, más los seeds 10 y 11 | 0 |
-| **2. Base del backend** | Auth, middlewares, manejo de errores, mover `empresas` a `/api/admin` | 1 |
-| **3. Base del front** | AuthContext, api.js, layouts, RutaProtegida, login | 2 |
-| **4. Superadmin** | Productoras, usuarios, catálogo de lugares (escenarios, espacios) y artistas | 2, 3 |
-| **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) |
-| **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) |
-| **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 |
-| **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) |
-| **8. Cierre** | Deploy, README actualizado, DER exportado para Sistemas de Información | todo |
+| Fase | Entregable | Depende de | Estado |
+| --- | --- | --- | --- |
+| **0. Acuerdo** | Este documento revisado por los 3; dudas cerradas | — | |
+| **1. Base de datos** | Scripts 01–08 corriendo en Supabase, más los seeds 10 y 11 | 0 | Scripts listos y probados; falta correrlos en Supabase |
+| **2. Base del backend** | Auth, middlewares, manejo de errores, mover `empresas` a `/api/admin` | 1 | Hecha |
+| **3. Base del front** | AuthContext, api.js, layouts, RutaProtegida, login | 2 | Hecha |
+| **4. Superadmin** | Productoras, usuarios, catálogo de lugares (escenarios, espacios) y artistas | 2, 3 | Productoras hecho |
+| **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | |
+| **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Registro hecho |
+| **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | |
+| **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |
+| **8. Cierre** | Deploy, README actualizado, DER exportado para Sistemas de Información | todo | |
 
 ### Reparto sugerido (después de hacer juntos las fases 1–3)
 - **Persona A, superadmin:** fase 4 completa (backend y front), métricas de recaudación y **el plano (7b)**, porque nace en la pantalla de lugares.

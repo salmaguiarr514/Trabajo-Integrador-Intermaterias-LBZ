@@ -1,0 +1,71 @@
+import { useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Button, Grid, Layout, Menu } from "antd";
+import { MenuOutlined } from "@ant-design/icons";
+import Logo from "../components/Logo.jsx";
+import MenuUsuario from "../components/MenuUsuario.jsx";
+
+// Estructura común de los paneles (admin y productora): barra superior y menú lateral.
+// items: [{ key: "/admin/empresas", icon, label }] → la key es la ruta.
+// En pantallas chicas el menú se abre con un botón y queda encima del contenido.
+function PanelBase({ inicio, subtitulo, items }) {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const esMovil = !Grid.useBreakpoint().lg;
+  const [menuAbierto, setMenuAbierto] = useState(false);
+
+  // Marca el ítem cuya ruta es la más larga que coincide con la actual
+  const seleccionado = items
+    .map((i) => i.key)
+    .filter((key) => pathname === key || pathname.startsWith(`${key}/`))
+    .sort((a, b) => b.length - a.length)[0];
+
+  const irA = ({ key }) => {
+    navigate(key);
+    setMenuAbierto(false);
+  };
+
+  return (
+    <Layout style={{ minHeight: "100vh", background: "transparent" }}>
+      <header className="barra">
+        <div className="barra-interior" style={{ paddingInline: 16, paddingBlock: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {esMovil && (
+              <Button type="text" icon={<MenuOutlined />} aria-label="Menú" onClick={() => setMenuAbierto(!menuAbierto)} />
+            )}
+            <Logo to={inicio} subtitulo={subtitulo} />
+          </div>
+          <MenuUsuario />
+        </div>
+      </header>
+      <Layout style={{ background: "transparent", position: "relative" }}>
+        <Layout.Sider
+          width={220}
+          collapsedWidth={0}
+          collapsed={esMovil && !menuAbierto}
+          trigger={null}
+          style={{
+            background: esMovil ? "#14141f" : "rgba(255, 255, 255, 0.03)",
+            borderRight: esMovil && !menuAbierto ? "none" : "1px solid rgba(255, 255, 255, 0.08)",
+            ...(esMovil && { position: "absolute", insetBlock: 0, left: 0, zIndex: 20 })
+          }}
+        >
+          <Menu
+            mode="inline"
+            selectedKeys={seleccionado ? [seleccionado] : []}
+            items={items}
+            onClick={irA}
+            style={{ background: "transparent", borderInlineEnd: "none", paddingTop: 12 }}
+          />
+        </Layout.Sider>
+        <Layout.Content style={{ minWidth: 0 }}>
+          <div className="contenido">
+            <Outlet />
+          </div>
+        </Layout.Content>
+      </Layout>
+    </Layout>
+  );
+}
+
+export default PanelBase;

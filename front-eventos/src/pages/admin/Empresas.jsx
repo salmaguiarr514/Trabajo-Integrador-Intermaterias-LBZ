@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert, App, Button, Card, Col, Empty, Input, Popconfirm, Row,
-  Space, Spin, Statistic, Table, Tag, Tooltip, Typography
+  Space, Statistic, Table, Tag, Tooltip, Typography
 } from "antd";
 import {
   CheckCircleOutlined, DeleteOutlined, EditOutlined,
-  PauseCircleOutlined, SearchOutlined, TeamOutlined
+  PauseCircleOutlined, PlusOutlined, SearchOutlined, TeamOutlined
 } from "@ant-design/icons";
-import { obtenerEmpresas, eliminarEmpresa } from "../services/empresasService.js";
+import { obtenerEmpresas, eliminarEmpresa } from "../../services/empresasService.js";
+import { mensajeDeError } from "../../services/api.js";
+import Cargando from "../../components/Cargando.jsx";
 
 function Empresas() {
   const [empresas, setEmpresas] = useState([]);
@@ -24,8 +26,8 @@ function Empresas() {
         const response = await obtenerEmpresas();
         if (!Array.isArray(response.data)) throw new Error("Respuesta inesperada de la API");
         setEmpresas(response.data);
-      } catch {
-        setError("No se pudieron cargar las empresas");
+      } catch (err) {
+        setError(mensajeDeError(err, "No se pudieron cargar las productoras"));
       } finally {
         setLoading(false);
       }
@@ -38,22 +40,23 @@ function Empresas() {
       await eliminarEmpresa(id);
       setEmpresas(empresas.filter((e) => e.id_empresa !== id));
       message.success("Productora eliminada");
-    } catch {
-      message.error("No se pudo eliminar la empresa");
+    } catch (err) {
+      // 409: tiene usuarios, lugares, artistas o eventos → se da de baja en vez de borrarla
+      const conDatos = err.response?.status === 409;
+      message.error(
+        conDatos
+          ? "La productora tiene datos asociados: desactivala desde Editar en lugar de eliminarla"
+          : mensajeDeError(err, "No se pudo eliminar la productora")
+      );
     }
   };
 
   if (loading) {
-    return (
-      <div style={{ textAlign: "center", padding: 80 }}>
-        <Spin size="large" />
-        <p>Cargando empresas...</p>
-      </div>
-    );
+    return <Cargando texto="Cargando productoras..." />;
   }
 
   if (error) {
-    return <Alert type="error" showIcon title={error} description="¿Está corriendo la API en el puerto 3000?" />;
+    return <Alert type="error" showIcon title={error} />;
   }
 
   const texto = busqueda.trim().toLowerCase();
@@ -74,7 +77,14 @@ function Empresas() {
         </Space>
       )
     },
-    { title: "CUIT", dataIndex: "cuit" },
+    { title: "CUIT", dataIndex: "cuit", render: (cuit) => <span style={{ whiteSpace: "nowrap" }}>{cuit}</span> },
+    {
+      title: "Service charge",
+      dataIndex: "cargo_servicio_pct",
+      responsive: ["md"],
+      sorter: (a, b) => a.cargo_servicio_pct - b.cargo_servicio_pct,
+      render: (pct) => `${pct} %`
+    },
     {
       title: "Contacto",
       key: "contacto",
@@ -115,7 +125,7 @@ function Empresas() {
           <Tooltip title="Editar">
             <Button
               icon={<EditOutlined />}
-              onClick={() => navigate(`/empresas/${empresa.id_empresa}/editar`)}
+              onClick={() => navigate(`/admin/empresas/${empresa.id_empresa}/editar`)}
             />
           </Tooltip>
           <Popconfirm
@@ -137,11 +147,16 @@ function Empresas() {
 
   return (
     <div className="pila">
-      <div>
-        <Typography.Title level={2} style={{ marginBottom: 4 }}>Productoras</Typography.Title>
-        <Typography.Text type="secondary">
-          Empresas que organizan recitales y festivales en la plataforma.
-        </Typography.Text>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <Typography.Title level={2} style={{ marginBottom: 4 }}>Productoras</Typography.Title>
+          <Typography.Text type="secondary">
+            Empresas que organizan recitales y festivales en la plataforma.
+          </Typography.Text>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/admin/empresas/nueva")}>
+          Nueva productora
+        </Button>
       </div>
 
       <Row gutter={[16, 16]}>

@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  Alert, App, Button, Card, Col, Form, Input, Result, Row, Space, Spin, Switch, Typography
+  Alert, App, Button, Card, Col, Form, Input, InputNumber, Result, Row, Space, Switch, Typography
 } from "antd";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
-import { obtenerEmpresa, crearEmpresa, actualizarEmpresa } from "../services/empresasService.js";
+import { obtenerEmpresa, crearEmpresa, actualizarEmpresa } from "../../services/empresasService.js";
+import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
+import Cargando from "../../components/Cargando.jsx";
 
-const FORM_VACIO = { nombre: "", cuit: "", email: "", telefono: "", direccion: "", activo: true };
+const LISTADO = "/admin/empresas";
+const FORM_VACIO = { nombre: "", cuit: "", email: "", telefono: "", direccion: "", cargo_servicio_pct: 10, activo: true };
+const FORMATO_CUIT = /^\d{2}-\d{8}-\d$/;
 
 function EmpresaForm() {
   const { id } = useParams();
@@ -31,11 +35,12 @@ function EmpresaForm() {
           email: data.email ?? "",
           telefono: data.telefono ?? "",
           direccion: data.direccion ?? "",
+          cargo_servicio_pct: data.cargo_servicio_pct,
           activo: data.activo ?? true
         });
       } catch (error) {
         if (error.response?.status === 404 || error.response?.status === 400) setNoExiste(true);
-        else setErrores({ api: "No se pudo cargar la empresa" });
+        else setErrores({ api: mensajeDeError(error, "No se pudo cargar la productora") });
       } finally {
         setCargando(false);
       }
@@ -51,6 +56,8 @@ function EmpresaForm() {
     const nuevos = {};
     if (!form.nombre.trim()) nuevos.nombre = "El nombre es obligatorio";
     if (!form.cuit.trim()) nuevos.cuit = "El CUIT es obligatorio";
+    else if (!FORMATO_CUIT.test(form.cuit.trim())) nuevos.cuit = "Formato 30-12345678-9";
+    if (form.cargo_servicio_pct == null) nuevos.cargo_servicio_pct = "Indicá el porcentaje";
     setErrores(nuevos);
     if (Object.keys(nuevos).length > 0) return;
 
@@ -60,7 +67,8 @@ function EmpresaForm() {
       cuit: form.cuit.trim(),
       email: form.email.trim() || null,
       telefono: form.telefono.trim() || null,
-      direccion: form.direccion.trim() || null
+      direccion: form.direccion.trim() || null,
+      cargo_servicio_pct: form.cargo_servicio_pct
     };
 
     setGuardando(true);
@@ -72,22 +80,22 @@ function EmpresaForm() {
         await crearEmpresa(empresa);
         message.success("Productora creada");
       }
-      navigate("/");
+      navigate(LISTADO);
     } catch (error) {
-      setErrores({
-        api: error.response?.data?.mensaje || `Error al ${id ? "editar" : "crear"} la empresa`
-      });
+      // Errores de validación de la API, debajo de cada campo
+      const campos = erroresPorCampo(error);
+      setErrores(
+        Object.keys(campos).length > 0
+          ? campos
+          : { api: mensajeDeError(error, `Error al ${id ? "editar" : "crear"} la productora`) }
+      );
     } finally {
       setGuardando(false);
     }
   };
 
   if (cargando) {
-    return (
-      <div style={{ textAlign: "center", padding: 80 }}>
-        <Spin size="large" />
-      </div>
-    );
+    return <Cargando />;
   }
 
   if (noExiste) {
@@ -95,8 +103,8 @@ function EmpresaForm() {
       <Result
         status="404"
         title="Productora no encontrada"
-        subTitle={`No existe una empresa con id ${id}.`}
-        extra={<Button type="primary" onClick={() => navigate("/")}>Volver al listado</Button>}
+        subTitle={`No existe una productora con id ${id}.`}
+        extra={<Button type="primary" onClick={() => navigate(LISTADO)}>Volver al listado</Button>}
       />
     );
   }
@@ -109,7 +117,7 @@ function EmpresaForm() {
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto" }}>
-      <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate("/")} style={{ paddingInline: 0 }}>
+      <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(LISTADO)} style={{ paddingInline: 0 }}>
         Volver
       </Button>
       <Typography.Title level={2} style={{ marginTop: 8 }}>
@@ -132,18 +140,31 @@ function EmpresaForm() {
               </Form.Item>
             </Col>
             <Col xs={24} md={14}>
-              <Form.Item label="Email">
+              <Form.Item label="Email" {...estado("email")}>
                 <Input name="email" type="email" value={form.email} onChange={handleChange} placeholder="contacto@productora.com" maxLength={150} />
               </Form.Item>
             </Col>
             <Col xs={24} md={10}>
-              <Form.Item label="Teléfono">
+              <Form.Item label="Teléfono" {...estado("telefono")}>
                 <Input name="telefono" value={form.telefono} onChange={handleChange} placeholder="351-4000000" maxLength={30} />
               </Form.Item>
             </Col>
-            <Col span={24}>
-              <Form.Item label="Dirección">
+            <Col xs={24} md={16}>
+              <Form.Item label="Dirección" {...estado("direccion")}>
                 <Input name="direccion" value={form.direccion} onChange={handleChange} placeholder="Av. Siempre Viva 742, Córdoba" maxLength={200} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item label="Service charge" required tooltip="Porcentaje que cobra Backstage sobre cada venta" {...estado("cargo_servicio_pct")}>
+                <InputNumber
+                  min={0}
+                  max={100}
+                  step={0.5}
+                  suffix="%"
+                  value={form.cargo_servicio_pct}
+                  onChange={(cargo_servicio_pct) => setForm({ ...form, cargo_servicio_pct })}
+                  style={{ width: "100%" }}
+                />
               </Form.Item>
             </Col>
             {id && (
@@ -159,7 +180,7 @@ function EmpresaForm() {
             <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={guardando}>
               {id ? "Guardar cambios" : "Crear productora"}
             </Button>
-            <Button onClick={() => navigate("/")}>Cancelar</Button>
+            <Button onClick={() => navigate(LISTADO)}>Cancelar</Button>
           </Space>
         </Form>
       </Card>

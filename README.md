@@ -25,9 +25,9 @@ proyecto-eventos/
 
 ## El software
 
-Plataforma para **productoras de recitales y festivales**. Cada productora es un *tenant* (empresa)
-y en el futuro gestionará sus propios eventos; este panel es para nosotros, los dueños de la
-plataforma, y sirve para administrar las productoras registradas.
+Plataforma para **productoras de recitales y festivales**. Cada productora es un *tenant* (empresa).
+Hay tres perfiles: **superadmin** (nosotros, panel `/admin`), **empresa** (personal de una productora, panel `/panel`)
+y **cliente** (el público que compra entradas).
 
 El negocio está en [docs/comun/dominio.md](docs/comun/dominio.md); los roles, endpoints y fases, en
 [docs/programacion-2/plan-desarrollo.md](docs/programacion-2/plan-desarrollo.md).
@@ -55,6 +55,7 @@ npm run dev        # http://localhost:5173  ← abrir esto en el navegador
 PORT=3000
 FRONTEND_URL=http://localhost:5173
 DATABASE_URL=postgresql://...supabase...
+JWT_SECRET=un-texto-largo-y-secreto
 ```
 
 **front-eventos/.env**
@@ -66,20 +67,28 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 
 ### Front
 
-| Ruta | Pantalla |
-| --- | --- |
-| `/` | Listado de productoras (búsqueda, orden, filtro por estado, eliminar con confirmación) |
-| `/empresas/nueva` | Formulario de alta |
-| `/empresas/:id/editar` | Mismo formulario, precargado (incluye activar/desactivar) |
-| cualquier otra | Página 404 |
+| Ruta | Quién | Pantalla |
+| --- | --- | --- |
+| `/` | todos | Cartelera (se completa en la fase 6) |
+| `/login`, `/registro` | todos | Ingreso y alta de clientes. En desarrollo el login muestra los usuarios de prueba |
+| `/admin/empresas` | superadmin | Listado de productoras (búsqueda, orden, filtro por estado, service charge, eliminar) |
+| `/admin/empresas/nueva`, `/admin/empresas/:id/editar` | superadmin | Formulario de alta y edición (incluye % de service charge y activar/desactivar) |
+| `/panel` | empresa | Inicio del panel de la productora (se completa en la fase 5) |
+| cualquier otra | todos | Página 404 |
+
+Si alguien entra a una ruta que no es de su rol, va a la pantalla de inicio de su rol; sin sesión, al login.
 
 ```
 front-eventos/src/
-├── main.jsx                 → BrowserRouter + tema de Ant Design
-├── App.jsx                  → QUÉ pantallas existen
-├── services/empresasService.js → llamadas a la API (axios)
-├── pages/                   → Empresas.jsx, EmpresaForm.jsx, NoEncontrada.jsx
-└── components/Navbar.jsx
+├── main.jsx                 → BrowserRouter + tema de Ant Design + AuthProvider
+├── App.jsx                  → QUÉ pantallas existen y quién puede verlas
+├── context/                 → AuthProvider.jsx (sesión) y auth.js (useAuth, inicioDeRol)
+├── services/api.js          → axios con el token y cierre de sesión si la API responde 401
+├── services/*Service.js     → llamadas a la API, uno por recurso
+├── routes/RutaProtegida.jsx → <RutaProtegida roles={["superadmin"]} />
+├── layouts/                 → PublicLayout, AdminLayout, PanelLayout (los dos últimos usan PanelBase)
+├── pages/public/  pages/admin/  pages/panel/
+└── components/              → Logo, MenuUsuario, Cargando
 ```
 
 ### Trabajo en grupo

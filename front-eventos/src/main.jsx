@@ -5,6 +5,7 @@ import { ConfigProvider, App as AntApp, theme } from "antd";
 import esES from "antd/locale/es_ES";
 import "./index.css";
 import App from "./App.jsx";
+import { AuthProvider } from "./context/AuthProvider.jsx";
 
 // Tema oscuro con acento violeta (estética de recitales / escenario)
 const tema = {
@@ -21,7 +22,9 @@ createRoot(document.getElementById("root")).render(
     <ConfigProvider theme={tema} locale={esES}>
       <AntApp>
         <BrowserRouter>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </BrowserRouter>
       </AntApp>
     </ConfigProvider>

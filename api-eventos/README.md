@@ -1,7 +1,7 @@
-# API Eventos – CRUD de empresas
+# API Eventos
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-Por ahora la API expone solo el CRUD de `empresas`; la base ya tiene el modelo completo.
+Hoy tiene el login y el CRUD de productoras para el superadmin; la base ya tiene el modelo completo.
 
 ## Puesta en marcha
 
@@ -14,7 +14,9 @@ Por ahora la API expone solo el CRUD de `empresas`; la base ya tiene el modelo c
    PORT=3000
    FRONTEND_URL=http://localhost:5173
    DATABASE_URL=postgresql://postgres.xxxx:CONTRASEÑA@aws-1-us-west-2.pooler.supabase.com:5432/postgres
+   JWT_SECRET=un-texto-largo-y-secreto
    ```
+   `JWT_SECRET` es la clave con la que se firman las sesiones: cualquier texto largo. Sin ella la API no arranca.
    La `DATABASE_URL` se pide por privado al grupo (Supabase → Connect → URI → **Session pooler**).
    El `.env` **nunca** se sube a GitHub (ya está en `.gitignore`).
 3. Levantar el servidor:
@@ -26,35 +28,54 @@ Por ahora la API expone solo el CRUD de `empresas`; la base ya tiene el modelo c
 ## Estructura
 
 ```
-database/                             → scripts SQL numerados (ver "Base de datos")
-src/index.js                           → crea el servidor y conecta todo
-src/routes/empresas.routes.js          → QUÉ rutas existen
-src/controllers/empresas.controller.js → QUÉ hace cada ruta
-src/data/db.js                         → conexión a la base de datos
+database/                          → scripts SQL numerados (ver "Base de datos")
+src/index.js                       → crea el servidor y conecta todo
+src/routes/                        → QUÉ rutas existen (admin/ = solo superadmin)
+src/controllers/                   → QUÉ hace cada ruta
+src/schemas/                       → validación de los body con zod
+src/middlewares/autenticar.js      → valida el token y llena req.usuario { id_usuario, rol, id_empresa }
+src/middlewares/permitir.js        → permitir("superadmin", ...) → 403 si el rol no está
+src/middlewares/validar.js         → valida req.body o req.params con un schema
+src/middlewares/manejarErrores.js  → traduce errores (zod, PostgreSQL) a 400 / 404 / 409
+src/data/db.js                     → conexión a la base de datos
 ```
+
+Los controllers no llevan try/catch: Express 5 manda los errores de las funciones async a `manejarErrores`.
+Para cortar con un error se hace `throw new ErrorHttp(404, "Mensaje")`.
 
 ## Endpoints
 
-| Método | Ruta                | Acción                   | Respuesta |
-| ------ | ------------------- | ------------------------ | --------- |
-| GET    | `/api/empresas`     | Listar todas las empresas | 200       |
-| GET    | `/api/empresas/:id` | Obtener una empresa      | 200 / 404 |
-| POST   | `/api/empresas`     | Crear una empresa        | 201 / 400 |
-| PUT    | `/api/empresas/:id` | Editar una empresa       | 200 / 404 |
-| DELETE | `/api/empresas/:id` | Eliminar una empresa     | 204 / 404 |
+Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el token lo devuelve el login).
 
-- Al crear, `nombre` y `cuit` son obligatorios (si faltan → 400). Un `cuit` repetido también responde 400.
-- En el PUT se pueden mandar solo los campos a modificar; el resto queda igual. Un campo opcional enviado vacío (`""` o `null`) se borra.
-- El `id` lo genera la base (SERIAL), nunca se toma del body.
+| Método | Ruta | Quién | Acción | Respuesta |
+| ------ | ---- | ----- | ------ | --------- |
+| POST | `/api/auth/login` | todos | `{ email, password }` → `{ token, usuario }` | 200 / 400 / 401 / 403 |
+| POST | `/api/auth/registro` | todos | Alta de **cliente** y login → `{ token, usuario }` | 201 / 400 / 409 |
+| GET | `/api/auth/yo` | 🔒 cualquiera | Usuario de la sesión | 200 / 401 |
+| GET | `/api/admin/empresas` | 🔒 superadmin | Listar productoras | 200 |
+| GET | `/api/admin/empresas/:id` | 🔒 superadmin | Obtener una | 200 / 404 |
+| POST | `/api/admin/empresas` | 🔒 superadmin | Crear | 201 / 400 / 409 |
+| PUT | `/api/admin/empresas/:id` | 🔒 superadmin | Editar (solo los campos que vienen) | 200 / 400 / 404 / 409 |
+| DELETE | `/api/admin/empresas/:id` | 🔒 superadmin | Borrar (solo si no tiene datos) | 204 / 404 / 409 |
+| GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |
 
-Ejemplo de body para POST:
+- Errores: siempre `{ mensaje }`. Si son de validación, además `errores: [{ campo, mensaje }]`.
+- Sin token o con token vencido → 401. Con un rol que no corresponde → 403.
+- Un usuario dado de baja, o de una productora dada de baja, no puede iniciar sesión (403).
+- Empresas: `nombre` y `cuit` (formato `30-12345678-9`) son obligatorios; `cargo_servicio_pct` va de 0 a 100 (por defecto 10).
+  Un campo opcional enviado vacío (`""` o `null`) se borra. Un CUIT repetido responde 409.
+- Una productora con usuarios, lugares, artistas o eventos no se borra (409): se da de baja con `activo: false`.
+- Cada respuesta trae el header `X-Instancia` (variable `INSTANCIA` o el nombre del equipo), para la demo de réplicas de Sistemas Operativos.
+
+Ejemplo de body para POST `/api/admin/empresas`:
 ```json
 {
-  "nombre": "Mi Empresa",
+  "nombre": "Mi Productora",
   "cuit": "30-71111111-1",
-  "email": "contacto@miempresa.com",
+  "email": "contacto@miproductora.com",
   "telefono": "351-4000000",
-  "direccion": "Calle 123, Córdoba"
+  "direccion": "Calle 123, Córdoba",
+  "cargo_servicio_pct": 10
 }
 ```
 

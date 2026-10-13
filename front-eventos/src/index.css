@@ -26,6 +26,27 @@ body {
   padding: 24px 16px 48px;
 }
 
+/* Barra superior fija con fondo translúcido */
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  background: rgba(11, 11, 18, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.barra-interior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.barra .contenido.barra-interior {
+  padding-block: 14px;
+}
+
 @media (max-width: 600px) {
   .ocultar-mobile {
     display: none;

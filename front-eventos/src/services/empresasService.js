@@ -1,16 +1,13 @@
-import axios from "axios";
+import api from "./api.js";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
-});
+// Solo superadmin
+export const obtenerEmpresas = () => api.get("/admin/empresas");
 
-export const obtenerEmpresas = () => api.get("/empresas");
+export const obtenerEmpresa = (id) => api.get(`/admin/empresas/${id}`);
 
-export const obtenerEmpresa = (id) => api.get(`/empresas/${id}`);
-
-export const crearEmpresa = (empresa) => api.post("/empresas", empresa);
+export const crearEmpresa = (empresa) => api.post("/admin/empresas", empresa);
 
 export const actualizarEmpresa = (id, empresa) =>
-  api.put(`/empresas/${id}`, empresa);
+  api.put(`/admin/empresas/${id}`, empresa);
 
-export const eliminarEmpresa = (id) => api.delete(`/empresas/${id}`);
+export const eliminarEmpresa = (id) => api.delete(`/admin/empresas/${id}`);
