@@ -1,6 +1,6 @@
 # Sistemas Operativos — Consigna
 
-Texto original de la cátedra, sin cambios. El resumen y el plan del grupo están en el [README](../../README.md#sistemas-operativos).
+Texto original de la cátedra, sin cambios. El resumen y el plan del grupo están en [plan.md](plan.md).
 
 ---
 

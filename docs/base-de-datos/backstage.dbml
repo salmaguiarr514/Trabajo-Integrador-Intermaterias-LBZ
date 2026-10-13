@@ -1,6 +1,6 @@
 // Backstage — modelo lógico de datos (PostgreSQL)
 // Para ver el diagrama: pegar este archivo en https://dbdiagram.io/d  → Export → PNG / PDF
-// Detalle de reglas y justificación: docs/der/DER.md
+// Detalle de reglas y justificación: docs/base-de-datos/der.md
 
 Project backstage {
   database_type: 'PostgreSQL'

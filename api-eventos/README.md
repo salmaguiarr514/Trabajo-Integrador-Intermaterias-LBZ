@@ -1,7 +1,7 @@
 # API Eventos – CRUD de empresas
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-En esta etapa solo existe la tabla `empresas`.
+Por ahora la API expone solo el CRUD de `empresas`; la base ya tiene el modelo completo.
 
 ## Puesta en marcha
 
@@ -26,7 +26,7 @@ En esta etapa solo existe la tabla `empresas`.
 ## Estructura
 
 ```
-database/empresas.sql                  → script de la tabla
+database/                             → scripts SQL numerados (ver "Base de datos")
 src/index.js                           → crea el servidor y conecta todo
 src/routes/empresas.routes.js          → QUÉ rutas existen
 src/controllers/empresas.controller.js → QUÉ hace cada ruta
@@ -59,6 +59,24 @@ Ejemplo de body para POST:
 ```
 
 ## Base de datos
+
+Los scripts de [database/](database/) se corren **en orden** en Supabase (SQL Editor → pegar → Run):
+
+| Script | Qué hace |
+| --- | --- |
+| `00_reset.sql` | Borra todo. **Solo desarrollo, y avisando al grupo** (la base es compartida) |
+| `01` a `06` | Extensiones y tablas. `02` no pisa la tabla `empresas` existente: le agrega las columnas nuevas |
+| `07_triggers.sql` | Reglas que no entran en FK ni CHECK |
+| `08_vistas.sql` | `v_lugares`, `v_disponibilidad`, `v_cartelera`, `v_asistencia`, `v_recaudacion` |
+| `10_seed_plataforma.sql` | Superadmin y 20 lugares de la plataforma |
+| `11_seed_demo.sql` | 3 productoras, usuarios, artistas, 1 festival, 2 recitales y compras |
+
+Usuarios de prueba: `admin@backstage.com` / `admin123` (superadmin); `staff@eventosdelcentro.com`,
+`staff@fiestasnorte.com`, `staff@produccionessur.com` (empresa) y `lucia.gomez@mail.com`, `martin.diaz@mail.com`,
+`sofia.perez@mail.com` (cliente), todos con `demo123`.
+
+Los cambios de esquema posteriores van en un script nuevo (`12_agrega_x.sql`), nunca editando uno ya corrido.
+El modelo está explicado en [docs/base-de-datos/der.md](../docs/base-de-datos/der.md).
 
 - CORS solo acepta pedidos desde `FRONTEND_URL` (el front de Vite).
 - Todo el grupo comparte **una sola base** en Supabase (la tabla `empresas` ya está creada ahí).
