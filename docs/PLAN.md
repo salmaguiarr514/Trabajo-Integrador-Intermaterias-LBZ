@@ -113,7 +113,7 @@ Carpeta `api-eventos/database/`, numerados y en orden de ejecución (Supabase �
 | `05_eventos.sql` | `eventos`, `jornadas`, `evento_escenarios`, `presentaciones` |
 | `06_ventas.sql` | `tarifas`, `compras`, `entradas`, `ingresos` |
 | `07_triggers.sql` | Los 6 triggers del DER (lugar válido, jornada en rango, presentación en jornada, mínimo un espacio, compras solo de clientes, ingresos válidos) |
-| `08_vistas.sql` | `v_cartelera` (eventos publicados con lugar y headliners), `v_lugares` (con la capacidad total calculada), `v_disponibilidad` (por evento, jornada y espacio: capacidad − vendidas), `v_recaudacion` (service charge por productora y mes) |
+| `08_vistas.sql` | `v_cartelera` (eventos publicados con lugar y headliners), `v_lugares` (con la capacidad total calculada), `v_disponibilidad` (por evento, jornada y espacio: capacidad − vendidas), `v_asistencia` (entradas vs. ingresos por jornada), `v_recaudacion` (service charge por productora y mes) |
 | `10_seed_plataforma.sql` | Superadmin y **20 lugares predefinidos** con escenarios, espacios con capacidad y, en algunos, el plano dibujado |
 | `11_seed_demo.sql` | 3 productoras con usuarios, lugares y artistas propios, 1 festival de 3 días completo, 2 recitales y clientes con compras (con service charge) |
 
