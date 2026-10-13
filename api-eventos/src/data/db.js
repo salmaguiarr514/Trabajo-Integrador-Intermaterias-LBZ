@@ -1,5 +1,11 @@
 import pg from "pg";
 
+// NUMERIC (precios, %) llega como número y no como texto.
+pg.types.setTypeParser(pg.types.builtins.NUMERIC, parseFloat);
+// DATE llega tal cual ("2027-02-13"). Si se convierte a Date de JS, el huso horario
+// la corre y en Argentina se ve un día antes.
+pg.types.setTypeParser(pg.types.builtins.DATE, (valor) => valor);
+
 // En local se usan las variables DB_*. Si existe DATABASE_URL (ej. deploy en Vercel
 // con una base en la nube como Neon o Supabase), se usa esa con SSL.
 const pool = process.env.DATABASE_URL
