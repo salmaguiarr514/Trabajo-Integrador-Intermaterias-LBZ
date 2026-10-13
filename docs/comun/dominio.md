@@ -1,7 +1,9 @@
 # Backstage — Dominio del negocio
 
 Descripción completa de la empresa **Backstage**: qué hace, quiénes participan, cómo gana plata, qué procesos tiene y qué reglas cumple.
-Es la base común para todas las materias del proyecto. El modelo de datos que lo implementa está en [der/DER.md](der/DER.md), y el plan técnico en [PLAN.md](PLAN.md).
+Es el negocio que implementan el software (Programación 2) y el modelo de datos (Base de Datos): el DER está en
+[base-de-datos/der.md](../base-de-datos/der.md) y el plan técnico en [programacion-2/plan-desarrollo.md](../programacion-2/plan-desarrollo.md).
+Para Sistemas de Información ver [alcance entre materias](alcance-entre-materias.md): el alcance de esa materia es otro.
 
 > Backstage es una empresa **ficticia**, creada para el proyecto intermaterias. Los pagos son simulados.
 > Las reglas marcadas con *(propuesta)* son decisiones nuestras que todavía se pueden ajustar.

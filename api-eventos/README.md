@@ -76,7 +76,7 @@ Usuarios de prueba: `admin@backstage.com` / `admin123` (superadmin); `staff@even
 `sofia.perez@mail.com` (cliente), todos con `demo123`.
 
 Los cambios de esquema posteriores van en un script nuevo (`12_agrega_x.sql`), nunca editando uno ya corrido.
-El modelo está explicado en [docs/der/DER.md](../docs/der/DER.md).
+El modelo está explicado en [docs/base-de-datos/der.md](../docs/base-de-datos/der.md).
 
 - CORS solo acepta pedidos desde `FRONTEND_URL` (el front de Vite).
 - Todo el grupo comparte **una sola base** en Supabase (la tabla `empresas` ya está creada ahí).

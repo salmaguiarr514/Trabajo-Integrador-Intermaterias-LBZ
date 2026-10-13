@@ -3,7 +3,7 @@
 Plataforma multitenant para **productoras de recitales y festivales**.
 Este documento define el dominio, el DER, los perfiles de usuario, la API, el front y el orden de trabajo.
 Es la referencia del grupo: si algo cambia, se cambia acá primero.
-El dominio del negocio (actores, procesos, reglas) está en [DOMINIO.md](DOMINIO.md), y el modelo de datos en [der/DER.md](der/DER.md).
+El dominio del negocio (actores, procesos, reglas) está en [comun/dominio.md](../comun/dominio.md), y el modelo de datos en [base-de-datos/der.md](../base-de-datos/der.md).
 
 ---
 
@@ -81,8 +81,8 @@ que se pinta según la disponibilidad.
 
 ## 3. DER
 
-El modelo de datos completo está en **[docs/der/DER.md](der/DER.md)** (entidades, cardinalidades, restricciones, reglas de borrado, normalización)
-y en **[docs/der/backstage.dbml](der/backstage.dbml)** (para ver y exportar el diagrama en dbdiagram.io).
+El modelo de datos completo está en **[base-de-datos/der.md](../base-de-datos/der.md)** (entidades, cardinalidades, restricciones, reglas de borrado, normalización)
+y en **[base-de-datos/backstage.dbml](../base-de-datos/backstage.dbml)** (para ver y exportar el diagrama en dbdiagram.io).
 
 Resumen: 15 tablas en 4 grupos.
 - **Plataforma:** empresas, usuarios
@@ -117,7 +117,7 @@ Carpeta `api-eventos/database/`, numerados y en orden de ejecución (Supabase �
 | `10_seed_plataforma.sql` | Superadmin y **20 lugares predefinidos** con escenarios, espacios con capacidad y, en algunos, el plano dibujado |
 | `11_seed_demo.sql` | 3 productoras con usuarios, lugares y artistas propios, 1 festival de 3 días completo, 2 recitales y clientes con compras (con service charge) |
 
-Las restricciones (CHECK, UNIQUE, FK compuestas, EXCLUDE, triggers) están listadas en [docs/der/DER.md](der/DER.md#4-restricciones-de-integridad).
+Las restricciones (CHECK, UNIQUE, FK compuestas, EXCLUDE, triggers) están listadas en [base-de-datos/der.md](../base-de-datos/der.md#4-restricciones-de-integridad).
 
 Lugares predefinidos propuestos (mezcla de Córdoba y del resto del país): Estadio Mario Alberto Kempes, Orfeo Superdomo,
 Quality Espacio, Plaza de la Música, Aeródromo Santa María de Punilla (Cosquín Rock), Estadio Monumental, La Bombonera,

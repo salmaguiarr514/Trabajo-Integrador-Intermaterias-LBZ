@@ -1,6 +1,6 @@
 # Sistemas de Información — Consignas
 
-Texto original de la cátedra, sin cambios. El resumen y el plan del grupo están en el [README](../../README.md#sistemas-de-información).
+Texto original de la cátedra, sin cambios. El resumen y el plan del grupo están en [plan.md](plan.md).
 
 ---
 
