@@ -11,9 +11,9 @@ import {
   crearEspacio,
   editarEspacio,
   eliminarEspacio
-} from "../../controllers/admin/lugares.controller.js";
-import { validar } from "../../middlewares/validar.js";
-import { idParams } from "../../schemas/comunes.js";
+} from "../controllers/lugares.controller.js";
+import { validar } from "../middlewares/validar.js";
+import { idParams } from "../schemas/comunes.js";
 import {
   crearLugarSchema,
   editarLugarSchema,
@@ -22,8 +22,10 @@ import {
   crearEspacioSchema,
   editarEspacioSchema,
   idHijoParams
-} from "../../schemas/lugares.schema.js";
+} from "../schemas/lugares.schema.js";
 
+// Mismas rutas para el superadmin (/api/admin/lugares) y la productora (/api/panel/lugares):
+// el controller decide qué ve y qué modifica cada uno según el rol del token.
 const router = Router();
 const id = validar(idParams, "params");
 const idHijo = validar(idHijoParams, "params");

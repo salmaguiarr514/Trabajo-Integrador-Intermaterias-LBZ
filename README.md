@@ -79,6 +79,9 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 | `/admin/empresas` | superadmin | Listado de productoras (búsqueda, orden, filtro por estado, service charge, eliminar) |
 | `/admin/empresas/nueva`, `/admin/empresas/:id/editar` | superadmin | Formulario de alta y edición (incluye % de service charge y activar/desactivar) |
 | `/panel` | empresa | Inicio del panel de la productora (se completa en la fase 5) |
+| `/panel/lugares`, `/panel/lugares/:id` | empresa | Los lugares de la plataforma (solo lectura) y los propios (con sectores y escenarios). Son las mismas pantallas que usa el superadmin |
+| `/panel/artistas` | empresa | Alta, edición, baja y borrado de los artistas de la productora |
+| `/panel/mi-productora` | empresa | Datos de contacto de la productora (el CUIT y el % los maneja el superadmin) |
 | cualquier otra | todos | Página 404 |
 
 Si alguien entra a una ruta que no es de su rol, va a la pantalla de inicio de su rol; sin sesión, al login.
@@ -92,7 +95,7 @@ front-eventos/src/
 ├── services/*Service.js     → llamadas a la API, uno por recurso
 ├── routes/RutaProtegida.jsx → <RutaProtegida roles={["superadmin"]} />
 ├── layouts/                 → PublicLayout, AdminLayout, PanelLayout (los dos últimos usan PanelBase)
-├── pages/public/  pages/admin/  pages/panel/
+├── pages/public/  pages/admin/  pages/panel/  pages/lugares/ (compartidas por admin y panel)
 └── components/              → Logo, MenuUsuario, Cargando
 ```
 

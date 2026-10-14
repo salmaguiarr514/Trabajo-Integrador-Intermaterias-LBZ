@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 import adminRouter from "./routes/admin/index.js";
+import panelRouter from "./routes/panel/index.js";
 import { manejarErrores } from "./middlewares/manejarErrores.js";
 
 if (!process.env.JWT_SECRET) {
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 app.get("/api/salud", (req, res) => res.json({ ok: true, instancia: INSTANCIA }));
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/panel", panelRouter);
 
 // Ruta 404 para rutas inexistentes (después de todas las rutas)
 app.use((req, res) => {

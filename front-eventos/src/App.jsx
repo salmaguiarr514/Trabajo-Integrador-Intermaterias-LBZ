@@ -11,11 +11,13 @@ import Dashboard from "./pages/admin/Dashboard.jsx";
 import Empresas from "./pages/admin/Empresas.jsx";
 import EmpresaForm from "./pages/admin/EmpresaForm.jsx";
 import Usuarios from "./pages/admin/Usuarios.jsx";
-import Lugares from "./pages/admin/Lugares.jsx";
-import LugarDetalle from "./pages/admin/LugarDetalle.jsx";
 import Artistas from "./pages/admin/Artistas.jsx";
 import Eventos from "./pages/admin/Eventos.jsx";
+import Lugares from "./pages/lugares/Lugares.jsx";
+import LugarDetalle from "./pages/lugares/LugarDetalle.jsx";
 import Inicio from "./pages/panel/Inicio.jsx";
+import MisArtistas from "./pages/panel/Artistas.jsx";
+import MiProductora from "./pages/panel/MiProductora.jsx";
 import NoEncontrada from "./pages/NoEncontrada.jsx";
 
 // key distinta por id: al cambiar de empresa (o pasar a "nueva") el formulario arranca de cero
@@ -43,8 +45,8 @@ function App() {
           <Route path="empresas/nueva" element={<EmpresaForm key="nueva" />} />
           <Route path="empresas/:id/editar" element={<EditarEmpresa />} />
           <Route path="usuarios" element={<Usuarios />} />
-          <Route path="lugares" element={<Lugares />} />
-          <Route path="lugares/:id" element={<LugarDetalle />} />
+          <Route path="lugares" element={<Lugares ambito="admin" />} />
+          <Route path="lugares/:id" element={<LugarDetalle ambito="admin" />} />
           <Route path="artistas" element={<Artistas />} />
           <Route path="eventos" element={<Eventos />} />
           <Route path="*" element={<NoEncontrada />} />
@@ -55,6 +57,10 @@ function App() {
       <Route element={<RutaProtegida roles={["empresa"]} />}>
         <Route path="/panel" element={<PanelLayout />}>
           <Route index element={<Inicio />} />
+          <Route path="lugares" element={<Lugares ambito="panel" />} />
+          <Route path="lugares/:id" element={<LugarDetalle ambito="panel" />} />
+          <Route path="artistas" element={<MisArtistas />} />
+          <Route path="mi-productora" element={<MiProductora />} />
           <Route path="*" element={<NoEncontrada />} />
         </Route>
       </Route>

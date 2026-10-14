@@ -41,13 +41,16 @@ export function AuthProvider({ children }) {
     return iniciarSesion(data);
   };
 
+  // Para reflejar cambios sin volver a loguearse (por ejemplo, el nombre de la productora)
+  const actualizarUsuario = (cambios) => setUsuario((u) => ({ ...u, ...cambios }));
+
   const logout = () => {
     borrarToken();
     setUsuario(null);
   };
 
   return (
-    <AuthContext.Provider value={{ usuario, cargando, login, registro, verificar, logout }}>
+    <AuthContext.Provider value={{ usuario, cargando, login, registro, verificar, actualizarUsuario, logout }}>
       {children}
     </AuthContext.Provider>
   );

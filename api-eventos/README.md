@@ -1,7 +1,7 @@
 # API Eventos
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-Hoy tiene el login y todo el panel del superadmin (fase 4, sin el plano); la base ya tiene el modelo completo.
+Hoy tiene el login, el panel del superadmin (fase 4, sin el plano) y del panel de la productora los lugares, los artistas y sus datos (fase 5, sin eventos todavía).
 
 ## Puesta en marcha
 
@@ -76,6 +76,13 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | GET | `/api/admin/eventos?estado=&id_empresa=` | 🔒 superadmin | Eventos de todas las productoras, con entradas vendidas y recaudado | 200 / 400 |
 | PATCH | `/api/admin/eventos/:id/estado` | 🔒 superadmin | `{ estado: "borrador" }` despublica, `{ estado: "cancelado" }` cancela | 200 / 400 / 404 / 409 |
 | GET | `/api/admin/metricas` | 🔒 superadmin | Totales, eventos por estado y recaudación por service charge (por mes y por productora) | 200 |
+| GET / PUT | `/api/panel/empresa` | 🔒 empresa | Datos de la propia productora (sin CUIT, % ni alta/baja) | 200 / 400 |
+| GET, POST, PUT, DELETE | `/api/panel/lugares/...` | 🔒 empresa | Las mismas rutas de lugares, escenarios y sectores que `/api/admin/lugares` | 200 / 201 / 204 / 400 / 403 / 404 / 409 |
+| GET | `/api/panel/artistas` | 🔒 empresa | Artistas de la productora | 200 |
+| GET | `/api/panel/artistas/:id` | 🔒 empresa | Obtener uno | 200 / 404 |
+| POST | `/api/panel/artistas` | 🔒 empresa | Crear (`nombre` obligatorio; `genero`, `pais`, `bio`, `imagen_url`) | 201 / 400 / 409 |
+| PUT | `/api/panel/artistas/:id` | 🔒 empresa | Editar (solo los campos que vienen) | 200 / 400 / 404 / 409 |
+| DELETE | `/api/panel/artistas/:id` | 🔒 empresa | Borrar (no si tiene presentaciones: se da de baja) | 204 / 404 / 409 |
 | GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |
 
 - Errores: siempre `{ mensaje }`. Si son de validación, además `errores: [{ campo, mensaje }]`.
@@ -93,7 +100,9 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 - Una productora con usuarios, lugares, artistas o eventos no se borra (409): se da de baja con `activo: false`.
 - Los usuarios no se borran: se dan de baja con `activo: false`. De un cliente solo se puede cambiar `activo`.
   El superadmin no puede darse de baja ni sacarse el rol a sí mismo.
-- Lugares: el superadmin ve también los propios de cada productora, pero solo modifica los de la plataforma (403).
+- Lugares (`/api/admin/lugares` y `/api/panel/lugares` usan el mismo controller): el superadmin ve todos y modifica los de la plataforma;
+  la productora ve los de la plataforma y los suyos, y modifica solo los suyos (403). Un lugar propio de otra productora responde 404.
+- Panel: todo se filtra por el `id_empresa` del token, nunca del body. Lo de otra productora responde 404, como si no existiera.
   Un lugar nuevo arranca con el sector "General" y el escenario "Principal".
 - Cada respuesta trae el header `X-Instancia` (variable `INSTANCIA` o el nombre del equipo), para la demo de réplicas de Sistemas Operativos.
 

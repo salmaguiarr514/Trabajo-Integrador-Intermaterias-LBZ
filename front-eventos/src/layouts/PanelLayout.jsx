@@ -1,11 +1,13 @@
-import { HomeOutlined } from "@ant-design/icons";
+import { CustomerServiceOutlined, EnvironmentOutlined, HomeOutlined, ShopOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/auth.js";
 import PanelBase from "./PanelBase.jsx";
 
-// Panel de la productora. Las secciones de la fase 5 (lugares, artistas, eventos, ventas)
-// se agregan acá.
+// Panel de la productora (fase 5). Eventos y ventas se agregan acá.
 const ITEMS = [
-  { key: "/panel", icon: <HomeOutlined />, label: "Inicio" }
+  { key: "/panel", icon: <HomeOutlined />, label: "Inicio" },
+  { key: "/panel/lugares", icon: <EnvironmentOutlined />, label: "Lugares" },
+  { key: "/panel/artistas", icon: <CustomerServiceOutlined />, label: "Artistas" },
+  { key: "/panel/mi-productora", icon: <ShopOutlined />, label: "Mi productora" }
 ];
 
 function PanelLayout() {

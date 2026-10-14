@@ -263,7 +263,7 @@ src/
 | **2. Base del backend** | Auth, middlewares, manejo de errores, mover `empresas` a `/api/admin` | 1 | Hecha |
 | **3. Base del front** | AuthContext, api.js, layouts, RutaProtegida, login | 2 | Hecha |
 | **4. Superadmin** | Productoras, usuarios, catálogo de lugares (escenarios, espacios) y artistas | 2, 3 | Hecha (dashboard, productoras, usuarios, lugares con escenarios y sectores, artistas, eventos con moderación); el plano queda para 7b |
-| **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | |
+| **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | En curso: lugares propios, artistas y datos de la productora hechos; falta el asistente de eventos y el inicio |
 | **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Registro hecho |
 | **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | |
 | **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |

@@ -5,7 +5,7 @@ import { obtenerArtistas } from "../../controllers/admin/artistas.controller.js"
 import { obtenerMetricas } from "../../controllers/admin/metricas.controller.js";
 import empresasRouter from "./empresas.routes.js";
 import usuariosRouter from "./usuarios.routes.js";
-import lugaresRouter from "./lugares.routes.js";
+import lugaresRouter from "../lugares.routes.js";
 import eventosRouter from "./eventos.routes.js";
 
 // /api/admin/*: todo lo de acá es solo para el superadmin
