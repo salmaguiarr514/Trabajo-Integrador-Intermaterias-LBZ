@@ -31,36 +31,36 @@ Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanz
 
 8. ✅ Cuando el cliente pide cambios a la propuesta, ¿eso cuenta como un rechazo?
 
-9. Esas combinaciones habituales de servicios, ¿las tienen anotadas en algún lado? ¿Les serviría arrancar una propuesta a partir de una de ellas? *(opcional)*  
+9. ✅ Esas combinaciones habituales de servicios, ¿las tienen anotadas en algún lado? ¿Les serviría arrancar una propuesta a partir de una de ellas? *(opcional)*  
    ↳ *Repregunta:* ¿Quién las mantiene?
 
-10. Cuando el cliente acepta, además de los servicios, los importes, la fecha y la sede, ¿quedan fijas también la cantidad de asistentes y las condiciones particulares?
+10. ✅ Cuando el cliente acepta, además de los servicios, los importes, la fecha y la sede, ¿quedan fijas también la cantidad de asistentes y las condiciones particulares?
 
-11. ¿Quién registra la cancelación de un evento? ¿Y que el evento se realizó, con sus observaciones?
+11. ✅ ¿Quién registra la cancelación de un evento? ¿Y que el evento se realizó, con sus observaciones?
 
 ## Cambios
 
 12. ✅ Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió?  
     ↳ *Repregunta:* ¿Quién pidió el cambio? ¿Cuándo se registró?
 
-13. Cuando registran un cambio, ¿les serviría ver en ese momento las tareas y los proveedores del evento para revisar cuáles se afectan?
+13. ✅ Cuando registran un cambio, ¿les serviría ver en ese momento las tareas y los proveedores del evento para revisar cuáles se afectan?
 
 ## Proveedores
 
 14. ✅ Si el encargo ya está confirmado, ¿quiere decir que los proveedores también lo están?
 
-15. ¿Qué datos necesitan tener de cada proveedor?
+15. ✅ ¿Qué datos necesitan tener de cada proveedor? *(respondida en la entrevista 1; falta pegar ese intercambio en la transcripción)*
 
-16. ¿Qué pasa si un proveedor que ya había confirmado se baja?  
+16. ✅ ¿Qué pasa si un proveedor que ya había confirmado se baja?  
     ↳ *Repregunta:* ¿Cómo se enteran? ¿El servicio vuelve a quedar pendiente?
 
-17. Cuando cambia la fecha y vuelven a consultar a un proveedor que ya había confirmado, ¿cómo queda su participación mientras esperan la respuesta?  
+17. ✅ Cuando cambia la fecha y vuelven a consultar a un proveedor que ya había confirmado, ¿cómo queda su participación mientras esperan la respuesta?  
     ↳ *Repregunta:* ¿Vuelve a "pendiente"?
 
-18. Un servicio que todavía no tiene proveedor confirmado, ¿puede estar "vencido"? ¿Tiene una fecha para resolverse?  
+18. ✅ Un servicio que todavía no tiene proveedor confirmado, ¿puede estar "vencido"? ¿Tiene una fecha para resolverse?  
     ↳ *Repregunta:* ¿O se controla con una tarea de confirmarlo?
 
-18b. ¿Cómo saben si un servicio es indispensable para el concierto? ¿Lo definen en algún momento?  
+18b. ✅ ¿Cómo saben si un servicio es indispensable para el concierto? ¿Lo definen en algún momento?  
     ↳ *Repregunta:* ¿Queda anotado en la propuesta o en lo acordado?
 
 ## Tareas
@@ -71,7 +71,7 @@ Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanz
 20. ✅ El responsable de una tarea, ¿es una persona o un área?  
     ↳ *Repregunta:* ¿Puede cambiar de responsable?
 
-21. ¿Qué hacen cuando una tarea se atrasa?  
+21. ¿Qué hacen cuando una tarea se atrasa? *(opcional: en parte respondida en la 19 y la 20)*  
     ↳ *Repregunta:* ¿Quién se entera? ¿Se cambia la fecha o el responsable?
 
 21b. Si una tarea ya está en curso y pasa su fecha prevista, ¿la consideran en curso o vencida?  

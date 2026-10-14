@@ -159,3 +159,87 @@ Si finalmente no logramos cubrir una necesidad indispensable y no podemos llevar
 
 No toda falta de confirmación implica cancelar el evento: depende de si el servicio es necesario para realizarlo. Y, si se cancela, conservamos la información del encargo, los servicios acordados y los compromisos registrados, para que quede constancia de lo sucedido.
 
+Excelente, volvamos a las combinaciones habituales de servicios.
+¿las tienen anotadas en algún lado? ¿Les serviría arrancar una propuesta a partir de una de ellas?
+Sí, en Backstage tenemos identificadas algunas combinaciones habituales de servicios, aunque hoy las usamos como referencia y no las tenemos centralizadas en un registro único. Nos basamos bastante en la experiencia de Coordinación y en propuestas que preparamos anteriormente.
+
+Nos serviría mucho poder iniciar una propuesta a partir de una de esas combinaciones. Por ejemplo, para un concierto que necesita sonido, iluminación y escenario, podríamos partir de esa combinación y después adaptarla a las necesidades del cliente.
+
+Eso sí, hay dos cosas importantes:
+
+La combinación sería un punto de partida, no un paquete cerrado. Podríamos agregar, quitar o modificar servicios.
+
+Los importes deben revisarse para cada propuesta, porque pueden variar según la sede, la cantidad de asistentes y las condiciones que nos ofrezcan los proveedores.
+
+La idea es ahorrar tiempo al preparar propuestas sin perder la flexibilidad para adaptarnos a cada cliente. No necesitamos que el sistema elija automáticamente los servicios ni calcule precios por reglas predefinidas; nos alcanza con tener combinaciones habituales como referencia y poder ajustarlas manualmente.
+
+Cuando el cliente acepta, además de los servicios, los importes, la fecha y la sede, ¿quedan fijas también la cantidad de asistentes y las condiciones particulares?
+Sí. Cuando el cliente acepta la propuesta, en Backstage dejamos registradas la cantidad estimada de asistentes y las condiciones particulares acordadas, además de los servicios, sus importes, la fecha y la sede.
+
+La cantidad de asistentes queda como una estimación acordada, porque puede haber variaciones. Nos sirve para organizar el concierto y coordinar los servicios necesarios.
+
+Las condiciones particulares pueden incluir, por ejemplo, horarios de montaje o necesidades específicas de sonido e iluminación que hayamos acordado con el cliente.
+
+Si después cambia alguno de esos datos, no lo tratamos como si nunca hubiera existido el acuerdo original: registramos el cambio y revisamos qué tareas y proveedores podrían verse afectados.
+
+Por lo tanto, la aceptación deja establecido el conjunto de condiciones acordadas para organizar el evento, pero eso no significa que esos datos no puedan cambiar más adelante.
+
+¿Quién registra la cancelación de un evento? ¿Y que el evento se realizó, con sus observaciones?
+En Backstage, el registro lo hace alguien de nuestro equipo, según quién esté llevando el seguimiento del encargo.
+
+Cancelación del evento: normalmente la registra Coordinación, porque lleva el seguimiento general del concierto. Deja asentado que el evento se canceló y el motivo, si lo conocemos. La cancelación puede haber sido decidida por el cliente o por Backstage.
+
+Realización del evento: también suele registrarla Coordinación, una vez que Producción le confirma que el concierto se llevó a cabo. Se agregan las observaciones relevantes sobre cómo se desarrolló, si corresponde.
+
+Producción puede aportar la información sobre lo ocurrido durante la preparación y el concierto, pero Coordinación se encarga de dejar registrado el cierre del encargo.
+
+En ambos casos conservamos la información anterior del evento. No eliminamos los servicios acordados, las tareas ni los cambios que se hayan registrado durante la organización.
+
+Cuando registran un cambio, ¿les serviría ver en ese momento las tareas y los proveedores del evento para luego ustedes revisar cuáles se afectan?
+Sí, nos serviría mucho. Cuando registramos un cambio, especialmente si ya confirmamos el evento, necesitamos tener a mano las tareas de preparación y los servicios con sus proveedores asociados.
+
+Por ejemplo, si cambia la fecha del concierto, Coordinación necesita revisar qué tareas tienen fechas previstas relacionadas con la fecha original y qué proveedores habían confirmado su participación para ese día.
+
+Lo importante es que podamos consultar los compromisos del evento en ese momento y decidir manualmente cuáles se ven afectados. Después, actualizamos lo que corresponda: por ejemplo, la fecha de una tarea o el estado de confirmación de un proveedor.
+
+No necesitamos que el sistema determine automáticamente qué compromisos están afectados ni que los reprograme. Necesitamos ver la información relacionada para que el equipo pueda revisarla y actuar a tiempo.
+
+Excelente, ahora unas consultas sobre los proveedores.
+Qué pasa si un proveedor que ya había confirmado se baja?
+Si un proveedor que ya había confirmado su participación se baja, en Backstage registramos que ya no contamos con él para ese servicio y volvemos a buscar un reemplazo.
+
+Por ejemplo, si el proveedor de sonido había confirmado y después nos avisa que no puede asistir, Producción informa la situación y Coordinación hace el seguimiento para conseguir otro proveedor.
+
+Mientras buscamos un reemplazo, el servicio vuelve a quedar pendiente de confirmación. Cuando conseguimos otro proveedor y este acepta participar, registramos su participación como confirmada.
+
+También dejamos una observación sobre lo ocurrido, para que quede constancia de que el proveedor original se había comprometido y después se retiró. No eliminamos ese antecedente.
+
+Si el servicio es indispensable y no conseguimos un reemplazo, evaluamos si podemos realizar el concierto en las condiciones acordadas. Si no es posible, Backstage puede decidir cancelar el evento, registrando el motivo.
+
+Un servicio que todavía no tiene proveedor confirmado, ¿puede estar "vencido"? ¿Tiene una fecha para resolverse?
+Sí, puede pasar que un servicio siga sin proveedor confirmado y que ya estemos cerca de la fecha del concierto. Pero en Backstage distinguimos dos cosas.
+
+El estado del servicio: queda pendiente mientras no tengamos un proveedor que haya confirmado su participación.
+
+La fecha prevista para resolverlo: nos sirve para saber cuándo deberíamos tener esa confirmación y poder avanzar con la preparación.
+
+Por ejemplo, si el concierto es el 20 de noviembre, podemos fijar como fecha prevista de confirmación del servicio de sonido el 10 de noviembre. Si llega ese día y todavía no conseguimos un proveedor, necesitamos identificarlo como un compromiso atrasado y darle seguimiento.
+
+Por eso, nos serviría poder identificar los servicios pendientes cuya fecha prevista de resolución ya pasó, de manera similar a las tareas vencidas.
+
+No significa que el servicio deje automáticamente de estar pendiente ni que el evento se cancele. Seguimos buscando una solución y evaluamos las consecuencias según la importancia del servicio y el tiempo que queda para el concierto.
+
+¿Cómo saben si un servicio es indispensable para el concierto? ¿Lo definen en algún momento?
+En Backstage, lo determinamos al preparar la propuesta y conversar con el cliente. No todos los servicios tienen la misma importancia para todos los conciertos.
+
+Por ejemplo, para un espectáculo que requiere amplificación, el sonido puede ser indispensable. En cambio, cierto tipo de iluminación adicional podría ser prescindible, según lo que se haya acordado y las características del evento.
+
+Cuando el cliente acepta la propuesta, quedan definidos los servicios y las condiciones acordadas. La importancia de cada servicio se determina según las necesidades del concierto y lo comprometido con el cliente, no solamente por el hecho de que un proveedor esté confirmado o pendiente.
+
+Si después un proveedor se baja, Coordinación revisa qué servicio queda descubierto y consulta con Producción qué consecuencias tendría no contar con él. Si es indispensable y no conseguimos un reemplazo, evaluamos si podemos realizar el concierto en las condiciones acordadas.
+
+No tenemos una clasificación automática que determine esa importancia: es una decisión operativa que toma el equipo según cada caso.
+
+
+
+
