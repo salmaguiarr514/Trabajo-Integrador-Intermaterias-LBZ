@@ -4,9 +4,9 @@ Primera sesión de relevamiento con el cliente (proyecto de ChatGPT de la cáted
 Transcripción textual; solo se ordenó el formato. El título de cada intercambio es el que cita la columna
 "Pregunta de origen" de los hechos del [análisis](../analisis/analisis-v1.md#1-hechos-relevados).
 
-> ⚠ **Faltan intercambios.** La validación de "condiciones acordadas" y la respuesta sobre los datos de cada proveedor
-> se hicieron en el chat, pero no se copiaron acá. Respaldan F15, F17, F18, F19, F21 y la equivalencia pedido = solicitud.
-> Hay que pegarlos en la sección [Validación](#validación-falta-pegar).
+> ⚠ **Falta un intercambio:** la respuesta sobre qué datos guardan de cada proveedor (F21: nombre o razón social, contacto,
+> servicio que presta, condiciones). Iría entre [Proveedores](#7-proveedores) y [Tareas](#8-tareas). El resto de lo que faltaba
+> quedó respaldado en la entrevista 2.
 
 ---
 
@@ -166,9 +166,7 @@ Fuera de eso, creo que ya tienen una buena visión de cómo trabajamos.
 
 ## Validación (falta pegar)
 
-*Pegar acá, textual, los intercambios que respaldan:*
+*Pegar acá, textual, el intercambio sobre los datos de cada proveedor (F21).*
 
-- F15: cuándo se considera rechazada la propuesta.
-- F17, F18, F19: qué queda acordado al confirmar (fecha, sede, asistentes, servicios, importes, condiciones particulares) y que confirmar el encargo no implica que los proveedores estén confirmados.
-- F21: qué datos se necesitan de cada proveedor.
-- Que "pedido" y "solicitud" significan lo mismo.
+Ya no hace falta buscar el resto: F15, F17, F18, F19 y la equivalencia pedido = solicitud quedaron respaldados en la
+[entrevista 2](respuestas-enrevista-2.md) (ver [notas](../analisis/notas-entrevista-2.md)).
