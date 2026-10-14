@@ -19,15 +19,16 @@ en la máquina de acceso y **una única base de datos SQL dockerizada**. Texto c
 - **Máquina de acceso:** una sola PC. Corre Nginx, que es la única puerta de entrada: sirve el front y reparte `/api` entre las réplicas.
 - **Base de datos:** **una sola** Postgres, en un contenedor, en una de las máquinas. Todas las réplicas usan esa misma base.
 - **Réplicas de la API:** el mismo backend corriendo varias veces, cada una en su contenedor.
-- **"Distintas máquinas":** según lo que se habló en clase, las réplicas corren en **las otras PCs del grupo** y se conectan a la base de la PC de acceso.
-  Ver la duda 1 en la sección 7: el texto también se puede leer como "las máquinas son los contenedores", todos en una sola PC.
+- **"Distintas máquinas" son PCs físicas distintas** (decidido): hay que demostrar que las réplicas corren en las otras PCs del grupo,
+  que se conectan a la base de la PC de acceso y que el nginx de esa PC las reconoce y les reparte los pedidos.
+- **La base va en la PC de acceso** (decidido): la consigna no lo especifica, y así la PC de acceso concentra la entrada y los datos.
 
-Por eso armamos **dos modos con los mismos archivos**:
+Armamos **dos modos con los mismos archivos**:
 
 | Modo | Para qué | Dónde corre cada cosa |
 | --- | --- | --- |
-| **Una PC** | Desarrollar, probar y, si falla la red el día de la demo, tener un plan B | Todo en una PC: nginx + 3 réplicas + Postgres |
-| **Varias PCs** (el de la demo) | Lo que pide la consigna según lo que se habló en clase | PC de acceso: nginx + Postgres (+ una réplica). Cada PC del grupo: una réplica |
+| **Varias PCs** (el de la demo) | Lo que pide la consigna | PC de acceso: nginx + Postgres (+ una réplica). Cada PC del grupo: una réplica |
+| **Una PC** | Desarrollar y probar sin depender de la red, y plan B si la red falla el día de la demo | Todo en una PC: nginx + 3 réplicas + Postgres |
 
 ```mermaid
 flowchart LR
@@ -51,10 +52,24 @@ flowchart LR
     A3 -->|LAN| DB
 ```
 
+### 2.1 Linux y Windows
+
+La materia trabaja con Linux. Docker Desktop en Windows también corre **contenedores Linux** (por dentro usa WSL 2), así que las imágenes
+(`postgres`, `nginx`, `node:24-alpine`), el `docker-compose.yml` y el `nginx.conf` son **los mismos** en los dos sistemas. Cambia el entorno:
+
+| | Linux (Docker Engine) | Windows (Docker Desktop) |
+| --- | --- | --- |
+| Comandos | `docker compose up -d`, `ps`, `logs`: iguales | Iguales |
+| Firewall | `ufw`, si está activo | Firewall de Windows: hay que abrir los puertos a mano |
+| Puertos hacia la red local | Directo | Docker Desktop los reenvía; el firewall puede bloquearlos |
+
+**Propuesta:** la **PC de acceso** (nginx + base) es la de Salma **con Linux**, porque es la que se muestra en la defensa.
+Las PCs con réplicas pueden ser Windows con Docker Desktop. Si el profesor pide Linux en todas, solo cambia la instalación de Docker (duda 2).
+
 ## 3. Supabase y la base dockerizada
 
-**¿Es al pedo seguir usando Supabase?** No. Mientras construimos la app, Supabase es lo que nos deja trabajar a los 3 sobre los mismos datos
-sin tener la PC de acceso prendida. La base dockerizada es para **el despliegue y la demo** de esta materia.
+**¿Es al pedo seguir usando Supabase?** No (decidido: seguimos desarrollando contra Supabase). Es lo que nos deja trabajar a los 3 sobre los
+mismos datos sin tener la PC de acceso prendida. La base dockerizada es para **el despliegue y la demo** de esta materia.
 
 **¿Cómo se cambia de una base a la otra?** Sin tocar código. [db.js](../../api-eventos/src/data/db.js) ya elige según el `.env`:
 
@@ -114,7 +129,7 @@ Lo que falta para el modo "varias PCs":
 
 | # | Paso | Quién | Estado |
 | --- | --- | --- | --- |
-| 1 | Instalar **Docker Desktop** en las 3 PCs (en Windows usa WSL 2) | Cada uno | ⬜ |
+| 1 | Instalar Docker: **Docker Engine** en la PC de acceso (Linux, Salma) y **Docker Desktop** en las PCs Windows (usa WSL 2) | Cada uno | 🟡 Salma instalando en Linux |
 | 2 | Traer a `main` los archivos de la rama `docker-nginx` y actualizarlos: scripts `01`–`12`, `JWT_SECRET`, variables de Gmail | | ⬜ |
 | 3 | **Modo una PC:** `docker compose up -d --build`, verificar que los scripts corren en el Postgres vacío y que la app funciona en `http://localhost` | | ⬜ |
 | 4 | Ver el balanceo: varios pedidos a `/api/salud` responden `api1`, `api2`, `api3` alternados; apagar una réplica y ver que sigue andando | | ⬜ |
@@ -138,11 +153,12 @@ Mientras tanto, el desarrollo de la app sigue contra Supabase como hasta ahora.
 
 ## 7. Dudas para el profesor
 
-1. **"Replicada en distintas máquinas (van a estar en contenedores)":** ¿las réplicas tienen que estar en **PCs físicas distintas**,
-   o alcanza con varios contenedores en una sola PC? (Tenemos los dos modos; la demo depende de esta respuesta).
-2. **"Una única base de datos … dockerizada (la SQL) y la otra vía web":** ¿"la otra" es una segunda base en la web (por ejemplo Supabase),
-   o se refiere a que la aplicación se accede vía web? Si es una base web, la API ya puede usar Supabase con solo cambiar `DATABASE_URL`.
-3. ¿La base tiene que estar en la misma PC que nginx (la de acceso) o puede estar en otra?
+Ya decidido: las réplicas van en **PCs físicas distintas** y la base en la **PC de acceso**.
+
+1. **"Una única base de datos … dockerizada (la SQL) y la otra vía web":** ¿"la otra" es una segunda base en la web (por ejemplo Supabase),
+   o se refiere a que la aplicación se accede vía web? Mientras tanto seguimos con Supabase para desarrollar; si fuera una base web,
+   la API ya la puede usar con solo cambiar `DATABASE_URL`.
+2. ¿Hace falta que **todas** las PCs usen Linux, o alcanza con que la de acceso sea Linux y las otras usen Docker Desktop en Windows?
 
 ## 8. Riesgos y cómo prevenirlos
 
@@ -153,4 +169,4 @@ Mientras tanto, el desarrollo de la app sigue contra Supabase como hasta ahora.
 | Las IPs de las PCs cambian de un día para otro | Ponerlas en variables del `.env` (no en el `nginx.conf`) y revisarlas antes de la demo |
 | Una réplica con otro `JWT_SECRET` rechaza las sesiones de las demás | El mismo `.env` en las 3 PCs (pasado por privado) |
 | Los scripts fallan en el Postgres vacío | Probarlo en el paso 3, bastante antes de la demo |
-| Falla la red el día de la demo | Plan B: el modo "una PC", que cumple lo mismo con todos los contenedores en una máquina |
+| Falla la red el día de la demo | Plan B: el modo "una PC". Muestra Docker, el compose y el balanceo, pero no las PCs distintas: es solo para no quedar sin nada |
