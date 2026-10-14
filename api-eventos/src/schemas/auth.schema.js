@@ -17,3 +17,10 @@ export const registroSchema = z.object({
   dni: opcional(z.string().trim().regex(/^\d{7,10}$/, "El DNI tiene que tener solo números")),
   telefono: opcional(z.string().trim().max(30))
 });
+
+export const verificarSchema = z.object({
+  email,
+  codigo: z.string().trim().regex(/^\d{6}$/, "El código tiene 6 números")
+});
+
+export const reenviarSchema = z.object({ email });
