@@ -1,4 +1,4 @@
-import { Navigate, Routes, Route, useParams } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router-dom";
 import RutaProtegida from "./routes/RutaProtegida.jsx";
 import PublicLayout from "./layouts/PublicLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
@@ -6,8 +6,14 @@ import PanelLayout from "./layouts/PanelLayout.jsx";
 import Cartelera from "./pages/public/Cartelera.jsx";
 import Login from "./pages/public/Login.jsx";
 import Registro from "./pages/public/Registro.jsx";
+import Dashboard from "./pages/admin/Dashboard.jsx";
 import Empresas from "./pages/admin/Empresas.jsx";
 import EmpresaForm from "./pages/admin/EmpresaForm.jsx";
+import Usuarios from "./pages/admin/Usuarios.jsx";
+import Lugares from "./pages/admin/Lugares.jsx";
+import LugarDetalle from "./pages/admin/LugarDetalle.jsx";
+import Artistas from "./pages/admin/Artistas.jsx";
+import Eventos from "./pages/admin/Eventos.jsx";
 import Inicio from "./pages/panel/Inicio.jsx";
 import NoEncontrada from "./pages/NoEncontrada.jsx";
 
@@ -30,10 +36,15 @@ function App() {
       {/* Superadmin */}
       <Route element={<RutaProtegida roles={["superadmin"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="empresas" replace />} />
+          <Route index element={<Dashboard />} />
           <Route path="empresas" element={<Empresas />} />
           <Route path="empresas/nueva" element={<EmpresaForm key="nueva" />} />
           <Route path="empresas/:id/editar" element={<EditarEmpresa />} />
+          <Route path="usuarios" element={<Usuarios />} />
+          <Route path="lugares" element={<Lugares />} />
+          <Route path="lugares/:id" element={<LugarDetalle />} />
+          <Route path="artistas" element={<Artistas />} />
+          <Route path="eventos" element={<Eventos />} />
           <Route path="*" element={<NoEncontrada />} />
         </Route>
       </Route>
