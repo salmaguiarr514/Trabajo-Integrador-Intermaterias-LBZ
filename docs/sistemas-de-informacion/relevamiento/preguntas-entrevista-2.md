@@ -18,7 +18,7 @@ Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanz
 3. Si un cliente desiste antes de aceptar, por ejemplo mientras todavía preparan la propuesta, ¿eso es un rechazo o una cancelación?  
    ↳ *Repregunta:* ¿Se puede cancelar un pedido que todavía no fue confirmado?
 
-4. ¿Hay casos en que sea Backstage quien cancela un evento?  
+4. ✅ ¿Hay casos en que sea Backstage quien cancela un evento?  
    ↳ *Repregunta:* ¿Por ejemplo, si no consiguen un proveedor?
 
 ## Propuesta y confirmación
@@ -36,11 +36,11 @@ Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanz
 
 10. Cuando el cliente acepta, además de los servicios, los importes, la fecha y la sede, ¿quedan fijas también la cantidad de asistentes y las condiciones particulares?
 
-11. ¿Quién deja registrada la confirmación, la cancelación y el cierre de un evento?
+11. ¿Quién registra la cancelación de un evento? ¿Y que el evento se realizó, con sus observaciones?
 
 ## Cambios
 
-12. Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió?  
+12. ✅ Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió?  
     ↳ *Repregunta:* ¿Quién pidió el cambio? ¿Cuándo se registró?
 
 13. Cuando registran un cambio, ¿les serviría ver en ese momento las tareas y los proveedores del evento para revisar cuáles se afectan?
@@ -60,22 +60,28 @@ Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanz
 18. Un servicio que todavía no tiene proveedor confirmado, ¿puede estar "vencido"? ¿Tiene una fecha para resolverse?  
     ↳ *Repregunta:* ¿O se controla con una tarea de confirmarlo?
 
+18b. ¿Cómo saben si un servicio es indispensable para el concierto? ¿Lo definen en algún momento?  
+    ↳ *Repregunta:* ¿Queda anotado en la propuesta o en lo acordado?
+
 ## Tareas
 
-19. Además de pendiente y vencida, ¿en qué otras situaciones puede estar una tarea?  
+19. ✅ Además de pendiente y vencida, ¿en qué otras situaciones puede estar una tarea?  
     ↳ *Repregunta:* ¿Se puede cancelar una tarea, por ejemplo después de un cambio? ¿Quién la marca como completada?
 
-20. El responsable de una tarea, ¿es una persona o un área?  
+20. ✅ El responsable de una tarea, ¿es una persona o un área?  
     ↳ *Repregunta:* ¿Puede cambiar de responsable?
 
 21. ¿Qué hacen cuando una tarea se atrasa?  
     ↳ *Repregunta:* ¿Quién se entera? ¿Se cambia la fecha o el responsable?
 
+21b. Si una tarea ya está en curso y pasa su fecha prevista, ¿la consideran en curso o vencida?  
+    ↳ *Repregunta:* ¿Y una pendiente que pasa su fecha?
+
 22. ¿Tendría sentido cargar tareas o proveedores en un evento que todavía no está confirmado?
 
 ## Personal y seguimiento
 
-23. ¿Qué información carga o modifica Administración?  
+23. ✅ ¿Qué información carga o modifica Administración?  
     ↳ *Repregunta:* ¿Puede tocar propuestas o tareas?
 
 24. Para controlar pendientes, ¿Coordinación y Producción necesitan ver juntos los de todos los eventos, o los miran evento por evento?

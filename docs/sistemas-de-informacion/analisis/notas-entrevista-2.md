@@ -28,8 +28,21 @@ El cliente confirmó el resumen ("el resumen es fiel a nuestro funcionamiento") 
 | **D8** Paso a negociación | Al **presentar la primera propuesta**. Si el cliente la acepta sin cambios, pasa directo a confirmado. La negociación es todo el período con la propuesta presentada |
 | **D4** Datos mínimos | **Para presentar:** contacto, tipo, fecha y sede previstas (pueden ser tentativas), asistentes estimados, necesidades principales. **Para confirmar:** aceptación, servicios y condiciones acordados, **fecha y sede concretas** |
 | **D5** Armado de la propuesta | Combinaciones habituales como punto de partida, no paquetes rígidos. Decide Coordinación según tipo, asistentes, sede y pedido. Importes según costos conocidos y cotizaciones de proveedores. Al aceptar se registran servicios e importes acordados |
+| **D6** Cambios | Se conserva **el dato anterior, el nuevo y el motivo** (si se conoce). No hace falta un historial exhaustivo, sí constancia de los cambios relevantes. Si un proveedor había confirmado para la fecha original, hay que volver a consultarlo. La revisión de tareas y proveedores afectados es manual |
+| **D3** Estados de la tarea | **Pendiente** (no empezada), **en curso**, **vencida** (pasó la fecha prevista sin completarse), **completada**, **cancelada** (ya no es necesaria; con observación del motivo, no se borra). La completa el responsable o Coordinación si este le avisa. Coordinación revisa qué tareas siguen teniendo sentido después de un cambio. Una cancelada no debe aparecer como pendiente |
+| **D10** Responsable | Una **persona concreta**, no un área. Coordinación puede reasignarla; se deja observación si es relevante y la tarea conserva estado y fecha |
+| **D2** Administración | Mantiene clientes y proveedores (contacto, servicios que ofrecen), **registra la participación** de los proveedores cuando responden, **registra la aceptación o el rechazo** del cliente y puede **actualizar una propuesta** si Coordinación acordó el cambio. No asigna ni organiza tareas: avisa a Coordinación |
+| **D9** Cancelación por Backstage | Sí, aunque no es habitual: si no consiguen proveedor para un **servicio indispensable** después de buscar reemplazo. Se registra con el motivo. No toda falta de confirmación implica cancelar |
+| **D7** Quién registra | A medias: la aceptación y el rechazo los registra Administración (respuesta D2). Falta la cancelación y el cierre |
 | **F15** | Si el cliente pide cambios, se ajusta y sigue en negociación: no es rechazo |
 | **F18** | Casi: servicios, importes, condiciones, fecha y sede concretas. Falta si los asistentes y las condiciones particulares también quedan fijos |
+
+## Para el análisis
+
+- **"Vencida"** se mezcla con los estados: una tarea en curso también puede pasar su fecha. Puede ser una **condición** que se calcula (fecha prevista pasada y no completada) más que un estado que alguien marca. Se pregunta (21b).
+- **Concepto nuevo: servicio indispensable.** Condiciona la cancelación por Backstage. Hay que saber dónde se define (18b).
+- **Permisos más cruzados que en la entrevista 1:** Administración también registra participaciones de proveedores y confirmaciones, que antes aparecían como tarea de Producción y Coordinación (F31). Los permisos van por tipo de dato, no por área estricta.
+- **Patrón que se repite:** nada se borra. Las tareas canceladas, las propuestas rechazadas y los eventos cancelados se conservan con un motivo u observación.
 
 ## ⚠ Contradicción a resolver
 

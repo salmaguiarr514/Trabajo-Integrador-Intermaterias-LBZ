@@ -93,3 +93,69 @@ Si durante la negociación el cliente solicita un cambio, actualizamos la propue
 
 Lo importante es que el presupuesto refleje lo que realmente le estamos ofreciendo a ese cliente, no solamente un paquete genérico.
 
+
+Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió?
+Sí, para nosotros es importante conservar la fecha anterior y registrar el motivo del cambio, si lo conocemos.
+
+Cuando ya confirmamos un concierto y el cliente nos pide cambiar la fecha, necesitamos saber cuál era la fecha acordada originalmente y cuál es la nueva. También dejamos una observación sobre el motivo, por ejemplo, si el cliente tuvo un inconveniente o si surgió un problema con la sede.
+
+Esto nos sirve para entender qué pasó y revisar los compromisos que ya teníamos organizados. Por ejemplo, si un proveedor había confirmado su participación para la fecha original, tenemos que volver a consultarlo para saber si puede participar en la nueva fecha.
+
+No necesitamos guardar un historial exhaustivo de cada conversación, pero sí dejar constancia de los cambios relevantes, con el dato anterior, el nuevo y el motivo cuando se conoce. La revisión de las tareas y los proveedores afectados la hacemos nosotros; el sistema no tiene que resolverla automáticamente.
+
+Además de pendiente y vencida, ¿en qué otras situaciones puede estar una tarea?  ¿Se puede cancelar una tarea, por ejemplo después de un cambio? ¿Quién la marca como completada?
+En Backstage, además de pendiente y vencida, una tarea puede estar en curso o completada.
+
+Pendiente: todavía no se empezó a trabajar en ella.
+
+En curso: el responsable ya comenzó a realizarla, pero aún no terminó.
+
+Vencida: pasó la fecha prevista y la tarea todavía no está completada. Esto nos permite identificar que requiere atención.
+
+Completada: el responsable terminó el trabajo y lo deja registrado.
+
+Sí, también podemos cancelar una tarea si deja de ser necesaria. Por ejemplo, si cambia la fecha o se modifica un servicio acordado, Coordinación revisa qué tareas siguen teniendo sentido. Si alguna ya no corresponde, se registra como cancelada, dejando una observación que explique el motivo. No la borramos, porque nos interesa conservar lo que había sido planificado.
+
+En cuanto a quién marca una tarea como completada, normalmente lo hace la persona responsable de realizarla. Si esa persona le informa a Coordinación que terminó el trabajo, Coordinación también puede actualizar su estado.
+
+Lo importante es que podamos distinguir el trabajo que todavía hay que hacer, el que está en marcha, el que se terminó, el que se atrasó y el que dejó de ser necesario. Así evitamos que una tarea cancelada siga apareciendo como un compromiso pendiente.
+
+Y esta persona que realiza la tarea es representada por un área o es puntualmente una persona? Puede cambiar el responsable de la tarea?
+En Backstage, el responsable de una tarea es una persona concreta del equipo, no un área completa.
+
+Por ejemplo, si tenemos que coordinar la prueba de sonido de un concierto, podemos asignársela a una persona de Producción. Así sabemos quién debe ocuparse de que esa tarea se realice.
+
+Sí, el responsable puede cambiar. Si la persona asignada no puede continuar o necesitamos reorganizar el trabajo, Coordinación puede asignar la tarea a otra persona del equipo.
+
+En ese caso, actualizamos el responsable y dejamos una observación del cambio cuando sea relevante. La tarea conserva su estado y su fecha prevista, salvo que también sea necesario modificarlos.
+
+Las áreas, como Coordinación, Producción y Administración, nos sirven para distribuir las responsabilidades generales, pero para el seguimiento de cada tarea necesitamos identificar a la persona que se ocupa de ella.
+
+¿Qué información carga o modifica Administración? ¿Puede tocar propuestas o tareas?
+En Backstage, Administración se ocupa principalmente de mantener actualizados los datos de los clientes y los proveedores, y de acompañar el seguimiento de los presupuestos y las confirmaciones.
+
+Concretamente, puede:
+
+Clientes: registrar y actualizar los datos de contacto y otra información necesaria para gestionar sus encargos.
+
+Proveedores: registrar sus datos de contacto y los servicios que ofrecen, y actualizar la información sobre su participación cuando recibimos una respuesta.
+
+Propuestas y presupuestos: colaborar en el seguimiento de los importes, los servicios incluidos y el estado de la propuesta. Por ejemplo, puede actualizar una propuesta si Coordinación acuerda un cambio con el cliente.
+
+Confirmaciones: registrar la aceptación o el rechazo comunicado por el cliente, y las respuestas de los proveedores sobre su participación.
+
+Respecto de las tareas, Administración no suele encargarse de asignarlas ni de organizar la preparación. Esa responsabilidad corresponde a Coordinación. Sin embargo, si Administración recibe información relevante para una tarea o detecta que una confirmación afecta la preparación, se la comunica a Coordinación para que se revise el seguimiento.
+
+En resumen, las responsabilidades están diferenciadas, pero no son compartimentos aislados. Administración puede actualizar información de una propuesta o registrar una confirmación cuando corresponde; Coordinación conserva la responsabilidad de organizar el encargo y hacer el seguimiento general, mientras que Producción se ocupa de su preparación.
+
+Lo importante es que los cambios queden registrados y que las personas que dependen de esa información sepan qué se modificó.
+
+¿Hay casos en que sea Backstage quien cancela un evento?  ¿Por ejemplo, si no consiguen un proveedor?
+Sí, puede pasar que la cancelación la decidamos nosotros en Backstage, aunque no es lo habitual. También puede ocurrir que sea el cliente quien decida cancelar.
+
+Por ejemplo, si no conseguimos un proveedor para un servicio indispensable del concierto, primero intentamos encontrar un reemplazo. Mientras no lo consigamos, ese servicio queda pendiente de confirmación y hacemos un seguimiento para resolverlo.
+
+Si finalmente no logramos cubrir una necesidad indispensable y no podemos llevar adelante el concierto en las condiciones acordadas, podemos decidir cancelar el evento. En ese caso, registramos la cancelación y el motivo, indicando que no conseguimos un proveedor para ese servicio.
+
+No toda falta de confirmación implica cancelar el evento: depende de si el servicio es necesario para realizarlo. Y, si se cancela, conservamos la información del encargo, los servicios acordados y los compromisos registrados, para que quede constancia de lo sucedido.
+
