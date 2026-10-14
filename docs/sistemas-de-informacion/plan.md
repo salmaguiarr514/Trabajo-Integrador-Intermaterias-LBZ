@@ -102,7 +102,7 @@ El criterio de cumplimiento pide demostrarlos en el software. En el análisis ti
 | --- | --- |
 | Evolución visible del análisis (versiones y fundamentos) | 🟡 v0 y v1. Seguir la convención de versiones |
 | Incorporar las devoluciones | ✅ La devolución del 09/10 está en la versión 0 |
-| **Documento formal escrito** consolidado | ⬜ Al cierre. Fecha a confirmar |
+| **Informe final** con el análisis completo (ver [§5](#5-informe-final)) | ⬜ Sin fecha todavía |
 
 ---
 
@@ -132,6 +132,24 @@ Cada vuelta tiene la misma forma: **preguntar → registrar → analizar → det
 | 5 | Completar lo que falta en v2: vista por actor, diagrama de flujos, datos obligatorios y transiciones, estados de la tarea, escenarios de los recorridos, relación entre contextos, atributos del modelo | Los 🟡 de la sección 2 pasan a ✅ | ⬜ |
 | 6 | Si aparecen dudas nuevas, entrevista 3 y versión 3 (repetir 2–5) | — | ⬜ |
 | 7 | Revisión de coherencia completa (propósito ↔ límite ↔ componentes ↔ modelo ↔ alcance) | — | ⬜ |
-| 8 | Documento formal escrito consolidado | Entregable final | ⬜ |
+| 8 | Escribir el [informe final](#5-informe-final) a partir de la última versión del análisis | Entregable final | ⬜ |
 
-**Pendientes del grupo:** confirmar la fecha de entrega del documento formal y su formato.
+**Pendientes del grupo:** la fecha de entrega del informe todavía no está definida.
+
+---
+
+## 5. Informe final
+
+Es el documento formal que se entrega al cierre: **el análisis completo, según lo relevado**.
+
+**Incluye:**
+- Sistema organizacional: propósito, límite, entorno, actores, elementos y relaciones, entradas, procesos y salidas, subsistemas, restricciones e interdependencias, reservas, bucles y demoras.
+- Sistema de información: datos y responsables, información por actor y finalidad, flujos, problemas de calidad y controles, qué cubre el software y qué queda fuera.
+- Diseño orientado al dominio: lenguaje ubicuo, procesos y reglas, estados, subdominios y Bounded Contexts con su justificación, modelo conceptual.
+- Recorridos que la solución tiene que soportar: el completo, la propuesta rechazada, el cambio relevante y la cancelación.
+
+**No incluye** el relevamiento propiamente dicho: ni las preguntas al chat, ni las respuestas, ni las transcripciones.
+Por eso el informe no cita los códigos F# y D#: esos quedan en las versiones de trabajo (`analisis/`), que siguen siendo el respaldo
+de cada afirmación si la profesora pregunta de dónde sale algo. Las conversaciones se conservan igual, porque la consigna pide tenerlas disponibles.
+
+Se escribe al final, cuando las dudas estén cerradas. Hasta entonces, todo se trabaja en las versiones del análisis.
