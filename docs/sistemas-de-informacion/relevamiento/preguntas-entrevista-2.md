@@ -10,6 +10,30 @@ Al terminar: guardar la conversación textual en `entrevista-2-AAAA-MM-DD.md` y 
 
 ---
 
+## Apertura
+
+La entrevista 1 se hizo desde otra cuenta: no hay que suponer que el chat la recuerda. Antes de preguntar, pegar este resumen
+y pedir que lo confirme o lo corrija. Sirve además como validación de lo que entendimos.
+
+> Hola, somos del mismo grupo que conversó con ustedes el 13/10. Para retomar, te resumimos lo que entendimos de cómo trabajan:
+>
+> Backstage organiza conciertos y espectáculos musicales por encargo de clientes (empresas, instituciones o particulares), de una sola jornada y de escala pequeña o mediana.
+> Trabajan tres áreas: Coordinación recibe los pedidos, arma la propuesta y hace el seguimiento general; Producción prepara el evento, coordina con los proveedores y controla las tareas; Administración mantiene los datos de clientes y proveedores y sigue presupuestos y confirmaciones.
+>
+> Cuando llega un pedido, registran el contacto del cliente, el tipo de evento, la fecha y la sede previstas, la cantidad estimada de asistentes y sus necesidades, y completan lo que falta en conversaciones posteriores.
+> Arman una propuesta con servicios e importes y su total. Mientras negocian, ajustan la propuesta vigente hasta que el cliente la acepta o la rechaza; si la rechaza, registran el motivo si lo comunica.
+> Si la acepta, el evento queda confirmado con los servicios y condiciones acordados, aunque eso no significa que los proveedores ya estén confirmados.
+>
+> Para cada servicio consultan a un proveedor: si puede, su participación queda confirmada; si no, buscan otro, y mientras tanto el servicio queda pendiente.
+> Coordinación asigna las tareas de preparación, con un responsable y una fecha prevista.
+> Si hay un cambio, como la fecha o un servicio, quien coordina lo registra y revisa a mano qué tareas y proveedores quedan afectados.
+> Al final registran que el evento se realizó, con observaciones, o que se canceló, con el motivo, conservando todo.
+> Los estados que usan son: en solicitud, en negociación, confirmado, realizado y cancelado.
+>
+> ¿Es así? ¿Hay algo que corregirías o agregarías?
+
+Anotar textualmente cualquier corrección: cambia hechos del análisis v1.
+
 ## A. Dudas abiertas
 
 | # | Pregunta | Repregunta posible | Duda | Respuesta |
@@ -24,6 +48,13 @@ Al terminar: guardar la conversación textual en `entrevista-2-AAAA-MM-DD.md` y 
 | 8 | ¿Qué información carga o modifica Administración? | ¿Puede tocar propuestas o tareas? | D2 | |
 | 9 | ¿Quién deja registrada la confirmación, la cancelación y el cierre de un evento? | | D7 | |
 | 10 | ¿Hay casos en que sea Backstage quien cancela un evento? | ¿Por ejemplo, si no consiguen un proveedor? | D9 | |
+
+## A2. Situaciones excepcionales
+
+| # | Pregunta | Repregunta posible | Respuesta |
+| --- | --- | --- | --- |
+| 10a | ¿Qué pasa si un proveedor que ya había confirmado se baja? | ¿Cómo se enteran? ¿Qué registran? ¿El servicio vuelve a quedar pendiente? | |
+| 10b | ¿Qué hacen cuando una tarea se atrasa? | ¿Quién se entera? ¿Se cambia la fecha o el responsable? | |
 
 ## B. Hechos sin respaldo
 
