@@ -159,6 +159,8 @@ Ya decidido: las réplicas van en **PCs físicas distintas** y la base en la **P
    o se refiere a que la aplicación se accede vía web? Mientras tanto seguimos con Supabase para desarrollar; si fuera una base web,
    la API ya la puede usar con solo cambiar `DATABASE_URL`.
 2. ¿Hace falta que **todas** las PCs usen Linux, o alcanza con que la de acceso sea Linux y las otras usen Docker Desktop en Windows?
+3. Docker Compose maneja los contenedores de **una** PC. Con réplicas en PCs distintas, ¿alcanza con **un compose por PC**
+   (acceso: nginx + base + api; nodos: api), o espera **Docker Swarm** (`docker stack deploy`, que usa el mismo formato y reparte entre PCs)?
 
 ## 8. Riesgos y cómo prevenirlos
 
