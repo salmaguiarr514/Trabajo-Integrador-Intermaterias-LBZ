@@ -44,7 +44,7 @@ Cada entrevista se guarda textual en `relevamiento/entrevista-N-AAAA-MM-DD.md`.
 | Aclarar dudas | 🟡 | D1, D4, D5 y D8 resueltas en la entrevista 2 ([notas](analisis/notas-entrevista-2.md)); el resto en curso |
 | **Validar con el cliente nuestras interpretaciones y propuestas** | 🟡 | Resumen de la entrevista 1 validado; faltan las preguntas 13, 22, 24 y 28 de la [guía](relevamiento/preguntas-entrevista-2.md) |
 | No inventar; distinguir hipótesis de lo confirmado | ✅ | En el análisis: F# (hecho), D# (duda), *(interpretación)* |
-| Conversaciones disponibles | 🟡 | Faltan pegar los intercambios que respaldan F15, F17–F19, F21 |
+| Conversaciones disponibles | ✅ | Entrevista 1 completa; entrevista 2 en curso |
 
 ### 2.2 Sistema organizacional
 

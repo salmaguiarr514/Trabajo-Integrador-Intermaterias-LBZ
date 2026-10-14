@@ -4,10 +4,6 @@ Primera sesión de relevamiento con el cliente (proyecto de ChatGPT de la cáted
 Transcripción textual; solo se ordenó el formato. El título de cada intercambio es el que cita la columna
 "Pregunta de origen" de los hechos del [análisis](../analisis/analisis-v1.md#1-hechos-relevados).
 
-> ⚠ **Falta un intercambio:** la respuesta sobre qué datos guardan de cada proveedor (F21: nombre o razón social, contacto,
-> servicio que presta, condiciones). Iría entre [Proveedores](#7-proveedores) y [Tareas](#8-tareas). El resto de lo que faltaba
-> quedó respaldado en la entrevista 2.
-
 ---
 
 ## 1. A qué se dedica
@@ -90,6 +86,23 @@ Si finalmente no hay acuerdo, la solicitud queda sin confirmación y conservamos
 
 La búsqueda y consulta de disponibilidad la hacemos nosotros por fuera del sistema; lo que necesitamos registrar es el resultado de esas gestiones.
 
+## 7b. Datos de los proveedores
+
+**Grupo:** ¿Cómo definen a los proveedores y qué datos recolectan sobre ellos?
+
+**Cliente:** Los proveedores los definimos según los servicios que necesita cada concierto. Una vez que sabemos qué servicios quedaron acordados con el cliente, buscamos proveedores que puedan prestar esos servicios y nos comunicamos con ellos para consultar su disponibilidad.
+
+De cada proveedor nos interesa tener información básica para poder contactarlo y saber qué ofrece, por ejemplo:
+- Nombre o razón social.
+- Datos de contacto.
+- Servicio que presta, por ejemplo sonido o iluminación.
+- Información relevante sobre las condiciones del servicio que nos comunique.
+- Para cada evento, si su participación está pendiente de confirmación o ya confirmada.
+
+La disponibilidad no la determina el sistema ni nosotros automáticamente: la consultamos directamente con el proveedor y después registramos el resultado.
+
+Además, un mismo proveedor puede participar en distintos eventos, según los servicios que necesitemos en cada caso.
+
 ## 8. Tareas
 
 **Grupo:** Bien, sigamos. ¿Qué tareas internas contempla la preparación del evento? ¿Quién se encarga de asignarlas y cómo determinan los tiempos de cada tarea?
@@ -161,12 +174,3 @@ Fuera de eso, creo que ya tienen una buena visión de cómo trabajamos.
 **Grupo:** Excelente, tendremos en cuenta la aclaración. Muchas gracias por el tiempo y por la paciencia con tantas preguntas. Ahora nos toca a nosotros sentarnos a ordenar todo. Seguro más adelante nos aparece alguna duda, así que te vamos a volver a escribir. ¡Gracias de nuevo!
 
 **Cliente:** ¡De nada! Me alegra haber podido ayudarles a entender cómo trabajamos en Backstage. Cuando vuelvan con alguna duda, podemos retomar desde lo que ya conversamos y aclarar cualquier situación concreta del negocio. ¡Éxitos con el trabajo!
-
----
-
-## Validación (falta pegar)
-
-*Pegar acá, textual, el intercambio sobre los datos de cada proveedor (F21).*
-
-Ya no hace falta buscar el resto: F15, F17, F18, F19 y la equivalencia pedido = solicitud quedaron respaldados en la
-[entrevista 2](respuestas-enrevista-2.md) (ver [notas](../analisis/notas-entrevista-2.md)).

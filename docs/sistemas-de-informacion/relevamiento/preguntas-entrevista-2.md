@@ -49,7 +49,7 @@ Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanz
 
 14. ✅ Si el encargo ya está confirmado, ¿quiere decir que los proveedores también lo están?
 
-15. ✅ ¿Qué datos necesitan tener de cada proveedor? *(respondida en la entrevista 1; falta pegar ese intercambio en la transcripción)*
+15. ✅ ¿Qué datos necesitan tener de cada proveedor? *(respondida en la entrevista 1)*
 
 16. ✅ ¿Qué pasa si un proveedor que ya había confirmado se baja?  
     ↳ *Repregunta:* ¿Cómo se enteran? ¿El servicio vuelve a quedar pendiente?
