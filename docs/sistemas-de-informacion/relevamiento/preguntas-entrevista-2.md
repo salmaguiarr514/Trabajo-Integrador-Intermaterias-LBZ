@@ -1,112 +1,100 @@
 # Guía para la entrevista 2
 
-Sale del [análisis versión 1](../analisis/analisis-v1.md). Tiene tres objetivos: cerrar las dudas abiertas (D1–D10), respaldar los hechos
-que no quedaron en la transcripción (⚠) y **validar con el cliente nuestras interpretaciones y propuestas**, como pide la consigna.
-
-Mismas reglas que la [guía general](guia-preguntas.md#cómo-usarla): hablarle como a un cliente real, con preguntas abiertas, sin términos de analista
-y usando su vocabulario ("pedido", "propuesta vigente", "encargo", "participación").
-
-Al terminar: guardar la conversación textual en `entrevista-2-AAAA-MM-DD.md` y anotar en la última columna qué contestó.
+✅ = ya preguntada o ya respondida. Lo que aportó cada respuesta está en las [notas](../analisis/notas-entrevista-2.md).
+Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanza.
 
 ---
 
 ## Apertura
 
-La entrevista 1 se hizo desde otra cuenta: no hay que suponer que el chat la recuerda. Antes de preguntar, pegar este resumen
-y pedir que lo confirme o lo corrija. Sirve además como validación de lo que entendimos.
+✅ Resumen de la entrevista 1 para que el cliente lo confirme.
 
-> Hola, somos del mismo grupo que conversó con ustedes el 13/10. Para retomar, te resumimos lo que entendimos de cómo trabajan:
->
-> Backstage organiza conciertos y espectáculos musicales por encargo de clientes (empresas, instituciones o particulares), de una sola jornada y de escala pequeña o mediana.
-> Trabajan tres áreas: Coordinación recibe los pedidos, arma la propuesta y hace el seguimiento general; Producción prepara el evento, coordina con los proveedores y controla las tareas; Administración mantiene los datos de clientes y proveedores y sigue presupuestos y confirmaciones.
->
-> Cuando llega un pedido, registran el contacto del cliente, el tipo de evento, la fecha y la sede previstas, la cantidad estimada de asistentes y sus necesidades, y completan lo que falta en conversaciones posteriores.
-> Arman una propuesta con servicios e importes y su total. Mientras negocian, ajustan la propuesta vigente hasta que el cliente la acepta o la rechaza; si la rechaza, registran el motivo si lo comunica.
-> Si la acepta, el evento queda confirmado con los servicios y condiciones acordados, aunque eso no significa que los proveedores ya estén confirmados.
->
-> Para cada servicio consultan a un proveedor: si puede, su participación queda confirmada; si no, buscan otro, y mientras tanto el servicio queda pendiente.
-> Coordinación asigna las tareas de preparación, con un responsable y una fecha prevista.
-> Si hay un cambio, como la fecha o un servicio, quien coordina lo registra y revisa a mano qué tareas y proveedores quedan afectados.
-> Al final registran que el evento se realizó, con observaciones, o que se canceló, con el motivo, conservando todo.
-> Los estados que usan son: en solicitud, en negociación, confirmado, realizado y cancelado.
->
-> ¿Es así? ¿Hay algo que corregirías o agregarías?
+## Rechazo y cancelación
 
-Anotar textualmente cualquier corrección: cambia hechos del análisis v1.
+1. ✅ Cuando un cliente rechaza la propuesta, ¿cómo queda ese pedido para ustedes?
 
-## Lo que resolvió la apertura
+2. Cuando un pedido queda cerrado por un rechazo, ¿cómo lo llaman? ¿Es un estado más, como "rechazado"?
 
-El cliente confirmó el resumen ("el resumen es fiel a nuestro funcionamiento") y agregó aclaraciones
-([respuestas](respuestas-enrevista-2.md)). Efecto sobre el análisis v1:
+3. Si un cliente desiste antes de aceptar, por ejemplo mientras todavía preparan la propuesta, ¿eso es un rechazo o una cancelación?  
+   ↳ *Repregunta:* ¿Se puede cancelar un pedido que todavía no fue confirmado?
 
-| Qué dijo | Efecto |
-| --- | --- |
-| Confirmó el resumen completo y "no agregaría otros procesos" | Valida F01–F14, F20, F23, F26, F27, F29 y F30 (lo que estaba en el resumen). La lista de procesos está completa |
-| "Está bien que distingan entre la confirmación del cliente y la de los proveedores: son dos cosas diferentes" | **F19 con respaldo.** Valida el término ambiguo "confirmado" (pregunta 20 ya no hace falta) |
-| "Queda confirmada cuando el cliente acepta" | **F17 con respaldo** |
-| Usa "pedido" y "solicitud" como lo mismo ("recepción del pedido", "la solicitud pasa a negociación") | Equivalencia con respaldo (pregunta 15 ya no hace falta) |
-| "La solicitud pasa a negociación cuando estamos ajustando la propuesta" | **D8 a medias**: falta saber si presentar la primera propuesta ya es negociación |
-| "Modificamos la propuesta vigente, sin necesidad de conservar un historial completo de todas las versiones" | Hecho nuevo. Coincide con el límite del alcance |
-| Ante un cambio "puede ser necesario volver a consultar a un proveedor o actualizar la fecha prevista de una tarea" | **D6 a medias**: ya se sabe qué se hace con los compromisos; falta qué pasa con el dato anterior |
-| Tareas vencidas = "no se completaron y ya pasaron su fecha prevista" | **D3 a medias**: queda definida "vencida"; faltan los demás estados de la tarea |
-| "Compromisos pendientes": servicios sin proveedor confirmado y tareas sin completar | Valida el término "Compromiso" del lenguaje ubicuo |
-| Las áreas "necesitan compartir la información actualizada" y "mantener centralizada la información de cada encargo" | Refuerza F08. Valida el registro único por evento (pregunta 16 ya no hace falta) |
-| Identificar pendientes y vencidos "es fundamental para que Coordinación y Producción sepan dónde intervenir" | Refuerza F32–F33. Define quiénes usan la lista de pendientes |
+4. ¿Hay casos en que sea Backstage quien cancela un evento?  
+   ↳ *Repregunta:* ¿Por ejemplo, si no consiguen un proveedor?
 
-## A. Dudas abiertas
+## Propuesta y confirmación
 
-| # | Pregunta | Repregunta posible | Duda | Estado |
-| --- | --- | --- | --- | --- |
-| 1 | Cuando un cliente rechaza la propuesta, ¿cómo queda ese pedido para ustedes? | ¿Lo siguen considerando un evento? ¿Puede volver a activarse más adelante? | D1 | ✅ El pedido "queda cerrado sin concretarse"; se conservan cliente, solicitud y propuesta como antecedente. Si el cliente vuelve, es un **pedido nuevo**. El rechazo ocurre en negociación; la cancelación, con el evento confirmado |
-| 1b | Cuando un pedido queda cerrado por un rechazo, ¿cómo lo llaman? ¿Es un estado más, como "rechazado"? | | D1 | **Nueva**: el cliente describió la situación pero no le puso nombre |
-| 1c | Si un cliente desiste antes de aceptar, por ejemplo mientras todavía preparan la propuesta, ¿eso es un rechazo o una cancelación? | ¿Se puede cancelar un pedido que todavía no fue confirmado? | D9 | **Nueva**: contradice la entrevista 1, donde la cancelación podía ocurrir "en cualquier momento antes de que el evento se realice" |
-| 2 | Cuando le presentan la primera propuesta al cliente, ¿el pedido ya está en negociación, o recién cuando el cliente pide un ajuste? | Si el cliente acepta la primera propuesta sin cambios, ¿pasa directo de "en solicitud" a "confirmado"? | D8 | ✅ Pasa a negociación **al presentar la primera propuesta**. Si el cliente la acepta sin cambios, pasa directo a confirmado. La negociación es todo el período con la propuesta presentada |
-| 3 | ¿Qué datos tienen que estar definidos para poder presentarle una propuesta al cliente? ¿Y para confirmar el encargo? | ¿Se puede confirmar sin sede o sin fecha definida? | D4 | ✅ **Para presentar:** contacto, tipo, fecha y sede previstas (pueden ser tentativas), asistentes estimados y necesidades principales. **Para confirmar:** aceptación registrada, servicios y condiciones acordados, y **fecha y sede concretas**. Sin fecha o sede definidas no se confirma |
-| 4 | ¿Cómo deciden qué servicios incluir en una propuesta y su importe? | ¿Tienen combinaciones habituales o es siempre a medida? | D5 | ✅ Tienen **combinaciones habituales como punto de partida**, no paquetes rígidos; cada propuesta se adapta. Coordinación decide según tipo, asistentes, sede y pedido. Los importes salen de costos conocidos y de cotizaciones que piden a los proveedores. Al aceptar se registran servicios e importes acordados |
-| 4b | Esas combinaciones habituales, ¿las tienen anotadas en algún lado? ¿Les serviría arrancar una propuesta a partir de una de ellas? | ¿Quién las mantiene? | D5 | **Nueva** (opcional): define si el software las guarda |
-| 5 | Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió? | ¿Quién pidió el cambio? ¿Cuándo se registró? | D6 | **Reformulada** |
-| 6 | Además de pendiente y vencida, ¿en qué otras situaciones puede estar una tarea? | ¿Se puede cancelar una tarea, por ejemplo después de un cambio? ¿Quién la marca como completada? | D3 | **Reformulada** |
-| 7 | El responsable de una tarea, ¿es una persona o un área? | ¿Puede cambiar de responsable? | D10 | Pendiente |
-| 8 | ¿Qué información carga o modifica Administración? | ¿Puede tocar propuestas o tareas? | D2 | Pendiente |
-| 9 | ¿Quién deja registrada la confirmación, la cancelación y el cierre de un evento? | | D7 | Pendiente |
-| 10 | ¿Hay casos en que sea Backstage quien cancela un evento? | ¿Por ejemplo, si no consiguen un proveedor? | D9 | Pendiente |
+5. ✅ Cuando le presentan la primera propuesta al cliente, ¿el pedido ya está en negociación, o recién cuando pide un ajuste?
 
-## A2. Situaciones excepcionales
+6. ✅ ¿Qué datos tienen que estar definidos para presentar una propuesta? ¿Y para confirmar el encargo?
 
-| # | Pregunta | Repregunta posible | Estado |
-| --- | --- | --- | --- |
-| 10a | ¿Qué pasa si un proveedor que ya había confirmado se baja? | ¿Cómo se enteran? ¿El servicio vuelve a quedar pendiente? | Pendiente |
-| 10b | ¿Qué hacen cuando una tarea se atrasa? | ¿Quién se entera? ¿Se cambia la fecha o el responsable? | Pendiente |
-| 10c | Cuando cambia la fecha y vuelven a consultar a un proveedor que ya había confirmado, ¿cómo queda su participación mientras esperan la respuesta? | ¿Vuelve a "pendiente"? | **Nueva** (sale de la apertura) |
-| 10d | Un servicio que todavía no tiene proveedor confirmado, ¿puede estar "vencido"? ¿Tiene una fecha para resolverse? | ¿O se controla con una tarea de confirmarlo? | **Nueva** (el cliente habló de "compromisos vencidos") |
+7. ✅ ¿Cómo deciden qué servicios incluir en una propuesta y su importe?
 
-## B. Hechos sin respaldo
+8. ✅ Cuando el cliente pide cambios a la propuesta, ¿eso cuenta como un rechazo?
 
-Usarlas **solo si no se recupera** el intercambio original del chat (ver [entrevista 1](entrevista-1-2026-10-13.md#validación-falta-pegar)).
+9. Esas combinaciones habituales de servicios, ¿las tienen anotadas en algún lado? ¿Les serviría arrancar una propuesta a partir de una de ellas? *(opcional)*  
+   ↳ *Repregunta:* ¿Quién las mantiene?
 
-| # | Pregunta | Hecho | Estado |
-| --- | --- | --- | --- |
-| 11 | Cuando el cliente acepta la propuesta, ¿qué queda acordado exactamente? | F18 | Casi resuelta: la respuesta 3 dice servicios, importes, condiciones, fecha y sede concretas. Falta solo si los asistentes y las condiciones particulares también quedan fijos |
-| 12 | ~~Si el encargo ya está confirmado, ¿quiere decir que los proveedores también lo están?~~ | F19 | ✅ Respondida en la apertura |
-| 13 | ¿Qué datos necesitan tener de cada proveedor? | F21 | Pendiente |
-| 14 | ~~Cuando el cliente pide cambios a la propuesta, ¿eso cuenta como un rechazo?~~ | F15 | ✅ Respuesta 2: si pide cambios, se ajusta y sigue en negociación |
-| 15 | ~~¿"Pedido" y "solicitud" son lo mismo para ustedes?~~ | Lenguaje | ✅ Respondida en la apertura |
+10. Cuando el cliente acepta, además de los servicios, los importes, la fecha y la sede, ¿quedan fijas también la cantidad de asistentes y las condiciones particulares?
 
-## C. Validar interpretaciones y propuestas
+11. ¿Quién deja registrada la confirmación, la cancelación y el cierre de un evento?
 
-Salen de los controles propuestos en el [análisis §3.3](../analisis/analisis-v1.md#33-problemas-de-calidad-de-la-información-y-controles).
-Se plantean como forma de trabajar, no como funciones del sistema.
+## Cambios
 
-| # | Pregunta | Qué valida | Estado |
-| --- | --- | --- | --- |
-| 16 | ~~Todo lo de un evento debería estar en un mismo lugar~~ | Registro único por evento | ✅ Respondida en la apertura |
-| 17 | Cuando registran un cambio, ¿les serviría ver en ese momento las tareas y los proveedores del evento para revisar cuáles se afectan? | Revisión de compromisos afectados | Pendiente |
-| 18 | ¿Tendría sentido cargar tareas o proveedores en un evento que todavía no está confirmado? | Restricción: preparación solo con encargo confirmado | Pendiente |
-| 19 | Para controlar pendientes, ¿Coordinación y Producción necesitan ver juntos los de todos los eventos, o los miran evento por evento? | Lista de pendientes | **Reformulada** |
-| 20 | ~~"Evento confirmado" y "participación confirmada" son cosas distintas~~ | Término "confirmado" | ✅ Respondida en la apertura |
-| 21 | En la propuesta, un servicio es lo que le ofrecen al cliente con su importe; en la preparación es algo que hay que cubrir con un proveedor. ¿Lo ven así? | Doble significado de "servicio" (base de los contextos) | Pendiente |
+12. Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió?  
+    ↳ *Repregunta:* ¿Quién pidió el cambio? ¿Cuándo se registró?
 
-## Validación de cierre
+13. Cuando registran un cambio, ¿les serviría ver en ese momento las tareas y los proveedores del evento para revisar cuáles se afectan?
 
-Al final, resumir con sus palabras el recorrido completo (pedido → propuesta → aceptación o rechazo → proveedores y tareas → cambios → realización o cancelación)
-y preguntar: "¿Es así? ¿Falta algo o hay algún caso que no se cumpla?"
+## Proveedores
+
+14. ✅ Si el encargo ya está confirmado, ¿quiere decir que los proveedores también lo están?
+
+15. ¿Qué datos necesitan tener de cada proveedor?
+
+16. ¿Qué pasa si un proveedor que ya había confirmado se baja?  
+    ↳ *Repregunta:* ¿Cómo se enteran? ¿El servicio vuelve a quedar pendiente?
+
+17. Cuando cambia la fecha y vuelven a consultar a un proveedor que ya había confirmado, ¿cómo queda su participación mientras esperan la respuesta?  
+    ↳ *Repregunta:* ¿Vuelve a "pendiente"?
+
+18. Un servicio que todavía no tiene proveedor confirmado, ¿puede estar "vencido"? ¿Tiene una fecha para resolverse?  
+    ↳ *Repregunta:* ¿O se controla con una tarea de confirmarlo?
+
+## Tareas
+
+19. Además de pendiente y vencida, ¿en qué otras situaciones puede estar una tarea?  
+    ↳ *Repregunta:* ¿Se puede cancelar una tarea, por ejemplo después de un cambio? ¿Quién la marca como completada?
+
+20. El responsable de una tarea, ¿es una persona o un área?  
+    ↳ *Repregunta:* ¿Puede cambiar de responsable?
+
+21. ¿Qué hacen cuando una tarea se atrasa?  
+    ↳ *Repregunta:* ¿Quién se entera? ¿Se cambia la fecha o el responsable?
+
+22. ¿Tendría sentido cargar tareas o proveedores en un evento que todavía no está confirmado?
+
+## Personal y seguimiento
+
+23. ¿Qué información carga o modifica Administración?  
+    ↳ *Repregunta:* ¿Puede tocar propuestas o tareas?
+
+24. Para controlar pendientes, ¿Coordinación y Producción necesitan ver juntos los de todos los eventos, o los miran evento por evento?
+
+## Lenguaje
+
+25. ✅ ¿"Pedido" y "solicitud" son lo mismo para ustedes?
+
+26. ✅ ¿"Evento confirmado" y "participación confirmada" son cosas distintas?
+
+27. ✅ ¿Todo lo de un evento debería estar en un mismo lugar?
+
+28. En la propuesta, un servicio es lo que le ofrecen al cliente con su importe; en la preparación es algo que hay que cubrir con un proveedor. ¿Lo ven así?
+
+## Cierre
+
+29. Resumir con sus palabras el recorrido completo (pedido → propuesta → aceptación o rechazo → proveedores y tareas → cambios → realización o cancelación) y preguntar: "¿Es así? ¿Falta algo o hay algún caso que no se cumpla?"
+
+---
+
+**Reglas:** hablarle como a un cliente real, con preguntas abiertas, sin términos de analista ("límite", "entorno", "actores").
+Guardar la conversación textual y pasarla para volcarla al análisis.

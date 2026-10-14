@@ -17,10 +17,12 @@ Todos los integrantes tienen que poder explicar las decisiones. Texto completo d
 | **relevamiento/** | |
 | [guia-preguntas.md](relevamiento/guia-preguntas.md) | Guía general de la entrevista: 55 preguntas por bloque, preguntas de validación y qué no preguntar |
 | [entrevista-1-2026-10-13.md](relevamiento/entrevista-1-2026-10-13.md) | Transcripción de la primera entrevista (faltan los intercambios de validación) |
-| [preguntas-entrevista-2.md](relevamiento/preguntas-entrevista-2.md) | Lo que hay que preguntar en la próxima sesión: dudas D1–D10, hechos sin respaldo, validación de propuestas |
+| [preguntas-entrevista-2.md](relevamiento/preguntas-entrevista-2.md) | Lista de preguntas de la entrevista 2, con ✅ las ya respondidas |
+| [respuestas-enrevista-2.md](relevamiento/respuestas-enrevista-2.md) | Conversación de la entrevista 2 (en curso) |
 | **analisis/** | |
 | [comparacion-dominio-alcance.md](analisis/comparacion-dominio-alcance.md) | Versión 0: el dominio que mandamos, la devolución de la profesora (09/10) y qué sobraba, faltaba o era hipótesis |
 | [analisis-v1.md](analisis/analisis-v1.md) | Versión 1 del análisis, a partir de la entrevista 1: hechos F01–F33, sistema organizacional, SI, dominio, dudas |
+| [notas-entrevista-2.md](analisis/notas-entrevista-2.md) | Qué aporta cada respuesta de la entrevista 2; se vuelca en la v2 |
 
 **Convención de versiones:** cada versión nueva del análisis es un archivo nuevo (`analisis-v2.md`, …) que empieza con
 "Cambios respecto de la versión anterior" y el porqué de cada uno. Las anteriores no se editan: son la evidencia de la evolución.
