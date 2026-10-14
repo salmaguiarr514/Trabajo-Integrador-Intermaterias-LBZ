@@ -1,7 +1,7 @@
-# Análisis — Borrador 1
+# Análisis — Versión 1
 
-**Estado:** borrador para devolución. **Fuente:** entrevista del 13/10/2026 con el cliente ([RESPUESTAS-CHAT.md](RESPUESTAS-CHAT.md)).
-**Alcance de referencia:** [Objetivo y alcance del software](../consignas/sistemas-de-informacion.md#2-objetivo-y-alcance-del-software).
+**Estado:** versión 1, en revisión. **Fuente:** [entrevista del 13/10/2026](../relevamiento/entrevista-1-2026-10-13.md).
+**Alcance de referencia:** [Objetivo y alcance del software](../consigna.md#2-objetivo-y-alcance-del-software).
 
 Cómo leerlo:
 
@@ -49,7 +49,7 @@ Cómo leerlo:
 | F32 | Problemas actuales: la información está repartida; ante un cambio cuesta saber qué compromisos se afectan y avisar a los responsables; cuesta ver tareas pendientes y vencidas y servicios sin confirmar; con varios eventos a la vez hay olvidos | Dificultades |
 | F33 | Lo más importante para el cliente: que después de un cambio quede claro **qué se acordó, qué cambió y qué queda pendiente**, y poder consultar eventos por fecha o estado | Cierre de la entrevista |
 
-> ⚠ Estos intercambios se hicieron en el chat pero **no están en RESPUESTAS-CHAT.md**. Hay que volver a pegarlos para que el hecho tenga respaldo.
+> ⚠ Estos intercambios se hicieron en el chat pero **no están en la [transcripción](../relevamiento/entrevista-1-2026-10-13.md#validación-falta-pegar)**. Hay que pegarlos para que el hecho tenga respaldo.
 
 ---
 
@@ -295,7 +295,7 @@ La relación entre los dos contextos es la aceptación: lo que en Propuestas es 
 
 ## 5. Dudas abiertas
 
-Son las preguntas de la segunda sesión.
+Cada una tiene su pregunta en la [guía de la segunda entrevista](../relevamiento/preguntas-entrevista-2.md).
 
 | # | Duda | Por qué importa |
 | --- | --- | --- |
@@ -327,36 +327,3 @@ Son las preguntas de la segunda sesión.
 | Consulta y cierre | Relevado | D7 |
 | Estados | Relevado a medias | D1, D8 |
 | Permisos del personal | Relevado a medias | D2 |
-
-Cómo está armado
-Hechos relevados: 33 hechos numerados (F01–F33), cada uno con la pregunta de la que salió. Todo lo que el análisis afirma del negocio cita un hecho.
-Sistema organizacional: propósito, límite y entorno, actores, entradas-procesos-salidas, subsistemas, restricciones, y reservas, bucles y demoras.
-Sistema de información: quién registra y consulta cada dato y para qué, los problemas que contó el cliente con un control propuesto para cada uno, y qué queda dentro y fuera del software.
-Dominio: lenguaje ubicuo, modelo conceptual, estados del evento, 12 reglas y una propuesta de contextos.
-Dudas abiertas: 10 dudas (D1–D10), que son la base de la segunda sesión.
-Cobertura: una tabla contra el documento de alcance.
-Lo que es decisión del grupo y no dicho por el cliente está marcado como "(interpretación)". Son sobre todo los controles propuestos y la separación en contextos.
-
-Dos hallazgos del análisis
-"Confirmado" significa dos cosas. Un evento confirmado es uno que el cliente aceptó, y una participación confirmada es un proveedor que dijo que puede. El cliente mismo aclaró que una no implica la otra. Es un buen ejemplo de término ambiguo para el lenguaje ubicuo.
-"Servicio" cambia de significado. En la propuesta es algo que se ofrece con un importe, y en la preparación es un compromiso a cubrir con un proveedor. En eso se apoya la separación en dos contextos, Propuestas y Preparación.
-Un pendiente del registro
-Seis hechos (F15, F17, F18, F19, F21 y la equivalencia pedido/solicitud) salen de intercambios que no están en RESPUESTAS-CHAT.md: la validación donde el cliente corrigió las "condiciones acordadas" y la respuesta con los datos del proveedor. Los marqué con ⚠. Hay que volver a pegarlos para que tengan respaldo.
-
-Preguntas para la segunda sesión
-Escrito para: el cliente del proyecto de ChatGPT.
-
-Cuando un cliente rechaza la propuesta, ¿cómo queda ese pedido para ustedes?
-¿Qué tiene que pasar para que un evento pase de "en solicitud" a "en negociación"?
-¿Qué datos tienen que estar definidos para poder presentarle una propuesta al cliente?
-¿Cómo deciden qué servicios incluir en una propuesta?
-Cuando hay un cambio después de confirmar, ¿qué pasa con lo que se había acordado antes?
-¿Cuándo consideran que una tarea está vencida?
-¿El responsable de una tarea es una persona o un área?
-¿Qué información carga o modifica Administración?
-¿Quién deja registrada la confirmación, la cancelación y el cierre de un evento?
-¿Hay casos en que sea Backstage quien cancela un evento?
-Cada una corresponde a una duda del borrador (D1–D10), así que las respuestas se pueden volcar directo al documento.
-
-
-

@@ -1,13 +1,13 @@
 # Comparación: DOMINIO.md vs. "Objetivo y alcance del software"
 
-Revisión del [DOMINIO.md](../DOMINIO.md) que le enviamos a la profesora, a partir de su devolución (2026-10-09):
+Revisión del [DOMINIO.md](../../comun/dominio.md) que le enviamos a la profesora, a partir de su devolución (2026-10-09):
 
 > "El dominio que plantearon incorpora cuestiones que están fuera del alcance y omite otras que sí deben contemplarse.
 > El análisis debe respetar ese documento. […] Pueden usar lo que me pasaste como punto de partida para formular preguntas
 > a ChatGPT para confirmar, corregir o descartar lo planteado."
 
-Referencia: [Objetivo y alcance del software](../consignas/sistemas-de-informacion.md#2-objetivo-y-alcance-del-software).
-Las preguntas que salen de esta comparación están en [preguntas-relevamiento.md](preguntas-relevamiento.md).
+Referencia: [Objetivo y alcance del software](../consigna.md#2-objetivo-y-alcance-del-software).
+Las preguntas que salen de esta comparación están en [guía de preguntas](../relevamiento/guia-preguntas.md).
 
 ---
 
@@ -91,6 +91,6 @@ Esto no se puede afirmar todavía: se convierte en preguntas para **confirmar, c
 ## 4. Cómo seguir
 
 1. No editar el DOMINIO.md para "arreglarlo" sin relevar: queda como **versión 1**, y esta comparación muestra cómo incorporamos la devolución.
-2. Hacer las preguntas de [preguntas-relevamiento.md](preguntas-relevamiento.md) en el chat del proyecto.
+2. Hacer las preguntas de [guía de preguntas](../relevamiento/guia-preguntas.md) en el chat del proyecto.
 3. Por cada fila de la sección 3 y de la sección 2, anotar si quedó **confirmada**, **corregida** o **descartada**, con la cita de la conversación.
 4. Con eso, escribir la versión 2 del dominio, en la que cada afirmación tenga respaldo en el relevamiento.

@@ -9,8 +9,10 @@ Cada carpeta corresponde a una materia. Lo que usan varias materias está en `co
 | `programacion-2/` | [plan-desarrollo.md](programacion-2/plan-desarrollo.md) | Plan para construir el sitio: roles y permisos, endpoints, pantallas, fases y reparto | Programación 2 |
 | `base-de-datos/` | [der.md](base-de-datos/der.md) | DER: entidades, cardinalidades, restricciones, triggers, borrado, 3FN | Base de Datos |
 | | [backstage.dbml](base-de-datos/backstage.dbml) | El modelo para abrir en dbdiagram.io y exportar el diagrama | Base de Datos |
-| `sistemas-de-informacion/` | [plan.md](sistemas-de-informacion/plan.md) | Resumen de la consigna, alcance obligatorio y plan del grupo | Sistemas de Información |
+| `sistemas-de-informacion/` | [plan.md](sistemas-de-informacion/plan.md) | **Empezar acá:** qué hay que cumplir, estado, historia y plan de iteración | Sistemas de Información |
 | | [consigna.md](sistemas-de-informacion/consigna.md) | Texto original de la cátedra | Sistemas de Información |
+| | [relevamiento/](sistemas-de-informacion/relevamiento/) | Guía de preguntas, transcripciones de las entrevistas y preguntas de la próxima | Sistemas de Información |
+| | [analisis/](sistemas-de-informacion/analisis/) | Versiones del análisis (v0: comparación con el alcance; v1: después de la entrevista 1) | Sistemas de Información |
 | `sistemas-operativos/` | [plan.md](sistemas-operativos/plan.md) | Qué hay que mostrar, cómo encaja con lo existente y dudas | Sistemas Operativos |
 | | [consigna.md](sistemas-operativos/consigna.md) | Texto original de la cátedra | Sistemas Operativos |
 

@@ -1,6 +1,6 @@
 # Guía de preguntas para el relevamiento
 
-Preguntas para el cliente del proyecto de ChatGPT. Salen de la [comparación entre el DOMINIO.md y el alcance](comparacion-dominio-alcance.md):
+Preguntas para el cliente del proyecto de ChatGPT. Salen de la [comparación entre el DOMINIO.md y el alcance](../analisis/comparacion-dominio-alcance.md):
 confirman, corrigen o descartan lo que planteamos (H = hipótesis) y cubren lo obligatorio que nos faltaba (O = omitido).
 
 ## Cómo usarla
@@ -156,7 +156,7 @@ Para usar al final de cada sesión, o al empezar la siguiente, con lo que hayamo
 
 ## Qué NO preguntar
 
-Está fuera del alcance (ver la [comparación](comparacion-dominio-alcance.md#1-lo-que-incorporamos-y-está-fuera-del-alcance)):
+Está fuera del alcance (ver la [comparación](../analisis/comparacion-dominio-alcance.md#1-lo-que-incorporamos-y-está-fuera-del-alcance)):
 
 - Venta de entradas, precios por sector, abonos, QR, control de acceso.
 - Cobros, pagos a proveedores, comisiones, facturación, rentabilidad.

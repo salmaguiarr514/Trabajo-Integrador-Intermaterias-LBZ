@@ -1,6 +1,6 @@
 # Sistemas de Información — Consignas
 
-Texto original de la cátedra, sin cambios. El resumen y el plan del grupo están en [plan.md](plan.md).
+Texto original de la cátedra. Versión actualizada el 14/10/2026. Qué hay que cumplir, el estado y el plan del grupo están en [plan.md](plan.md).
 
 ---
 
@@ -142,7 +142,7 @@ ChatGPT actuará como **cliente y conocedor del dominio**. El relevamiento, el a
 
 #### Análisis de sistema organizacional
 
-Delimiten el sistema que necesitan comprender para desarrollar la solución e **identifiquen su propósito, límites, entorno, actores, elementos, relaciones, entradas, procesos y salidas relevantes**.
+Delimiten el sistema que necesitan comprender para desarrollar la solución e **identifiquen su propósito, límite, entorno, actores, elementos, relaciones, entradas, procesos y salidas relevantes**.
 
 Analicen los **subsistemas, restricciones e interdependencias** que condicionen su funcionamiento. Consideren también **reservas, retroalimentaciones (bucles) y demoras** cuando ayuden a comprender el problema o fundamentar la solución.
 
@@ -156,7 +156,7 @@ Deberán comprender:
 
 - Quién produce, registra, consulta o modifica la información, y con qué responsabilidad.
 - Qué información necesita cada actor y con qué finalidad (operar, controlar o tomar decisiones).
-- Cuáles son sus fuentes, canales y destinatarios.
+- Cuáles son sus fuentes, canales y destinatarios (flujos de información).
 
 No olviden **diseñar la solución garantizando la calidad de la información, previniendo problemas frecuentes y aplicando reglas y mecanismos de control**.
 
@@ -191,7 +191,7 @@ Cada grupo elegirá cómo organizar y representar su trabajo: textos, diagramas,
 
 Mantengan disponibles las conversaciones de relevamiento y las versiones de trabajo necesarias para explicar sus decisiones.
 
-En las fechas indicadas por el docente, **presentarán el estado actual del análisis para recibir devolución**. Los avances podrán incluir borradores, cuestiones pendientes e interpretaciones todavía en revisión.
+~~En las fechas indicadas por el docente, **presentarán el estado actual del análisis para recibir devolución**. Los avances podrán incluir borradores, cuestiones pendientes e interpretaciones todavía en revisión.~~ *(tachado en la versión del 14/10/2026)*
 
 Al finalizar, deberán entregar una versión consolidada y formal que integre los resultados del relevamiento, el análisis realizado y el diseño conceptual de la solución desarrollada, un **documento formal escrito**.
 
