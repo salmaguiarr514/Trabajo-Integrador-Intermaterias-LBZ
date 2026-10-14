@@ -38,6 +38,9 @@ Una pregunta por mensaje; las repreguntas se usan solo si la respuesta no alcanz
 
 11. ✅ ¿Quién registra la cancelación de un evento? ¿Y que el evento se realizó, con sus observaciones?
 
+30. La sede del concierto, ¿la consigue el cliente o la consiguen ustedes? ¿Se contrata como un servicio más?  
+    ↳ *Repregunta:* ¿Quién se comunica con la sede?
+
 ## Cambios
 
 12. ✅ Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió?  

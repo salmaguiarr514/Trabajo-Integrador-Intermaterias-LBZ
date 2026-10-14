@@ -16,9 +16,9 @@ Todos los integrantes tienen que poder explicar las decisiones. Texto completo d
 | [consigna.md](consigna.md) | Consignas de la cátedra: anuncio, objetivo y alcance del software, trabajo práctico integrador |
 | **relevamiento/** | |
 | [guia-preguntas.md](relevamiento/guia-preguntas.md) | Guía general de la entrevista: 55 preguntas por bloque, preguntas de validación y qué no preguntar |
-| [entrevista-1-2026-10-13.md](relevamiento/entrevista-1-2026-10-13.md) | Transcripción de la primera entrevista (faltan los intercambios de validación) |
+| [entrevista-1-2026-10-13.md](relevamiento/entrevista-1-2026-10-13.md) | Transcripción completa de la primera entrevista |
 | [preguntas-entrevista-2.md](relevamiento/preguntas-entrevista-2.md) | Lista de preguntas de la entrevista 2, con ✅ las ya respondidas |
-| [respuestas-enrevista-2.md](relevamiento/respuestas-enrevista-2.md) | Conversación de la entrevista 2 (en curso) |
+| [respuestas-enrevista-2.md](relevamiento/respuestas-enrevista-2.md) | Conversación de la entrevista 2 (en curso; al terminar se renombra a `entrevista-2-2026-10-14.md`) |
 | **analisis/** | |
 | [comparacion-dominio-alcance.md](analisis/comparacion-dominio-alcance.md) | Versión 0: el dominio que mandamos, la devolución de la profesora (09/10) y qué sobraba, faltaba o era hipótesis |
 | [analisis-v1.md](analisis/analisis-v1.md) | Versión 1 del análisis, a partir de la entrevista 1: hechos F01–F33, sistema organizacional, SI, dominio, dudas |
@@ -39,52 +39,52 @@ Cada entrevista se guarda textual en `relevamiento/entrevista-N-AAAA-MM-DD.md`.
 | Exigencia | Estado | Dónde / qué falta |
 | --- | --- | --- |
 | Definir qué necesitamos averiguar | ✅ | [guia-preguntas.md](relevamiento/guia-preguntas.md), a partir de "Qué debe descubrir cada grupo" |
-| Preguntas y repreguntas sobre procesos, responsabilidades, información y reglas | ✅ | [Entrevista 1](relevamiento/entrevista-1-2026-10-13.md) |
-| Preguntas sobre **situaciones excepcionales** | 🟡 | Se vio rechazo, cancelación y proveedor que no puede. Falta: proveedor que se baja ya confirmado, tarea atrasada, cambio que afecta a un proveedor confirmado |
-| Aclarar dudas | 🟡 | D1, D4, D5 y D8 resueltas en la entrevista 2 ([notas](analisis/notas-entrevista-2.md)); el resto en curso |
-| **Validar con el cliente nuestras interpretaciones y propuestas** | 🟡 | Resumen de la entrevista 1 validado; faltan las preguntas 13, 22, 24 y 28 de la [guía](relevamiento/preguntas-entrevista-2.md) |
-| No inventar; distinguir hipótesis de lo confirmado | ✅ | En el análisis: F# (hecho), D# (duda), *(interpretación)* |
+| Preguntas y repreguntas sobre procesos, responsabilidades, información y reglas | ✅ | Entrevistas [1](relevamiento/entrevista-1-2026-10-13.md) y [2](relevamiento/respuestas-enrevista-2.md) |
+| Preguntas sobre **situaciones excepcionales** | ✅ | Rechazo, cancelación por el cliente y por Backstage, proveedor que no puede o se baja, servicio atrasado, cambio de fecha con proveedor confirmado, tarea cancelada o reasignada |
+| Aclarar dudas | 🟡 | D1–D10 respondidas ([notas](analisis/notas-entrevista-2.md)). Quedan: nombre del estado del rechazo y la **contradicción sobre la cancelación** (preguntas 2 y 3), "vencida" como estado o condición (21b) |
+| **Validar con el cliente nuestras interpretaciones y propuestas** | 🟡 | Validados: resumen de la entrevista 1, "confirmado", "pedido = solicitud", registro centralizado, ver compromisos al registrar un cambio. Faltan las preguntas 22, 24, 28 y el cierre (29) |
+| No inventar; distinguir hipótesis de lo confirmado | 🟡 | Se cumple en general. Excepción: v1 dice que la sede "es un dato que trae el cliente", y nunca se preguntó (nueva pregunta 30) |
 | Conversaciones disponibles | ✅ | Entrevista 1 completa; entrevista 2 en curso |
 
 ### 2.2 Sistema organizacional
 
 | Exigencia | Estado | Dónde / qué falta |
 | --- | --- | --- |
-| Propósito, límite, entorno, actores, elementos, relaciones | ✅ | [v1 §2.1–2.4](analisis/analisis-v1.md#2-sistema-organizacional) |
-| Entradas, procesos y salidas | ✅ | v1 §2.5 |
-| Subsistemas, restricciones, interdependencias | ✅ | v1 §2.6–2.7 |
-| Reservas, bucles y demoras | ✅ | v1 §2.8 |
-| Coherencia entre propósito, límite y componentes | 🟡 | Revisar en v2 con las respuestas nuevas |
+| Propósito, límite, entorno, actores, elementos, relaciones | 🟡 | [v1 §2.1–2.4](analisis/analisis-v1.md#2-sistema-organizacional). En v2: quitar el pendiente de D7, ubicar la sede según la pregunta 30, agregar que un proveedor trabaja en varios eventos |
+| Entradas, procesos y salidas | 🟡 | v1 §2.5. En v2: el rechazo como salida ("pedido cerrado sin concretarse") y la cancelación por Backstage |
+| Subsistemas, restricciones, interdependencias | 🟡 | v1 §2.6–2.7. En v2: restricción "no se confirma sin fecha y sede concretas"; dependencia de servicios indispensables |
+| Reservas, bucles y demoras | 🟡 | v1 §2.8. En v2: el bucle del proveedor que se baja (vuelve a pendiente) y el servicio atrasado como demora |
+| Coherencia entre propósito, límite y componentes | ⬜ | Revisión completa al escribir v2 |
 
 ### 2.3 Sistema de información
 
 | Exigencia | Estado | Dónde / qué falta |
 | --- | --- | --- |
-| Quién produce, registra, consulta o modifica cada dato, y con qué responsabilidad | 🟡 | v1 §3.1. Faltan D2 (Administración) y D7 (quién confirma, cancela y cierra) |
-| Qué información necesita **cada actor** y para qué (operar, controlar, decidir) | 🟡 | v1 §3.1 está ordenado por dato. Falta la vista por actor |
-| Fuentes, canales y destinatarios (**flujos de información**) | 🟡 | v1 §3.2 es muy corto. Falta un diagrama de flujos |
-| Diseño de la solución: calidad de la información, prevención de problemas, reglas y controles | 🟡 | v1 §3.3 tiene controles **propuestos, sin validar**. Faltan validaciones concretas: datos obligatorios por etapa y transiciones de estado permitidas |
-| Qué soporta el software y cómo se relaciona con lo que sigue fuera | ✅ | v1 §3.4 |
+| Quién produce, registra, consulta o modifica cada dato, y con qué responsabilidad | 🟡 | Ya relevado (D2, D7). Falta volcarlo en v2: Administración registra participaciones, aceptación y rechazo; Coordinación registra cancelación y realización |
+| Qué información necesita **cada actor** y para qué (operar, controlar, decidir) | ⬜ | Falta la vista por actor. Hay información suficiente para armarla |
+| Fuentes, canales y destinatarios (**flujos de información**) | ⬜ | v1 §3.2 es muy corto. Falta el diagrama de flujos |
+| Diseño de la solución: calidad de la información, prevención de problemas, reglas y controles | 🟡 | Ya hay controles concretos con respaldo: datos mínimos para presentar y para confirmar, cambios con dato anterior, nuevo y motivo, nada se borra, compromisos atrasados. Falta escribirlos como controles en v2 |
+| Qué soporta el software y cómo se relaciona con lo que sigue fuera | ✅ | v1 §3.4. Sumar en v2: combinaciones habituales como punto de partida, el indispensable como decisión del equipo |
 
 ### 2.4 Diseño orientado al dominio
 
 | Exigencia | Estado | Dónde / qué falta |
 | --- | --- | --- |
-| Conceptos, procesos, responsabilidades y reglas | 🟡 | v1 §4. 12 reglas; faltan las que salgan de D1, D3, D4 y D6 |
-| Lenguaje ubicuo, con términos ambiguos aclarados | ✅ | v1 §4.1 ("confirmado", "pendiente", "servicio", "evento") |
-| Subdominios y Bounded Contexts **justificados** | 🟡 | v1 §4.5 es una propuesta inicial. Falta validar el doble sentido de "servicio" y describir la relación entre contextos |
-| Modelo conceptual | 🟡 | v1 §4.2. Depende de D1 y D6; faltan los atributos principales |
-| Estados del evento y de la tarea | 🟡 | Evento en v1 §4.3 (sin rechazo, D1). Tarea sin definir (D3) |
+| Conceptos, procesos, responsabilidades y reglas | 🟡 | v1 §4.4 tiene 12 reglas. Hay 12 reglas nuevas con respaldo para v2 (ver [§6](#6-revisión-general-14102026)) |
+| Lenguaje ubicuo, con términos ambiguos aclarados | 🟡 | v1 §4.1. Agregar: compromiso atrasado, servicio indispensable, combinación habitual, observación. Validar "servicio" (pregunta 28) |
+| Subdominios y Bounded Contexts **justificados** | 🟡 | v1 §4.5. El doble sentido de "servicio" falta validarlo (28). Revisar: Administración trabaja en los dos contextos |
+| Modelo conceptual | 🟡 | v1 §4.2 desactualizado: faltan atributos del cambio, fecha prevista del servicio, estados de la tarea y combinación habitual |
+| Estados del evento y de la tarea | 🟡 | Tarea: relevada (D3), falta 21b. Evento: falta el rechazo y resolver la contradicción de la cancelación (2 y 3) |
 
 ### 2.5 Lo que debe descubrir el grupo (consigna de alcance)
 
 | Qué descubrir | Estado |
 | --- | --- |
-| Qué información necesita la organizadora y para qué | 🟡 |
-| Cómo prepara las propuestas y qué condiciones permiten confirmar | 🟡 (D4, D5) |
-| Quién hace cada actividad y quién consulta o modifica | 🟡 (D2, D7, D10) |
-| Qué estados, reglas y validaciones tienen sentido | 🟡 (D1, D3, D8) |
-| Cómo trata cambios, rechazos, cancelaciones y pendientes | 🟡 (D1, D6, D9) |
+| Qué información necesita la organizadora y para qué | ✅ Relevado; falta la vista por actor en el análisis |
+| Cómo prepara las propuestas y qué condiciones permiten confirmar | ✅ |
+| Quién hace cada actividad y quién consulta o modifica | ✅ |
+| Qué estados, reglas y validaciones tienen sentido | 🟡 Faltan las preguntas 2, 3 y 21b |
+| Cómo trata cambios, rechazos, cancelaciones y pendientes | 🟡 Falta la contradicción de la cancelación (3) |
 
 ### 2.6 Recorridos que el análisis tiene que explicar
 
@@ -92,19 +92,19 @@ El criterio de cumplimiento pide demostrarlos en el software. En el análisis ti
 
 | Recorrido | Estado |
 | --- | --- |
-| Solicitud → propuesta → aceptación → servicios y tareas → pendientes → cierre | 🟡 Disperso en v1; falta escribirlo como escenario |
-| Propuesta rechazada | ⬜ Depende de D1 |
-| Cambio relevante | ⬜ Depende de D6 |
-| Cancelación | 🟡 Falta D7 y D9 |
-| Acceso identificado del personal con permisos sencillos | 🟡 Falta D2 |
+| Solicitud → propuesta → aceptación → servicios y tareas → pendientes → cierre | 🟡 Relevado completo; falta escribirlo como escenario |
+| Propuesta rechazada | 🟡 Relevado (D1); falta el nombre del estado (2) |
+| Cambio relevante | 🟡 Relevado (D6, 13, 17); falta escribirlo |
+| Cancelación | 🟡 Relevada por cliente y por Backstage; falta la contradicción (3) |
+| Acceso identificado del personal con permisos sencillos | 🟡 Relevado (F31, D2, D7, D10); falta la matriz de permisos |
 
 ### 2.7 Entrega
 
 | Exigencia | Estado |
 | --- | --- |
-| Evolución visible del análisis (versiones y fundamentos) | 🟡 v0 y v1. Seguir la convención de versiones |
+| Evolución visible del análisis (versiones y fundamentos) | 🟡 v0, v1 y notas de la entrevista 2. Falta v2 |
 | Incorporar las devoluciones | ✅ La devolución del 09/10 está en la versión 0 |
-| **Informe final** con el análisis completo (ver [§5](#5-informe-final)) | ⬜ Sin fecha todavía |
+| **Informe final** con el análisis completo (ver [§5](#5-informe-final)), presentado como artifact con gráficos | ⬜ Sin fecha todavía |
 
 ---
 
@@ -118,6 +118,9 @@ El criterio de cumplimiento pide demostrarlos en el software. En el análisis ti
 | 13/10 | Entrevista 1 con el cliente | [Transcripción](relevamiento/entrevista-1-2026-10-13.md) |
 | 13/10 | Análisis versión 1: 33 hechos, 10 dudas | [analisis-v1.md](analisis/analisis-v1.md) |
 | 14/10 | Consigna actualizada; carpeta reorganizada; guía de la entrevista 2 | Este documento |
+| 14/10 | Entrevista 2 (en curso): el cliente valida el resumen; se responden D1–D10 y las excepciones; aparece una contradicción sobre la cancelación | [Respuestas](relevamiento/respuestas-enrevista-2.md), [notas](analisis/notas-entrevista-2.md) |
+| 14/10 | Se completa la entrevista 1 con los datos de los proveedores (F21) | [§7b](relevamiento/entrevista-1-2026-10-13.md#7b-datos-de-los-proveedores) |
+| 14/10 | Revisión general contra la consigna | [§6](#6-revisión-general-14102026) |
 
 ---
 
@@ -127,9 +130,9 @@ Cada vuelta tiene la misma forma: **preguntar → registrar → analizar → det
 
 | # | Paso | Resultado | Estado |
 | --- | --- | --- | --- |
-| 1 | Recuperar del chat los intercambios de validación que faltan y pegarlos en la entrevista 1 | F15, F17–F19, F21 con respaldo | ⬜ |
-| 2 | Hacer la [entrevista 2](relevamiento/preguntas-entrevista-2.md): dudas, excepciones y validación de propuestas | `entrevista-2-….md` | ⬜ |
-| 3 | Volcar las respuestas: hechos nuevos (F34…), dudas cerradas, propuestas confirmadas o descartadas | Tabla de respuestas completa | ⬜ |
+| 1 | Recuperar del chat los intercambios de validación que faltan y pegarlos en la entrevista 1 | F15, F17–F19, F21 con respaldo | ✅ |
+| 2 | Hacer la [entrevista 2](relevamiento/preguntas-entrevista-2.md): dudas, excepciones y validación de propuestas | `entrevista-2-….md` | 🟡 Faltan 2, 3, 21b, 22, 24, 28, 29 y 30 |
+| 3 | Volcar las respuestas: hechos nuevos (F34…), dudas cerradas, propuestas confirmadas o descartadas | [Notas de la entrevista 2](analisis/notas-entrevista-2.md) | 🟡 Al día con lo respondido |
 | 4 | Escribir `analisis-v2.md` con "Cambios respecto de la v1" | Versión 2 | ⬜ |
 | 5 | Completar lo que falta en v2: vista por actor, diagrama de flujos, datos obligatorios y transiciones, estados de la tarea, escenarios de los recorridos, relación entre contextos, atributos del modelo | Los 🟡 de la sección 2 pasan a ✅ | ⬜ |
 | 6 | Si aparecen dudas nuevas, entrevista 3 y versión 3 (repetir 2–5) | — | ⬜ |
@@ -155,3 +158,54 @@ Por eso el informe no cita los códigos F# y D#: esos quedan en las versiones de
 de cada afirmación si la profesora pregunta de dónde sale algo. Las conversaciones se conservan igual, porque la consigna pide tenerlas disponibles.
 
 Se escribe al final, cuando las dudas estén cerradas. Hasta entonces, todo se trabaja en las versiones del análisis.
+
+---
+
+## 6. Revisión general (14/10/2026)
+
+**Dónde estamos.** El relevamiento está casi completo: las dos entrevistas cubren todas las áreas del alcance y todas las situaciones
+que el criterio de cumplimiento pide demostrar. El análisis escrito, en cambio, quedó atrás: la v1 es del 13/10 y no tiene nada de la entrevista 2.
+**El siguiente paso grande es escribir `analisis-v2.md`.**
+
+### Qué de la v1 quedó desactualizado o mal
+
+| v1 | Problema | Corrección en v2 |
+| --- | --- | --- |
+| §4.3 Estados del evento | Permite cancelar desde "en solicitud" y "en negociación"; no tiene el rechazo; el paso a negociación no estaba claro | Paso a negociación al presentar la primera propuesta. Agregar el cierre por rechazo. La cancelación, según lo que responda la pregunta 3 |
+| §2.2 Entorno | "La sede es un dato que trae el cliente": no se preguntó nunca | Según la pregunta 30 |
+| §3.1 y F31 | Producción registra las participaciones de proveedores | También Administración. Los permisos van por tipo de dato, no por área estricta |
+| §2.3 y §3.1 | "Quién registra la confirmación, cancelación y cierre" pendiente (D7) | Aceptación y rechazo: Administración. Cancelación y realización: Coordinación, con información de Producción |
+| §4.2 Modelo | Faltan atributos y conceptos | Cambio con dato anterior, nuevo y motivo. Servicio acordado con fecha prevista de resolución. Tarea con estado y observación. Combinación habitual. Proveedor en muchos eventos |
+| §4.4 Reglas | 12 reglas | Sumar las de la lista de abajo |
+| §5 Dudas | D1–D10 abiertas | Cerradas; quedan solo las nuevas |
+
+### Reglas nuevas con respaldo (para v2)
+
+1. Un pedido pasa a negociación cuando se presenta la primera propuesta.
+2. Para presentar una propuesta hacen falta contacto, tipo, fecha y sede previstas, asistentes estimados y necesidades principales.
+3. No se confirma un encargo sin fecha y sede concretas.
+4. Al confirmar quedan registrados servicios, importes, fecha, sede, asistentes estimados y condiciones particulares.
+5. Un rechazo cierra el pedido sin concretarse; si el cliente vuelve, es un pedido nuevo.
+6. Un cambio relevante registra el dato anterior, el nuevo y el motivo si se conoce.
+7. Si un proveedor confirmado se baja o debe reconsultarse, el servicio vuelve a pendiente y queda una observación.
+8. Un servicio pendiente con su fecha prevista de resolución vencida es un compromiso atrasado.
+9. Una tarea tiene un responsable que es una persona; Coordinación la asigna y la reasigna.
+10. Una tarea que deja de ser necesaria se cancela con observación; no se borra ni cuenta como pendiente.
+11. Backstage puede cancelar un evento si no consigue proveedor para un servicio indispensable.
+12. Nada se borra: rechazos, cancelaciones y tareas canceladas se conservan con su motivo u observación.
+
+### Riesgos frente a la consigna
+
+- **"No inventar":** revisar en v2 cada afirmación sin F#. La sede (pregunta 30) es el caso detectado.
+- **"Coherencia":** la v1 separa los contextos por área (Coordinación ↔ Propuestas, Producción ↔ Preparación), pero Administración
+  trabaja en los dos. La consigna dice que no tiene que haber correspondencia automática entre contextos y sectores: justificar
+  la separación por el lenguaje ("servicio") y por el momento (la confirmación), no por quién trabaja.
+- **"Limitarse a lo que interviene en la solución":** no hace falta analizar cómo se consulta la disponibilidad ni cómo se negocia: eso queda fuera del software.
+- **Gráficos:** el informe va como artifact. Los diagramas que el grupo haga conviene hacerlos después de la v2, salvo el del sistema y el de bucles, que ya están estables.
+
+### Orden para retomar
+
+1. Terminar la entrevista 2: preguntas **2, 3 y 30** primero; después 21b, 22, 24, 28 y el cierre.
+2. Renombrar las respuestas a `entrevista-2-2026-10-14.md` con el mismo formato que la entrevista 1.
+3. Escribir `analisis-v2.md` con la tabla de cambios de arriba.
+4. Hacer los gráficos y armar el informe.
