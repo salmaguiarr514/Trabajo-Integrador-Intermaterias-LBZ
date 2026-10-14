@@ -6,7 +6,7 @@ import { filtrosUsuariosSchema } from "../../schemas/usuarios.schema.js";
 // Nunca se devuelve el hash de la contraseña
 const SELECT_USUARIO = `
   SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.dni, u.telefono, u.rol,
-         u.id_empresa, u.activo, u.fecha_creacion, e.nombre AS empresa
+         u.id_empresa, u.activo, u.email_verificado, u.fecha_creacion, e.nombre AS empresa
   FROM usuarios u
   LEFT JOIN empresas e ON e.id_empresa = u.id_empresa`;
 
@@ -41,9 +41,10 @@ export const crearUsuario = async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
   const columnas = COLUMNAS.filter((c) => datos[c] !== undefined);
 
+  // Los crea el superadmin: no pasan por la verificación del email
   const { rows } = await pool.query(
-    `INSERT INTO usuarios (${columnas.join(", ")}, password_hash)
-     VALUES (${columnas.map((_, i) => `$${i + 1}`).join(", ")}, $${columnas.length + 1})
+    `INSERT INTO usuarios (${columnas.join(", ")}, password_hash, email_verificado)
+     VALUES (${columnas.map((_, i) => `$${i + 1}`).join(", ")}, $${columnas.length + 1}, TRUE)
      RETURNING id_usuario`,
     [...columnas.map((c) => datos[c]), hash]
   );
