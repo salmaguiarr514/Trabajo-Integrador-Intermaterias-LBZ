@@ -41,8 +41,8 @@ Cada entrevista se guarda textual en `relevamiento/entrevista-N-AAAA-MM-DD.md`.
 | Definir qué necesitamos averiguar | ✅ | [guia-preguntas.md](relevamiento/guia-preguntas.md), a partir de "Qué debe descubrir cada grupo" |
 | Preguntas y repreguntas sobre procesos, responsabilidades, información y reglas | ✅ | [Entrevista 1](relevamiento/entrevista-1-2026-10-13.md) |
 | Preguntas sobre **situaciones excepcionales** | 🟡 | Se vio rechazo, cancelación y proveedor que no puede. Falta: proveedor que se baja ya confirmado, tarea atrasada, cambio que afecta a un proveedor confirmado |
-| Aclarar dudas | ⬜ | D1–D10 → [entrevista 2](relevamiento/preguntas-entrevista-2.md#a-dudas-abiertas) |
-| **Validar con el cliente nuestras interpretaciones y propuestas** | ⬜ | → [entrevista 2](relevamiento/preguntas-entrevista-2.md#c-validar-interpretaciones-y-propuestas) |
+| Aclarar dudas | 🟡 | D1, D4, D5 y D8 resueltas en la entrevista 2 ([notas](analisis/notas-entrevista-2.md)); el resto en curso |
+| **Validar con el cliente nuestras interpretaciones y propuestas** | 🟡 | Resumen de la entrevista 1 validado; faltan las preguntas 13, 22, 24 y 28 | → [entrevista 2](relevamiento/preguntas-entrevista-2.md) |
 | No inventar; distinguir hipótesis de lo confirmado | ✅ | En el análisis: F# (hecho), D# (duda), *(interpretación)* |
 | Conversaciones disponibles | 🟡 | Faltan pegar los intercambios que respaldan F15, F17–F19, F21 |
 
