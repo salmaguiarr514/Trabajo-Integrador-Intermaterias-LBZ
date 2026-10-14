@@ -71,6 +71,11 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 | --- | --- | --- |
 | `/` | todos | Cartelera (se completa en la fase 6) |
 | `/login`, `/registro` | todos | Ingreso y alta de clientes. En desarrollo el login muestra los usuarios de prueba |
+| `/admin` | superadmin | Inicio: recaudación por service charge (total, por mes y por productora), entradas vendidas, eventos por estado |
+| `/admin/usuarios` | superadmin | Usuarios de todos los roles: alta y edición de superadmins y personal de productoras, activar/desactivar |
+| `/admin/lugares`, `/admin/lugares/:id` | superadmin | Catálogo de lugares; en el detalle, pestañas de sectores (con capacidad), escenarios y datos. Los propios de cada productora se ven en solo lectura |
+| `/admin/artistas` | superadmin | Artistas de todas las productoras (solo lectura) |
+| `/admin/eventos` | superadmin | Eventos de todas las productoras, con despublicar y cancelar |
 | `/admin/empresas` | superadmin | Listado de productoras (búsqueda, orden, filtro por estado, service charge, eliminar) |
 | `/admin/empresas/nueva`, `/admin/empresas/:id/editar` | superadmin | Formulario de alta y edición (incluye % de service charge y activar/desactivar) |
 | `/panel` | empresa | Inicio del panel de la productora (se completa en la fase 5) |

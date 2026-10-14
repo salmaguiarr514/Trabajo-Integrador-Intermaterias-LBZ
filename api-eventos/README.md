@@ -1,7 +1,7 @@
 # API Eventos
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-Hoy tiene el login y el CRUD de productoras para el superadmin; la base ya tiene el modelo completo.
+Hoy tiene el login y todo el panel del superadmin (fase 4, sin el plano); la base ya tiene el modelo completo.
 
 ## Puesta en marcha
 
@@ -57,6 +57,23 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | POST | `/api/admin/empresas` | 🔒 superadmin | Crear | 201 / 400 / 409 |
 | PUT | `/api/admin/empresas/:id` | 🔒 superadmin | Editar (solo los campos que vienen) | 200 / 400 / 404 / 409 |
 | DELETE | `/api/admin/empresas/:id` | 🔒 superadmin | Borrar (solo si no tiene datos) | 204 / 404 / 409 |
+| GET | `/api/admin/usuarios?rol=&id_empresa=` | 🔒 superadmin | Listar usuarios (sin el hash) | 200 / 400 |
+| GET | `/api/admin/usuarios/:id` | 🔒 superadmin | Obtener uno | 200 / 404 |
+| POST | `/api/admin/usuarios` | 🔒 superadmin | Crear un superadmin o un usuario de productora | 201 / 400 / 409 |
+| PUT | `/api/admin/usuarios/:id` | 🔒 superadmin | Editar (solo los campos que vienen; `password` solo si viene) | 200 / 400 / 404 / 409 |
+| GET | `/api/admin/lugares?origen=plataforma\|propio` | 🔒 superadmin | Listar lugares (de `v_lugares`, con capacidad total) | 200 / 400 |
+| GET | `/api/admin/lugares/:id` | 🔒 superadmin | Lugar con sus `escenarios` y `espacios` | 200 / 404 |
+| POST | `/api/admin/lugares` | 🔒 superadmin | Crear un lugar de la plataforma (con `capacidad` para el sector "General") | 201 / 400 / 409 |
+| PUT | `/api/admin/lugares/:id` | 🔒 superadmin | Editar (solo los de la plataforma) | 200 / 400 / 403 / 404 / 409 |
+| DELETE | `/api/admin/lugares/:id` | 🔒 superadmin | Borrar (solo de la plataforma y sin eventos) | 204 / 403 / 404 / 409 |
+| POST | `/api/admin/lugares/:id/escenarios` | 🔒 superadmin | Agregar escenario | 201 / 400 / 403 / 409 |
+| PUT / DELETE | `/api/admin/lugares/:id/escenarios/:idHijo` | 🔒 superadmin | Editar / borrar escenario (no si un evento lo usa) | 200 / 204 / 404 / 409 |
+| POST | `/api/admin/lugares/:id/espacios` | 🔒 superadmin | Agregar sector (`nombre`, `capacidad`, `modalidad`, `color`) | 201 / 400 / 403 / 409 |
+| PUT / DELETE | `/api/admin/lugares/:id/espacios/:idHijo` | 🔒 superadmin | Editar / borrar sector (no el último ni uno con tarifas) | 200 / 204 / 404 / 409 |
+| GET | `/api/admin/artistas?id_empresa=` | 🔒 superadmin | Artistas de todas las productoras (solo lectura) | 200 |
+| GET | `/api/admin/eventos?estado=&id_empresa=` | 🔒 superadmin | Eventos de todas las productoras, con entradas vendidas y recaudado | 200 / 400 |
+| PATCH | `/api/admin/eventos/:id/estado` | 🔒 superadmin | `{ estado: "borrador" }` despublica, `{ estado: "cancelado" }` cancela | 200 / 400 / 404 / 409 |
+| GET | `/api/admin/metricas` | 🔒 superadmin | Totales, eventos por estado y recaudación por service charge (por mes y por productora) | 200 |
 | GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |
 
 - Errores: siempre `{ mensaje }`. Si son de validación, además `errores: [{ campo, mensaje }]`.
@@ -65,6 +82,10 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 - Empresas: `nombre` y `cuit` (formato `30-12345678-9`) son obligatorios; `cargo_servicio_pct` va de 0 a 100 (por defecto 10).
   Un campo opcional enviado vacío (`""` o `null`) se borra. Un CUIT repetido responde 409.
 - Una productora con usuarios, lugares, artistas o eventos no se borra (409): se da de baja con `activo: false`.
+- Los usuarios no se borran: se dan de baja con `activo: false`. De un cliente solo se puede cambiar `activo`.
+  El superadmin no puede darse de baja ni sacarse el rol a sí mismo.
+- Lugares: el superadmin ve también los propios de cada productora, pero solo modifica los de la plataforma (403).
+  Un lugar nuevo arranca con el sector "General" y el escenario "Principal".
 - Cada respuesta trae el header `X-Instancia` (variable `INSTANCIA` o el nombre del equipo), para la demo de réplicas de Sistemas Operativos.
 
 Ejemplo de body para POST `/api/admin/empresas`:
