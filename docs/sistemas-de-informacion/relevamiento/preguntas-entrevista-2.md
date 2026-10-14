@@ -57,10 +57,13 @@ El cliente confirmó el resumen ("el resumen es fiel a nuestro funcionamiento") 
 
 | # | Pregunta | Repregunta posible | Duda | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | Cuando un cliente rechaza la propuesta, ¿cómo queda ese pedido para ustedes? | ¿Lo siguen considerando un evento? ¿Puede volver a activarse más adelante? | D1 | Pendiente |
-| 2 | Cuando le presentan la primera propuesta al cliente, ¿el pedido ya está en negociación, o recién cuando el cliente pide un ajuste? | Si el cliente acepta la primera propuesta sin cambios, ¿pasa directo de "en solicitud" a "confirmado"? | D8 | **Reformulada** |
-| 3 | ¿Qué datos tienen que estar definidos para poder presentarle una propuesta al cliente? ¿Y para confirmar el encargo? | ¿Se puede confirmar sin sede o sin fecha definida? | D4 | Pendiente |
-| 4 | ¿Cómo deciden qué servicios incluir en una propuesta y su importe? | ¿Tienen combinaciones habituales o es siempre a medida? | D5 | Pendiente |
+| 1 | Cuando un cliente rechaza la propuesta, ¿cómo queda ese pedido para ustedes? | ¿Lo siguen considerando un evento? ¿Puede volver a activarse más adelante? | D1 | ✅ El pedido "queda cerrado sin concretarse"; se conservan cliente, solicitud y propuesta como antecedente. Si el cliente vuelve, es un **pedido nuevo**. El rechazo ocurre en negociación; la cancelación, con el evento confirmado |
+| 1b | Cuando un pedido queda cerrado por un rechazo, ¿cómo lo llaman? ¿Es un estado más, como "rechazado"? | | D1 | **Nueva**: el cliente describió la situación pero no le puso nombre |
+| 1c | Si un cliente desiste antes de aceptar, por ejemplo mientras todavía preparan la propuesta, ¿eso es un rechazo o una cancelación? | ¿Se puede cancelar un pedido que todavía no fue confirmado? | D9 | **Nueva**: contradice la entrevista 1, donde la cancelación podía ocurrir "en cualquier momento antes de que el evento se realice" |
+| 2 | Cuando le presentan la primera propuesta al cliente, ¿el pedido ya está en negociación, o recién cuando el cliente pide un ajuste? | Si el cliente acepta la primera propuesta sin cambios, ¿pasa directo de "en solicitud" a "confirmado"? | D8 | ✅ Pasa a negociación **al presentar la primera propuesta**. Si el cliente la acepta sin cambios, pasa directo a confirmado. La negociación es todo el período con la propuesta presentada |
+| 3 | ¿Qué datos tienen que estar definidos para poder presentarle una propuesta al cliente? ¿Y para confirmar el encargo? | ¿Se puede confirmar sin sede o sin fecha definida? | D4 | ✅ **Para presentar:** contacto, tipo, fecha y sede previstas (pueden ser tentativas), asistentes estimados y necesidades principales. **Para confirmar:** aceptación registrada, servicios y condiciones acordados, y **fecha y sede concretas**. Sin fecha o sede definidas no se confirma |
+| 4 | ¿Cómo deciden qué servicios incluir en una propuesta y su importe? | ¿Tienen combinaciones habituales o es siempre a medida? | D5 | ✅ Tienen **combinaciones habituales como punto de partida**, no paquetes rígidos; cada propuesta se adapta. Coordinación decide según tipo, asistentes, sede y pedido. Los importes salen de costos conocidos y de cotizaciones que piden a los proveedores. Al aceptar se registran servicios e importes acordados |
+| 4b | Esas combinaciones habituales, ¿las tienen anotadas en algún lado? ¿Les serviría arrancar una propuesta a partir de una de ellas? | ¿Quién las mantiene? | D5 | **Nueva** (opcional): define si el software las guarda |
 | 5 | Cuando cambia algo ya acordado, por ejemplo la fecha, ¿necesitan saber después cuál era la fecha anterior y por qué cambió? | ¿Quién pidió el cambio? ¿Cuándo se registró? | D6 | **Reformulada** |
 | 6 | Además de pendiente y vencida, ¿en qué otras situaciones puede estar una tarea? | ¿Se puede cancelar una tarea, por ejemplo después de un cambio? ¿Quién la marca como completada? | D3 | **Reformulada** |
 | 7 | El responsable de una tarea, ¿es una persona o un área? | ¿Puede cambiar de responsable? | D10 | Pendiente |
@@ -83,10 +86,10 @@ Usarlas **solo si no se recupera** el intercambio original del chat (ver [entrev
 
 | # | Pregunta | Hecho | Estado |
 | --- | --- | --- | --- |
-| 11 | Cuando el cliente acepta la propuesta, ¿qué queda acordado exactamente? | F18 | Pendiente (F17 ya tiene respaldo) |
+| 11 | Cuando el cliente acepta la propuesta, ¿qué queda acordado exactamente? | F18 | Casi resuelta: la respuesta 3 dice servicios, importes, condiciones, fecha y sede concretas. Falta solo si los asistentes y las condiciones particulares también quedan fijos |
 | 12 | ~~Si el encargo ya está confirmado, ¿quiere decir que los proveedores también lo están?~~ | F19 | ✅ Respondida en la apertura |
 | 13 | ¿Qué datos necesitan tener de cada proveedor? | F21 | Pendiente |
-| 14 | Cuando el cliente pide cambios a la propuesta, ¿eso cuenta como un rechazo? | F15 | Pendiente: la apertura lo sugiere pero no lo dice |
+| 14 | ~~Cuando el cliente pide cambios a la propuesta, ¿eso cuenta como un rechazo?~~ | F15 | ✅ Respuesta 2: si pide cambios, se ajusta y sigue en negociación |
 | 15 | ~~¿"Pedido" y "solicitud" son lo mismo para ustedes?~~ | Lenguaje | ✅ Respondida en la apertura |
 
 ## C. Validar interpretaciones y propuestas

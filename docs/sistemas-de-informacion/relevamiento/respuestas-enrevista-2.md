@@ -15,8 +15,6 @@ Hola, somos del mismo grupo que conversó con ustedes el 13/10. Para retomar, te
 >
 > ¿Es así? ¿Hay algo que corregirías o agregarías?
 …
-
-
 Sí, en general es correcto. Desde Backstage, el resumen refleja bien cómo trabajamos, desde la recepción del pedido hasta el cierre del evento. También está bien que distingan entre la confirmación del cliente y la confirmación de los proveedores: son dos cosas diferentes.
 
 Solo haría algunas aclaraciones:
@@ -34,3 +32,64 @@ Solo haría algunas aclaraciones:
 Agregaría una última cuestión importante: necesitamos poder identificar qué compromisos siguen pendientes y cuáles están vencidos. Por ejemplo, qué servicios todavía no tienen un proveedor confirmado y qué tareas de preparación aún no se completaron y ya pasaron su fecha prevista. Esa información es fundamental para que Coordinación y Producción sepan dónde deben intervenir.
 
 Por lo demás, el resumen es fiel a nuestro funcionamiento. No agregaría otros procesos: lo importante para nosotros es mantener centralizada la información de cada encargo y poder saber qué se acordó con el cliente, qué falta confirmar y qué queda por hacer antes del concierto.
+
+Bien, tomaremos en cuenta estas agregaciones para el análisis. 
+Continuamos con las preguntas:
+Cuando un cliente rechaza la propuesta, ¿cómo queda ese pedido para ustedes?
+Cuando un cliente rechaza la propuesta, registramos el rechazo y, si nos explica por qué, también dejamos asentado el motivo.
+
+Para nosotros, ese pedido queda cerrado sin concretarse. Conservamos los datos del cliente, la solicitud original y la propuesta que le habíamos presentado, porque nos interesa mantener esa información como antecedente.
+
+No pasa al estado de confirmado ni seguimos preparando el evento. Si más adelante el cliente vuelve a contactarnos para organizar un concierto, lo tratamos como un nuevo pedido, aunque podemos tener en cuenta lo conversado anteriormente.
+
+Es importante distinguirlo de una cancelación: el rechazo ocurre durante la negociación, antes de que el cliente acepte la propuesta; la cancelación ocurre cuando el evento ya había sido confirmado.
+
+Cuando le presentan la primera propuesta al cliente, ¿el pedido ya está en negociación, o recién cuando el cliente pide un ajuste? y si el cliente acepta la primera propuesta sin hacer cambios, pasa directamente a un estado confirmado?
+En Backstage, el pedido pasa al estado en negociación cuando le presentamos la primera propuesta al cliente, no hace falta que el cliente pida un ajuste.
+
+A partir de ahí, pueden pasar dos cosas:
+
+El cliente pide cambios: ajustamos la propuesta vigente y se la volvemos a presentar, manteniendo el pedido en negociación.
+
+El cliente acepta la primera propuesta sin cambios: registramos su aceptación y el pedido pasa directamente a confirmado.
+
+Es decir, no es obligatorio que haya una modificación para que exista una negociación. La negociación incluye todo el período en el que la propuesta está presentada y esperamos la respuesta del cliente.
+
+Y recordemos que, cuando el pedido pasa a confirmado, quedan registrados los servicios y las condiciones acordadas, pero todavía puede haber proveedores cuya participación esté pendiente de confirmación.
+
+¿Qué datos tienen que estar definidos para poder presentarle una propuesta al cliente? ¿Y para confirmar el encargo? | ¿Se puede confirmar sin sede o sin fecha definida?
+En Backstage, para presentar una primera propuesta no necesitamos tener absolutamente todos los detalles del concierto resueltos, pero sí contar con información suficiente para definir qué servicios ofrecer y estimar sus importes.
+
+Para presentar una propuesta, necesitamos tener definidos, como mínimo:
+
+El tipo de concierto o espectáculo musical.
+
+La fecha prevista, aunque todavía podemos estar conversando sobre ella.
+
+La sede prevista, aunque todavía no esté cerrada definitivamente.
+
+La cantidad estimada de asistentes.
+
+Las necesidades principales del cliente, por ejemplo, sonido, iluminación o escenario.
+
+También necesitamos los datos de contacto del cliente para poder presentarle la propuesta y conversar sobre los ajustes.
+
+Para confirmar el encargo, el criterio es más estricto: tenemos que registrar la aceptación del cliente y dejar definidos los servicios y las condiciones acordadas. Eso incluye tener una fecha y una sede concretas para el evento, además de los demás datos necesarios para saber qué estamos organizando.
+
+Por lo tanto, no confirmamos un encargo si la fecha o la sede siguen sin definirse. Podemos avanzar con la propuesta y la negociación mientras resolvemos esos datos, pero antes de confirmar necesitamos tenerlos establecidos.
+
+Una aclaración: que la sede esté definida no significa que ya esté confirmada la participación de todos los proveedores. Esos compromisos se siguen por separado durante la preparación.
+
+¿Cómo deciden qué servicios incluir en una propuesta y su importe? | ¿Tienen combinaciones habituales o es siempre a medida?
+En Backstage tenemos algunas combinaciones de servicios que usamos como punto de partida, pero no trabajamos con paquetes rígidos ni hacemos todas las propuestas de la misma manera. Cada propuesta se adapta a lo que necesita el cliente y a las características del concierto.
+
+Para decidir qué incluir, en Coordinación tenemos en cuenta principalmente el tipo de espectáculo, la cantidad estimada de asistentes, la sede prevista y lo que el cliente nos pide. Por ejemplo, un concierto puede necesitar sonido e iluminación, mientras que otro también puede requerir un escenario.
+
+En cuanto a los importes, tomamos como referencia los costos que conocemos de los servicios y las cotizaciones que solicitamos a los proveedores cuando hace falta. Después, detallamos los servicios y sus importes en la propuesta y calculamos el total que le ofrecemos al cliente.
+
+Las combinaciones habituales nos sirven para no empezar desde cero, pero podemos agregar, quitar o modificar servicios según el pedido.
+
+Si durante la negociación el cliente solicita un cambio, actualizamos la propuesta vigente y volvemos a presentársela. Cuando finalmente la acepta, dejamos registrados los servicios y los importes acordados.
+
+Lo importante es que el presupuesto refleje lo que realmente le estamos ofreciendo a ese cliente, no solamente un paquete genérico.
+
