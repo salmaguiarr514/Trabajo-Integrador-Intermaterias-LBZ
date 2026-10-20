@@ -3,6 +3,9 @@ import api from "./api.js";
 // Solo productoras (/api/panel). Todo es de la productora del usuario logueado.
 // Los lugares están en lugaresService.js (lo comparten superadmin y productora).
 
+// ─── Inicio ───
+export const obtenerResumen = () => api.get("/panel/resumen");
+
 // ─── Mi productora ───
 export const obtenerMiEmpresa = () => api.get("/panel/empresa");
 export const actualizarMiEmpresa = (datos) => api.put("/panel/empresa", datos);

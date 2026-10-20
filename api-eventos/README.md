@@ -76,6 +76,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | GET | `/api/admin/eventos?estado=&id_empresa=` | 🔒 superadmin | Eventos de todas las productoras, con entradas vendidas y recaudado | 200 / 400 |
 | PATCH | `/api/admin/eventos/:id/estado` | 🔒 superadmin | `{ estado: "borrador" }` despublica, `{ estado: "cancelado" }` cancela | 200 / 400 / 404 / 409 |
 | GET | `/api/admin/metricas` | 🔒 superadmin | Totales, eventos por estado y recaudación por service charge (por mes y por productora) | 200 |
+| GET | `/api/panel/resumen` | 🔒 empresa | Inicio: publicados, borradores, entradas vendidas, recaudado (subtotal), próximos eventos y últimas ventas | 200 |
 | GET / PUT | `/api/panel/empresa` | 🔒 empresa | Datos de la propia productora (sin CUIT, % ni alta/baja) | 200 / 400 |
 | GET, POST, PUT, DELETE | `/api/panel/lugares/...` | 🔒 empresa | Las mismas rutas de lugares, escenarios y sectores que `/api/admin/lugares` | 200 / 201 / 204 / 400 / 403 / 404 / 409 |
 | GET | `/api/panel/artistas` | 🔒 empresa | Artistas de la productora | 200 |

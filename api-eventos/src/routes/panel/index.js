@@ -3,6 +3,7 @@ import { autenticar } from "../../middlewares/autenticar.js";
 import { permitir } from "../../middlewares/permitir.js";
 import { validar } from "../../middlewares/validar.js";
 import { obtenerMiEmpresa, editarMiEmpresa } from "../../controllers/panel/empresa.controller.js";
+import { obtenerResumen } from "../../controllers/panel/resumen.controller.js";
 import { miEmpresaSchema } from "../../schemas/empresas.schema.js";
 import lugaresRouter from "../lugares.routes.js";
 import artistasRouter from "./artistas.routes.js";
@@ -13,6 +14,7 @@ import eventosRouter from "./eventos.routes.js";
 const router = Router();
 
 router.use(autenticar, permitir("empresa"));
+router.get("/resumen", obtenerResumen);
 router.get("/empresa", obtenerMiEmpresa);
 router.put("/empresa", validar(miEmpresaSchema), editarMiEmpresa);
 router.use("/lugares", lugaresRouter);
