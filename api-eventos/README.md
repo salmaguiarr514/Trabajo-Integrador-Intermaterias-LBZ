@@ -1,7 +1,7 @@
 # API Eventos
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-Hoy tiene el login, el panel del superadmin (fase 4, sin el plano) y del panel de la productora los lugares, los artistas y sus datos (fase 5, sin eventos todavía).
+Hoy tiene el login, el panel del superadmin (fase 4, sin el plano) y el panel de la productora: lugares, artistas, sus datos y el armado completo de eventos (fase 5).
 
 ## Puesta en marcha
 
@@ -83,6 +83,17 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | POST | `/api/panel/artistas` | 🔒 empresa | Crear (`nombre` obligatorio; `genero`, `pais`, `bio`, `imagen_url`) | 201 / 400 / 409 |
 | PUT | `/api/panel/artistas/:id` | 🔒 empresa | Editar (solo los campos que vienen) | 200 / 400 / 404 / 409 |
 | DELETE | `/api/panel/artistas/:id` | 🔒 empresa | Borrar (no si tiene presentaciones: se da de baja) | 204 / 404 / 409 |
+| GET | `/api/panel/eventos` | 🔒 empresa | Eventos de la productora, con jornadas, shows, tarifas y entradas vendidas | 200 |
+| GET | `/api/panel/eventos/:id` | 🔒 empresa | Todo el evento para el asistente: escenarios del lugar (con `habilitado`), sectores, jornadas, line-up y tarifas | 200 / 404 |
+| POST | `/api/panel/eventos` | 🔒 empresa | Crear en borrador. Genera una jornada por día y habilita todos los escenarios del lugar | 201 / 400 |
+| PUT | `/api/panel/eventos/:id` | 🔒 empresa | Editar. El lugar solo cambia si no hay line-up ni tarifas (RN-21) | 200 / 400 / 404 / 409 |
+| DELETE | `/api/panel/eventos/:id` | 🔒 empresa | Borrar con todo (no si tiene ventas: se cancela) | 204 / 404 / 409 |
+| PATCH | `/api/panel/eventos/:id/estado` | 🔒 empresa | `publicado` (pide jornada, show y tarifa activa: RN-20), `borrador` (despublicar, sin ventas) o `cancelado` | 200 / 400 / 404 / 409 |
+| GET | `/api/panel/eventos/:id/disponibilidad` | 🔒 empresa | Capacidad, vendidas y libres por jornada y sector (`v_disponibilidad`) | 200 / 404 |
+| POST, PUT, DELETE | `/api/panel/eventos/:id/jornadas[/:idHijo]` | 🔒 empresa | Jornadas (`fecha` dentro del evento, `hora_apertura`, `nombre`) | 201 / 200 / 204 / 400 / 404 / 409 |
+| PUT | `/api/panel/eventos/:id/escenarios` | 🔒 empresa | `{ escenarios: [ids] }` reemplaza los habilitados (no se saca uno con shows) | 200 / 400 / 409 |
+| POST, PUT, DELETE | `/api/panel/eventos/:id/presentaciones[/:idHijo]` | 🔒 empresa | Line-up: `id_jornada`, `id_escenario`, `id_artista`, `inicio`, `fin` (`"2027-02-13T22:30"`), `headliner`. Si se superpone, 409 con quién choca | 201 / 200 / 204 / 400 / 404 / 409 |
+| POST, PUT, DELETE | `/api/panel/eventos/:id/tarifas[/:idHijo]` | 🔒 empresa | `id_espacio`, `id_jornada` (`null` = abono), `nombre`, `precio`, `venta_desde`, `venta_hasta`, `activa`. Sin cupo: es la capacidad del sector | 201 / 200 / 204 / 400 / 404 / 409 |
 | GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |
 
 - Errores: siempre `{ mensaje }`. Si son de validación, además `errores: [{ campo, mensaje }]`.
@@ -103,6 +114,8 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 - Lugares (`/api/admin/lugares` y `/api/panel/lugares` usan el mismo controller): el superadmin ve todos y modifica los de la plataforma;
   la productora ve los de la plataforma y los suyos, y modifica solo los suyos (403). Un lugar propio de otra productora responde 404.
 - Panel: todo se filtra por el `id_empresa` del token, nunca del body. Lo de otra productora responde 404, como si no existiera.
+- Eventos: un evento cancelado o finalizado ya no se modifica. Las horas de los shows y de la venta viajan como texto `"AAAA-MM-DDTHH:MM"`
+  (hora de Argentina, sin huso) para que el navegador no las corra. Un show puede empezar en la madrugada siguiente a su jornada (antes de las 8).
   Un lugar nuevo arranca con el sector "General" y el escenario "Principal".
 - Cada respuesta trae el header `X-Instancia` (variable `INSTANCIA` o el nombre del equipo), para la demo de réplicas de Sistemas Operativos.
 

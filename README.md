@@ -80,6 +80,8 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 | `/admin/empresas/nueva`, `/admin/empresas/:id/editar` | superadmin | Formulario de alta y edición (incluye % de service charge y activar/desactivar) |
 | `/panel` | empresa | Inicio del panel de la productora (se completa en la fase 5) |
 | `/panel/lugares`, `/panel/lugares/:id` | empresa | Los lugares de la plataforma (solo lectura) y los propios (con sectores y escenarios). Son las mismas pantallas que usa el superadmin |
+| `/panel/eventos` | empresa | Eventos de la productora, con su estado y qué le falta para publicarse |
+| `/panel/eventos/nuevo`, `/panel/eventos/:id` | empresa | Asistente en 6 pasos: datos, jornadas, escenarios, line-up (grilla escenario × horario), tarifas y publicar |
 | `/panel/artistas` | empresa | Alta, edición, baja y borrado de los artistas de la productora |
 | `/panel/mi-productora` | empresa | Datos de contacto de la productora (el CUIT y el % los maneja el superadmin) |
 | cualquier otra | todos | Página 404 |

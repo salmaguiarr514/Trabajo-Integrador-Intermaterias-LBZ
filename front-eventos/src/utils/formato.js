@@ -16,3 +16,12 @@ export const rangoFechas = (inicio, fin) => (inicio === fin ? fecha(inicio) : `$
 
 // Columnas TIMESTAMP (fecha_creacion)
 export const fechaHora = (iso) => (iso ? new Date(iso).toLocaleDateString("es-AR") : "—");
+
+// "2027-02-13" → "sáb 13/2"
+export const diaCorto = (iso) => {
+  const f = deFecha(iso);
+  return `${f.toLocaleDateString("es-AR", { weekday: "short" }).replace(".", "")} ${f.getDate()}/${f.getMonth() + 1}`;
+};
+
+// "2027-02-13T22:30" → "22:30"
+export const hora = (fechaHora) => (fechaHora ? fechaHora.slice(11, 16) : "—");

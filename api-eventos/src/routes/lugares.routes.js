@@ -13,15 +13,14 @@ import {
   eliminarEspacio
 } from "../controllers/lugares.controller.js";
 import { validar } from "../middlewares/validar.js";
-import { idParams } from "../schemas/comunes.js";
+import { idHijoParams, idParams } from "../schemas/comunes.js";
 import {
   crearLugarSchema,
   editarLugarSchema,
   crearEscenarioSchema,
   editarEscenarioSchema,
   crearEspacioSchema,
-  editarEspacioSchema,
-  idHijoParams
+  editarEspacioSchema
 } from "../schemas/lugares.schema.js";
 
 // Mismas rutas para el superadmin (/api/admin/lugares) y la productora (/api/panel/lugares):

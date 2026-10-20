@@ -11,3 +11,9 @@ export const opcional = (schema) =>
 export const idParams = z.object({
   id: z.coerce.number({ error: "El id debe ser un número entero" }).int("El id debe ser un número entero").positive("El id debe ser un número entero")
 });
+
+// Para validar req.params de un recurso anidado: /lugares/:id/escenarios/:idHijo, /eventos/:id/jornadas/:idHijo
+export const idHijoParams = z.object({
+  id: z.coerce.number({ error: "El id debe ser un número entero" }).int("El id debe ser un número entero").positive("El id debe ser un número entero"),
+  idHijo: z.coerce.number({ error: "El id debe ser un número entero" }).int("El id debe ser un número entero").positive("El id debe ser un número entero")
+});
