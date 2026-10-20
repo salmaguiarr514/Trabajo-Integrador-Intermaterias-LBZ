@@ -29,12 +29,3 @@ export const actualizar = (tabla, datos, columnas, donde) => {
     valores: [...cols.map((c) => datos[c]), ...Object.values(donde)]
   };
 };
-
-// Los TIMESTAMP se devuelven como texto "2027-02-13T22:30": son horas de Argentina sin huso,
-// y si viajaran como Date el navegador las correría.
-export const hora = (col, alias = col.split(".").pop()) => `to_char(${col}, 'YYYY-MM-DD"T"HH24:MI') AS ${alias}`;
-
-// "Ahora" y "hoy" en Argentina, para comparar con esos TIMESTAMP y DATE sin huso
-// (el servidor de la base corre en UTC).
-export const AHORA = "(NOW() AT TIME ZONE 'America/Argentina/Buenos_Aires')";
-export const HOY = `${AHORA}::DATE`;

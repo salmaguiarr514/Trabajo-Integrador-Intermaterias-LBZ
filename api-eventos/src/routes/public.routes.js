@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { obtenerCartelera, obtenerEventoPublico, obtenerArtistaPublico } from "../controllers/public.controller.js";
+import { obtenerArtistaPublico, obtenerCartelera, obtenerCiudades, obtenerEventoPublico } from "../controllers/public.controller.js";
 import { validar } from "../middlewares/validar.js";
 import { idParams } from "../schemas/comunes.js";
 
-// /api/public/*: sin login
+// /api/public/*: sin login. Solo eventos publicados o agotados.
 const router = Router();
-const id = validar(idParams, "params");
 
 router.get("/eventos", obtenerCartelera);
-router.get("/eventos/:id", id, obtenerEventoPublico);
-router.get("/artistas/:id", id, obtenerArtistaPublico);
+router.get("/ciudades", obtenerCiudades);
+router.get("/eventos/:id", validar(idParams, "params"), obtenerEventoPublico);
+router.get("/artistas/:id", validar(idParams, "params"), obtenerArtistaPublico);
 
 export default router;

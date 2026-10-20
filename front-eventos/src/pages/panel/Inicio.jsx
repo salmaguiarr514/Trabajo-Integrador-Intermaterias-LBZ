@@ -1,21 +1,140 @@
-import { Card, Typography } from "antd";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import { Alert, Button, Card, Col, Empty, Row, Space, Statistic, Table, Tag, Typography } from "antd";
+import { CalendarOutlined, DollarOutlined, EditOutlined, PlusOutlined, RocketOutlined, TagsOutlined } from "@ant-design/icons";
 import { useAuth } from "../../context/auth.js";
+import { obtenerResumen } from "../../services/panelService.js";
+import { useCarga } from "../../hooks/useCarga.js";
+import { numero, pesos, rangoFechas } from "../../utils/formato.js";
+import { COLOR_ESTADO } from "../../utils/estados.js";
+import Cargando from "../../components/Cargando.jsx";
 
-// Dashboard de la productora: se completa en la fase 5 (próximos eventos y ventas)
+// Inicio del panel de la productora: cómo viene y qué tiene por delante
 function Inicio() {
   const { usuario } = useAuth();
+  const navigate = useNavigate();
+  const resumen = useCarga(obtenerResumen, "resumen", "No se pudo cargar el resumen");
 
-  return (
-    <div className="pila">
+  const encabezado = (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
       <div>
         <Typography.Title level={2} style={{ marginBottom: 4 }}>Hola, {usuario.nombre}</Typography.Title>
         <Typography.Text type="secondary">Panel de {usuario.empresa}</Typography.Text>
       </div>
-      <Card>
-        <Typography.Paragraph style={{ margin: 0 }}>
-          Desde acá vas a cargar tus lugares y artistas, armar eventos con su line-up y tarifas, y seguir las ventas.
-        </Typography.Paragraph>
-      </Card>
+      <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/panel/eventos/nuevo")}>
+        Nuevo evento
+      </Button>
+    </div>
+  );
+
+  if (resumen.cargando) return <Cargando texto="Cargando tu panel..." />;
+  if (resumen.error) return <div className="pila">{encabezado}<Alert type="error" showIcon title={resumen.error} /></div>;
+
+  const r = resumen.datos;
+  const abrir = (id) => navigate(`/panel/eventos/${id}`);
+
+  return (
+    <div className="pila">
+      {encabezado}
+
+      <Row gutter={[16, 16]}>
+        <Col xs={12} lg={6}>
+          <Card style={{ height: "100%" }}>
+            <Statistic title="Publicados" value={r.publicados} prefix={<RocketOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={12} lg={6}>
+          <Card style={{ height: "100%" }}>
+            <Statistic title="En borrador" value={r.borradores} prefix={<EditOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={12} lg={6}>
+          <Card style={{ height: "100%" }}>
+            <Statistic title="Entradas vendidas" value={r.entradas_vendidas} groupSeparator="." prefix={<TagsOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={12} lg={6}>
+          <Card style={{ height: "100%" }}>
+            <Statistic
+              title="Recaudado"
+              value={r.recaudado}
+              precision={0}
+              groupSeparator="."
+              prefix={<DollarOutlined />}
+              styles={{ content: { color: "#a855f7", fontWeight: 700 } }}
+            />
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Sin el service charge</Typography.Text>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={14}>
+          <Card title={<><CalendarOutlined /> Próximos eventos</>} extra={<Button type="link" onClick={() => navigate("/panel/eventos")}>Ver todos</Button>}>
+            {r.proximos.length === 0 ? (
+              <Empty description="No tenés eventos por delante">
+                <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/panel/eventos/nuevo")}>Armar uno</Button>
+              </Empty>
+            ) : (
+              <Space orientation="vertical" size={0} style={{ width: "100%" }}>
+                {r.proximos.map((e, i) => (
+                  <div
+                    key={e.id_evento}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => abrir(e.id_evento)}
+                    onKeyDown={(ev) => ev.key === "Enter" && abrir(e.id_evento)}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      padding: "12px 0",
+                      borderTop: i ? "1px solid rgba(255,255,255,0.08)" : "none",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <Space orientation="vertical" size={2} style={{ minWidth: 0 }}>
+                      <Space wrap size={8}>
+                        <Typography.Text strong>{e.nombre}</Typography.Text>
+                        <Tag color={COLOR_ESTADO[e.estado]}>{e.estado}</Tag>
+                      </Space>
+                      <Typography.Text type="secondary">
+                        {rangoFechas(e.fecha_inicio, e.fecha_fin)} · {e.lugar}, {e.ciudad}
+                      </Typography.Text>
+                    </Space>
+                    <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                      <Typography.Text strong style={{ fontVariantNumeric: "tabular-nums" }}>{numero(e.entradas_vendidas)} entradas</Typography.Text>
+                      <br />
+                      <Typography.Text type="secondary" style={{ fontVariantNumeric: "tabular-nums" }}>{pesos(e.recaudado)}</Typography.Text>
+                    </div>
+                  </div>
+                ))}
+              </Space>
+            )}
+          </Card>
+        </Col>
+        <Col xs={24} lg={10}>
+          <Card title={<><TagsOutlined /> Últimas ventas</>}>
+            <Table
+              rowKey="id_compra"
+              size="small"
+              pagination={false}
+              dataSource={r.ultimas_ventas}
+              locale={{ emptyText: <Empty description="Todavía no vendiste entradas" /> }}
+              columns={[
+                {
+                  title: "Cuándo",
+                  dataIndex: "fecha",
+                  render: (f) => <span style={{ whiteSpace: "nowrap" }}>{dayjs(f).format("DD/MM HH:mm")}</span>
+                },
+                { title: "Evento", dataIndex: "evento", ellipsis: true },
+                { title: "Entradas", dataIndex: "cantidad", align: "right" },
+                { title: "Importe", dataIndex: "subtotal", align: "right", render: (v) => <span style={{ whiteSpace: "nowrap" }}>{pesos(v)}</span> }
+              ]}
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 }

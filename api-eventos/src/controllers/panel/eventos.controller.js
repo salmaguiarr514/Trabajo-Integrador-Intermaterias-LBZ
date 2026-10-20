@@ -1,6 +1,7 @@
 import pool, { enTransaccion } from "../../data/db.js";
 import { ErrorHttp } from "../../utils/ErrorHttp.js";
-import { actualizar, hora, insertar } from "../../utils/sql.js";
+import { actualizar, insertar } from "../../utils/sql.js";
+import { hora } from "../../utils/fechas.js";
 
 // Eventos de la productora del usuario (fase 5): el evento y todo lo que cuelga de él
 // (jornadas, escenarios habilitados, line-up y tarifas). Todo filtra por req.usuario.id_empresa:

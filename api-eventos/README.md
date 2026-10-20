@@ -1,8 +1,7 @@
 # API Eventos
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-Hoy tiene el login, el panel del superadmin (fase 4, sin el plano) y el panel de la productora: lugares, artistas, sus datos y el armado completo de eventos (fase 5),
-y lo del público y el cliente: cartelera, detalle del evento, compra con service charge y pago simulado, mis entradas y perfil (fase 6).
+Hoy tiene el login, el panel del superadmin (fase 4, sin el plano), el panel de la productora (fase 5) y el sitio público con la compra de entradas (fase 6).
 
 ## Puesta en marcha
 
@@ -77,6 +76,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | GET | `/api/admin/eventos?estado=&id_empresa=` | 🔒 superadmin | Eventos de todas las productoras, con entradas vendidas y recaudado | 200 / 400 |
 | PATCH | `/api/admin/eventos/:id/estado` | 🔒 superadmin | `{ estado: "borrador" }` despublica, `{ estado: "cancelado" }` cancela | 200 / 400 / 404 / 409 |
 | GET | `/api/admin/metricas` | 🔒 superadmin | Totales, eventos por estado y recaudación por service charge (por mes y por productora) | 200 |
+| GET | `/api/panel/resumen` | 🔒 empresa | Inicio: publicados, borradores, entradas vendidas, recaudado (subtotal), próximos eventos y últimas ventas | 200 |
 | GET / PUT | `/api/panel/empresa` | 🔒 empresa | Datos de la propia productora (sin CUIT, % ni alta/baja) | 200 / 400 |
 | GET, POST, PUT, DELETE | `/api/panel/lugares/...` | 🔒 empresa | Las mismas rutas de lugares, escenarios y sectores que `/api/admin/lugares` | 200 / 201 / 204 / 400 / 403 / 404 / 409 |
 | GET | `/api/panel/artistas` | 🔒 empresa | Artistas de la productora | 200 |
@@ -95,15 +95,17 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | PUT | `/api/panel/eventos/:id/escenarios` | 🔒 empresa | `{ escenarios: [ids] }` reemplaza los habilitados (no se saca uno con shows) | 200 / 400 / 409 |
 | POST, PUT, DELETE | `/api/panel/eventos/:id/presentaciones[/:idHijo]` | 🔒 empresa | Line-up: `id_jornada`, `id_escenario`, `id_artista`, `inicio`, `fin` (`"2027-02-13T22:30"`), `headliner`. Si se superpone, 409 con quién choca | 201 / 200 / 204 / 400 / 404 / 409 |
 | POST, PUT, DELETE | `/api/panel/eventos/:id/tarifas[/:idHijo]` | 🔒 empresa | `id_espacio`, `id_jornada` (`null` = abono), `nombre`, `precio`, `venta_desde`, `venta_hasta`, `activa`. Sin cupo: es la capacidad del sector | 201 / 200 / 204 / 400 / 404 / 409 |
-| GET | `/api/public/eventos?q=&ciudad=&provincia=&tipo=&desde=&hasta=&artista=&genero=` | todos | Cartelera: eventos publicados o agotados que no terminaron (`v_cartelera`) | 200 / 400 |
-| GET | `/api/public/eventos/:id` | todos | Detalle: lugar (con plano), jornadas, escenarios, line-up, sectores, tarifas (`en_venta`, `disponibles`) y disponibilidad | 200 / 404 |
+| GET | `/api/public/eventos?q=&ciudad=&tipo=` | todos | Cartelera (`v_cartelera`, solo lo que no terminó) | 200 / 400 |
+| GET | `/api/public/ciudades` | todos | Ciudades con eventos en cartelera | 200 |
+| GET | `/api/public/eventos/:id` | todos | Detalle: jornadas, line-up, tarifas activas con `disponibles` y `en_venta`, `cargo_servicio_pct` | 200 / 404 |
 | GET | `/api/public/artistas/:id` | todos | Artista y sus próximas presentaciones (solo si toca en un evento de la cartelera) | 200 / 404 |
-| POST | `/api/cliente/compras/cotizar` | 🔒 cliente | `{ id_evento, items: [{ id_tarifa, cantidad }] }` → líneas, `subtotal`, `cargo_servicio` y `total`. No guarda nada | 200 / 400 / 404 / 409 |
-| POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` (`credito`, `debito`, `transferencia`) y `tarjeta_ficticia` (16 números, si es tarjeta) → la compra con sus entradas | 201 / 400 / 402 / 404 / 409 |
-| GET | `/api/cliente/compras` | 🔒 cliente | Mis compras (pagadas y rechazadas) | 200 |
+| POST | `/api/cliente/compras/cotizar` | 🔒 cliente | `{ id_evento, items: [{ id_tarifa, cantidad }] }` → detalle, subtotal, service charge y total | 200 / 400 / 404 / 409 |
+| POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` y `tarjeta` (`numero`, `nombre`, `vencimiento`, `cvv`). Pago simulado: termina en 0000 → `rechazada` | 201 / 400 / 404 / 409 |
+| GET | `/api/cliente/compras` | 🔒 cliente | Mis compras (también las rechazadas) | 200 |
 | GET | `/api/cliente/compras/:id` | 🔒 cliente | Una compra con sus entradas | 200 / 404 |
-| GET | `/api/cliente/entradas` | 🔒 cliente | Mis entradas de compras pagadas, con el `codigo` para el QR y los ingresos registrados | 200 |
-| GET / PUT | `/api/cliente/perfil` | 🔒 cliente | Mis datos (`nombre`, `apellido`, `dni`, `telefono`). Para cambiar la contraseña: `password_actual` y `password_nueva` | 200 / 400 |
+| GET | `/api/cliente/entradas` | 🔒 cliente | Mis entradas de compras pagadas, con el `codigo` (UUID) para el QR | 200 |
+| GET | `/api/cliente/perfil` | 🔒 cliente | Mis datos | 200 |
+| PUT | `/api/cliente/perfil` | 🔒 cliente | `nombre`, `apellido`, `dni`, `telefono`. Para cambiar la contraseña: `password_actual` y `password_nueva` | 200 / 400 |
 | GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |
 
 - Errores: siempre `{ mensaje }`. Si son de validación, además `errores: [{ campo, mensaje }]`.
@@ -124,15 +126,17 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 - Lugares (`/api/admin/lugares` y `/api/panel/lugares` usan el mismo controller): el superadmin ve todos y modifica los de la plataforma;
   la productora ve los de la plataforma y los suyos, y modifica solo los suyos (403). Un lugar propio de otra productora responde 404.
 - Panel: todo se filtra por el `id_empresa` del token, nunca del body. Lo de otra productora responde 404, como si no existiera.
+- Compra: en una transacción se bloquean las tarifas del evento en los sectores pedidos (`SELECT … FOR UPDATE`) y recién después se mira
+  la disponibilidad, así dos compras simultáneas no venden el mismo último lugar. Un abono ocupa lugar en todas las jornadas. Hasta 10 entradas
+  por compra. Service charge = subtotal × % de la productora. Si se agota todo, el evento pasa a `agotado`.
 - Eventos: un evento cancelado o finalizado ya no se modifica. Las horas de los shows y de la venta viajan como texto `"AAAA-MM-DDTHH:MM"`
   (hora de Argentina, sin huso) para que el navegador no las corra. Un show puede empezar en la madrugada siguiente a su jornada (antes de las 8).
   Un lugar nuevo arranca con el sector "General" y el escenario "Principal".
 - Compras (RN-22 a RN-30): máximo 10 entradas por compra. Una tarifa se vende si está activa y dentro de su período de venta.
-  Se controla el cupo de cada sector y jornada (un abono ocupa lugar en todas las jornadas): si no alcanza, 409 con
-  `id_espacio`, `id_jornada` y `disponibles`. Todo pasa en una transacción que bloquea las tarifas de los sectores
-  involucrados, así dos compras simultáneas no se pasan del cupo.
-  Service charge = subtotal × % de la productora (queda copiado en la compra).
-  Pago simulado: una tarjeta terminada en `0000` se rechaza (402, la compra queda `rechazada` y sin entradas); cualquier otra
+  Se controla el cupo de cada sector y jornada (un abono ocupa lugar en todas las jornadas): si no alcanza, 409.
+  Todo pasa en una transacción que bloquea las tarifas de los sectores involucrados, así dos compras simultáneas no se pasan del cupo.
+  Service charge = subtotal × % de la productora (queda copiado en la compra). Un evento que ya terminó no se vende (409).
+  Pago simulado: una tarjeta terminada en `0000` se rechaza (201 con `estado: "rechazada"`, sin entradas); cualquier otra
   tarjeta y la transferencia se aprueban. Si después de una compra no queda lugar en ningún sector, el evento pasa a `agotado`.
 - Cada respuesta trae el header `X-Instancia` (variable `INSTANCIA` o el nombre del equipo), para la demo de réplicas de Sistemas Operativos.
 

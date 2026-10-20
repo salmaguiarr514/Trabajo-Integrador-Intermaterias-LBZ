@@ -7,6 +7,9 @@ import Cartelera from "./pages/public/Cartelera.jsx";
 import Login from "./pages/public/Login.jsx";
 import Registro from "./pages/public/Registro.jsx";
 import VerificarEmail from "./pages/public/VerificarEmail.jsx";
+import EventoDetalle from "./pages/public/EventoDetalle.jsx";
+import Checkout from "./pages/cliente/Checkout.jsx";
+import MisEntradas from "./pages/cliente/MisEntradas.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import Empresas from "./pages/admin/Empresas.jsx";
 import EmpresaForm from "./pages/admin/EmpresaForm.jsx";
@@ -37,6 +40,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/verificar" element={<VerificarEmail />} />
+        <Route path="/eventos/:id" element={<EventoDetalle />} />
+        <Route element={<RutaProtegida roles={["cliente"]} />}>
+          <Route path="/checkout/:id" element={<Checkout />} />
+          <Route path="/mis-entradas" element={<MisEntradas />} />
+        </Route>
       </Route>
 
       {/* Superadmin */}

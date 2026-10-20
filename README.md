@@ -17,7 +17,7 @@ Cada profesor pide algo distinto, así que la documentación está ordenada **po
 proyecto-eventos/
 ├── api-eventos/        → backend (Node + Express + PostgreSQL en Supabase) · puerto 3000
 │   └── database/       → scripts SQL numerados
-├── front-eventos/      → frontend (React + Vite + Ant Design) · puerto 5173
+├── front-eventos/      → frontend (React + Vite; Ant Design en los paneles, Tailwind en el sitio público) · puerto 5173
 └── docs/               → documentación por materia (índice en docs/README.md)
 ```
 
@@ -69,7 +69,10 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 
 | Ruta | Quién | Pantalla |
 | --- | --- | --- |
-| `/` | todos | Cartelera (se completa en la fase 6) |
+| `/` | todos | Cartelera: eventos publicados, con búsqueda (artista, género, lugar) y filtros por tipo y ciudad |
+| `/eventos/:id` | todos | Detalle: grilla por jornada, abono, tarifas con lo que queda libre; se eligen entradas de varias tarifas |
+| `/checkout/:id` | cliente | Resumen calculado por la API (subtotal + service charge) y pago simulado (una tarjeta terminada en 0000 se rechaza) |
+| `/mis-entradas` | cliente | Entradas con su QR, agrupadas por evento, e historial de compras |
 | `/login`, `/registro` | todos | Ingreso y alta de clientes. En desarrollo el login muestra los usuarios de prueba |
 | `/admin` | superadmin | Inicio: recaudación por service charge (total, por mes y por productora), entradas vendidas, eventos por estado |
 | `/admin/usuarios` | superadmin | Usuarios de todos los roles: alta y edición de superadmins y personal de productoras, activar/desactivar |
@@ -78,7 +81,7 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 | `/admin/eventos` | superadmin | Eventos de todas las productoras, con despublicar y cancelar |
 | `/admin/empresas` | superadmin | Listado de productoras (búsqueda, orden, filtro por estado, service charge, eliminar) |
 | `/admin/empresas/nueva`, `/admin/empresas/:id/editar` | superadmin | Formulario de alta y edición (incluye % de service charge y activar/desactivar) |
-| `/panel` | empresa | Inicio del panel de la productora (se completa en la fase 5) |
+| `/panel` | empresa | Inicio: eventos publicados y en borrador, entradas vendidas, lo recaudado (sin service charge), próximos eventos y últimas ventas |
 | `/panel/lugares`, `/panel/lugares/:id` | empresa | Los lugares de la plataforma (solo lectura) y los propios (con sectores y escenarios). Son las mismas pantallas que usa el superadmin |
 | `/panel/eventos` | empresa | Eventos de la productora, con su estado y qué le falta para publicarse |
 | `/panel/eventos/nuevo`, `/panel/eventos/:id` | empresa | Asistente en 6 pasos: datos, jornadas, escenarios, line-up (grilla escenario × horario), tarifas y publicar |

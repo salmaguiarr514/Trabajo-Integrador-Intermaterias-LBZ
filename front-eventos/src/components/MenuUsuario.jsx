@@ -1,7 +1,7 @@
 import { startTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Dropdown, Space, Typography } from "antd";
-import { AppstoreOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, LogoutOutlined, TagsOutlined, UserOutlined } from "@ant-design/icons";
 import { inicioDeRol, useAuth } from "../context/auth.js";
 
 const NOMBRE_ROL = { superadmin: "Equipo Backstage", empresa: "Productora", cliente: "Cliente" };
@@ -23,9 +23,9 @@ function MenuUsuario() {
       )
     },
     { type: "divider" },
-    ...(usuario.rol !== "cliente"
-      ? [{ key: "panel", icon: <AppstoreOutlined />, label: "Mi panel", onClick: () => navigate(inicioDeRol(usuario.rol)) }]
-      : []),
+    usuario.rol === "cliente"
+      ? { key: "entradas", icon: <TagsOutlined />, label: "Mis entradas", onClick: () => navigate("/mis-entradas") }
+      : { key: "panel", icon: <AppstoreOutlined />, label: "Mi panel", onClick: () => navigate(inicioDeRol(usuario.rol)) },
     {
       key: "salir",
       icon: <LogoutOutlined />,
