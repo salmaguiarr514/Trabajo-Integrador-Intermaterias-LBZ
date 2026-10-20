@@ -25,3 +25,20 @@ export const diaCorto = (iso) => {
 
 // "2027-02-13T22:30" → "22:30"
 export const hora = (fechaHora) => (fechaHora ? fechaHora.slice(11, 16) : "—");
+
+// Para el bloque de fecha de las tarjetas de la cartelera: { dia: 13, mes: "feb", semana: "sáb" }
+export const diaMes = (iso) => {
+  const f = deFecha(iso);
+  return {
+    dia: f.getDate(),
+    mes: f.toLocaleDateString("es-AR", { month: "short" }).replace(".", ""),
+    semana: f.toLocaleDateString("es-AR", { weekday: "short" }).replace(".", "")
+  };
+};
+
+// "13 al 15 de febrero de 2027" o "21 de noviembre de 2026"
+export const rangoLargo = (inicio, fin) => {
+  const opciones = { day: "numeric", month: "long", year: "numeric" };
+  if (inicio === fin) return deFecha(inicio).toLocaleDateString("es-AR", opciones);
+  return `${deFecha(inicio).getDate()} al ${deFecha(fin).toLocaleDateString("es-AR", opciones)}`;
+};

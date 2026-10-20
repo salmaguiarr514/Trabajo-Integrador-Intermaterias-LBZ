@@ -17,7 +17,7 @@ Cada profesor pide algo distinto, así que la documentación está ordenada **po
 proyecto-eventos/
 ├── api-eventos/        → backend (Node + Express + PostgreSQL en Supabase) · puerto 3000
 │   └── database/       → scripts SQL numerados
-├── front-eventos/      → frontend (React + Vite + Ant Design) · puerto 5173
+├── front-eventos/      → frontend (React + Vite; Ant Design en los paneles, Tailwind en el sitio público) · puerto 5173
 └── docs/               → documentación por materia (índice en docs/README.md)
 ```
 
@@ -69,7 +69,10 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 
 | Ruta | Quién | Pantalla |
 | --- | --- | --- |
-| `/` | todos | Cartelera (se completa en la fase 6) |
+| `/` | todos | Cartelera: eventos publicados, con búsqueda (artista, género, lugar) y filtros por tipo y ciudad |
+| `/eventos/:id` | todos | Detalle: grilla por jornada, abono, tarifas con lo que queda libre; se eligen entradas de varias tarifas |
+| `/checkout/:id` | cliente | Resumen calculado por la API (subtotal + service charge) y pago simulado (una tarjeta terminada en 0000 se rechaza) |
+| `/mis-entradas` | cliente | Entradas con su QR, agrupadas por evento, e historial de compras |
 | `/login`, `/registro` | todos | Ingreso y alta de clientes. En desarrollo el login muestra los usuarios de prueba |
 | `/admin` | superadmin | Inicio: recaudación por service charge (total, por mes y por productora), entradas vendidas, eventos por estado |
 | `/admin/usuarios` | superadmin | Usuarios de todos los roles: alta y edición de superadmins y personal de productoras, activar/desactivar |
