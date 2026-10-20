@@ -1,7 +1,7 @@
 # API Eventos
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-Hoy tiene el login, el panel del superadmin (fase 4, sin el plano), el panel de la productora (fase 5) y el sitio público con la compra de entradas (fase 6).
+Hoy tiene el login, el panel del superadmin (fase 4, sin el plano), el panel de la productora (fase 5), el sitio público con la compra de entradas (fase 6) y las ventas por evento y el control de acceso (fase 7).
 
 ## Puesta en marcha
 
@@ -90,6 +90,8 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | PUT | `/api/panel/eventos/:id` | 🔒 empresa | Editar. El lugar solo cambia si no hay line-up ni tarifas (RN-21) | 200 / 400 / 404 / 409 |
 | DELETE | `/api/panel/eventos/:id` | 🔒 empresa | Borrar con todo (no si tiene ventas: se cancela) | 204 / 404 / 409 |
 | PATCH | `/api/panel/eventos/:id/estado` | 🔒 empresa | `publicado` (pide jornada, show y tarifa activa: RN-20), `borrador` (despublicar, sin ventas) o `cancelado` | 200 / 400 / 404 / 409 |
+| GET | `/api/panel/eventos/:id/ventas` | 🔒 empresa | Totales (subtotal, service charge, total, compras y rechazadas), ventas por tarifa y por día, ocupación (`v_disponibilidad`), asistencia (`v_asistencia`) y últimas compras sin datos del comprador | 200 / 404 |
+| POST | `/api/panel/entradas/validar` | 🔒 empresa | Control de acceso: `{ codigo, id_jornada }`. Registra el ingreso o dice por qué no pasa (otro evento, otro día, anulada, ya ingresó y a qué hora) | 201 / 400 / 404 / 409 |
 | GET | `/api/panel/eventos/:id/disponibilidad` | 🔒 empresa | Capacidad, vendidas y libres por jornada y sector (`v_disponibilidad`) | 200 / 404 |
 | POST, PUT, DELETE | `/api/panel/eventos/:id/jornadas[/:idHijo]` | 🔒 empresa | Jornadas (`fecha` dentro del evento, `hora_apertura`, `nombre`) | 201 / 200 / 204 / 400 / 404 / 409 |
 | PUT | `/api/panel/eventos/:id/escenarios` | 🔒 empresa | `{ escenarios: [ids] }` reemplaza los habilitados (no se saca uno con shows) | 200 / 400 / 409 |

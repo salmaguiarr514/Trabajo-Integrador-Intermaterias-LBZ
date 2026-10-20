@@ -30,3 +30,7 @@ export const reemplazarEscenarios = (id, escenarios) => api.put(`/panel/eventos/
 export const crearParteEvento = (idEvento, tipo, datos) => api.post(`/panel/eventos/${idEvento}/${tipo}`, datos);
 export const actualizarParteEvento = (idEvento, tipo, id, datos) => api.put(`/panel/eventos/${idEvento}/${tipo}/${id}`, datos);
 export const eliminarParteEvento = (idEvento, tipo, id) => api.delete(`/panel/eventos/${idEvento}/${tipo}/${id}`);
+
+// ─── Ventas y control de acceso (fase 7) ───
+export const obtenerVentasEvento = (id) => api.get(`/panel/eventos/${id}/ventas`);
+export const validarEntrada = (codigo, id_jornada) => api.post("/panel/entradas/validar", { codigo, id_jornada });

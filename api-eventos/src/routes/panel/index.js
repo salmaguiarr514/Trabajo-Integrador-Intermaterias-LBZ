@@ -4,7 +4,9 @@ import { permitir } from "../../middlewares/permitir.js";
 import { validar } from "../../middlewares/validar.js";
 import { obtenerMiEmpresa, editarMiEmpresa } from "../../controllers/panel/empresa.controller.js";
 import { obtenerResumen } from "../../controllers/panel/resumen.controller.js";
+import { validarEntrada } from "../../controllers/panel/ventas.controller.js";
 import { miEmpresaSchema } from "../../schemas/empresas.schema.js";
+import { validarEntradaSchema } from "../../schemas/eventos.schema.js";
 import lugaresRouter from "../lugares.routes.js";
 import artistasRouter from "./artistas.routes.js";
 import eventosRouter from "./eventos.routes.js";
@@ -20,5 +22,6 @@ router.put("/empresa", validar(miEmpresaSchema), editarMiEmpresa);
 router.use("/lugares", lugaresRouter);
 router.use("/artistas", artistasRouter);
 router.use("/eventos", eventosRouter);
+router.post("/entradas/validar", validar(validarEntradaSchema), validarEntrada); // control de acceso
 
 export default router;

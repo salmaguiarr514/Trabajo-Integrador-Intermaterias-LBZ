@@ -18,6 +18,7 @@ import {
   eliminarTarifa,
   obtenerDisponibilidad
 } from "../../controllers/panel/eventos.controller.js";
+import { obtenerVentasEvento } from "../../controllers/panel/ventas.controller.js";
 import { validar } from "../../middlewares/validar.js";
 import { idHijoParams, idParams } from "../../schemas/comunes.js";
 import {
@@ -44,6 +45,7 @@ router.put("/:id", id, validar(editarEventoSchema), editarEvento);
 router.delete("/:id", id, eliminarEvento);
 router.patch("/:id/estado", id, validar(estadoEventoPanelSchema), cambiarEstadoEvento);
 router.get("/:id/disponibilidad", id, obtenerDisponibilidad);
+router.get("/:id/ventas", id, obtenerVentasEvento);
 
 router.post("/:id/jornadas", id, validar(crearJornadaSchema), crearJornada);
 router.put("/:id/jornadas/:idHijo", idHijo, validar(editarJornadaSchema), editarJornada);

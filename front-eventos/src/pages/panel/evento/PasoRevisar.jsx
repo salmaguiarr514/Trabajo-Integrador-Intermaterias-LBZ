@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Alert, App, Button, Card, Descriptions, Popconfirm, Space, Typography } from "antd";
-import { CheckCircleFilled, CloseCircleFilled, EyeInvisibleOutlined, RocketOutlined, StopOutlined } from "@ant-design/icons";
+import { BarChartOutlined, CheckCircleFilled, CloseCircleFilled, EyeInvisibleOutlined, RocketOutlined, StopOutlined } from "@ant-design/icons";
 import { cambiarEstadoEvento } from "../../../services/panelService.js";
 import { mensajeDeError } from "../../../services/api.js";
 import { numero, pesos, rangoFechas } from "../../../utils/formato.js";
@@ -19,6 +20,7 @@ const requisitos = (e) => [
 
 function PasoRevisar({ evento, soloLectura, onCambio, irA }) {
   const { message } = App.useApp();
+  const navigate = useNavigate();
   const [cambiando, setCambiando] = useState(false);
   const lista = requisitos(evento);
   const listo = lista.every((r) => r.ok);
@@ -79,7 +81,13 @@ function PasoRevisar({ evento, soloLectura, onCambio, irA }) {
         />
       )}
       {evento.estado === "publicado" && (
-        <Alert type="success" showIcon title="Publicado: está en la cartelera" description={evento.cantidad_compras > 0 ? "Ya tiene ventas: no se puede despublicar." : undefined} />
+        <Alert
+          type="success"
+          showIcon
+          title="Publicado: está en la cartelera"
+          description={evento.cantidad_compras > 0 ? "Ya tiene ventas: no se puede despublicar." : undefined}
+          action={<Button icon={<BarChartOutlined />} onClick={() => navigate(`/panel/eventos/${evento.id_evento}/ventas`)}>Ver ventas</Button>}
+        />
       )}
 
       {!soloLectura && (

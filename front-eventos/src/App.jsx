@@ -23,6 +23,8 @@ import MisArtistas from "./pages/panel/Artistas.jsx";
 import MiProductora from "./pages/panel/MiProductora.jsx";
 import EventosPanel from "./pages/panel/Eventos.jsx";
 import EventoAsistente from "./pages/panel/evento/EventoAsistente.jsx";
+import VentasEvento from "./pages/panel/VentasEvento.jsx";
+import ControlAcceso from "./pages/panel/ControlAcceso.jsx";
 import NoEncontrada from "./pages/NoEncontrada.jsx";
 
 // key distinta por id: al cambiar de empresa (o pasar a "nueva") el formulario arranca de cero
@@ -73,6 +75,8 @@ function App() {
           <Route path="eventos" element={<EventosPanel />} />
           <Route path="eventos/nuevo" element={<EventoAsistente />} />
           <Route path="eventos/:id" element={<EventoAsistente />} />
+          <Route path="eventos/:id/ventas" element={<VentasEvento />} />
+          <Route path="acceso" element={<ControlAcceso />} />
           <Route path="mi-productora" element={<MiProductora />} />
           <Route path="*" element={<NoEncontrada />} />
         </Route>

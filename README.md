@@ -84,6 +84,8 @@ Cada carpeta tiene un `.env.example` para copiar. Más detalle de la API en [api
 | `/panel` | empresa | Inicio: eventos publicados y en borrador, entradas vendidas, lo recaudado (sin service charge), próximos eventos y últimas ventas |
 | `/panel/lugares`, `/panel/lugares/:id` | empresa | Los lugares de la plataforma (solo lectura) y los propios (con sectores y escenarios). Son las mismas pantallas que usa el superadmin |
 | `/panel/eventos` | empresa | Eventos de la productora, con su estado y qué le falta para publicarse |
+| `/panel/eventos/:id/ventas` | empresa | Ventas del evento: totales, ocupación por día y sector, ventas por tarifa y por día, asistencia y últimas compras |
+| `/panel/acceso` | empresa | Control de acceso en la puerta: se elige evento y día, se escanea o pega el código y dice ADELANTE o NO PASA |
 | `/panel/eventos/nuevo`, `/panel/eventos/:id` | empresa | Asistente en 6 pasos: datos, jornadas, escenarios, line-up (grilla escenario × horario), tarifas y publicar |
 | `/panel/artistas` | empresa | Alta, edición, baja y borrado de los artistas de la productora |
 | `/panel/mi-productora` | empresa | Datos de contacto de la productora (el CUIT y el % los maneja el superadmin) |

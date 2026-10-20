@@ -100,3 +100,14 @@ const ventaValida = (t) => !t.venta_desde || !t.venta_hasta || t.venta_hasta > t
 const errorVenta = { message: "El fin de la venta tiene que ser después del inicio", path: ["venta_hasta"] };
 export const crearTarifaSchema = z.object(camposTarifa).refine(ventaValida, errorVenta);
 export const editarTarifaSchema = z.object(camposTarifa).partial().refine(ventaValida, errorVenta);
+
+// ─── Control de acceso (RN-24) ───
+// El código del QR es el UUID de la entrada. Se acepta con espacios o en mayúsculas (lectores de QR, pegado).
+export const validarEntradaSchema = z.object({
+  codigo: z
+    .string({ error: "Escaneá o pegá el código de la entrada" })
+    .trim()
+    .toLowerCase()
+    .pipe(z.uuid({ error: "Ese código no tiene el formato de una entrada de Backstage" })),
+  id_jornada: z.number({ error: "Elegí la jornada que se está controlando" }).int().positive()
+});

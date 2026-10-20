@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Alert, App, Button, Card, Empty, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
-import { DeleteOutlined, EditOutlined, EnvironmentOutlined, PlusOutlined } from "@ant-design/icons";
+import { BarChartOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, PlusOutlined } from "@ant-design/icons";
 import { eliminarEvento, obtenerEventos } from "../../services/panelService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
@@ -100,6 +100,11 @@ function Eventos() {
           <Tooltip title="Abrir el asistente">
             <Button icon={<EditOutlined />} onClick={() => abrir(e)} />
           </Tooltip>
+          {e.estado !== "borrador" && (
+            <Tooltip title="Ventas y asistencia">
+              <Button icon={<BarChartOutlined />} onClick={() => navigate(`/panel/eventos/${e.id_evento}/ventas`)} />
+            </Tooltip>
+          )}
           {e.cantidad_compras > 0 ? (
             <Tooltip title="Tiene ventas: no se puede eliminar, solo cancelar">
               <Button danger icon={<DeleteOutlined />} disabled />

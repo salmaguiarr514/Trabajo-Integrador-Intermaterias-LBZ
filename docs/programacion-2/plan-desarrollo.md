@@ -265,7 +265,7 @@ src/
 | **4. Superadmin** | Productoras, usuarios, catálogo de lugares (escenarios, espacios) y artistas | 2, 3 | Hecha (dashboard, productoras, usuarios, lugares con escenarios y sectores, artistas, eventos con moderación); el plano queda para 7b |
 | **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | Hecha: inicio (próximos eventos y ventas), lugares propios, artistas, datos de la productora y asistente de eventos completo con publicar |
 | **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Hecha: cartelera, detalle con grilla, registro (con verificación del email), compra con service charge y pago simulado, mis entradas con QR. El checkout elige sectores de una lista: el plano queda para 7b |
-| **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | |
+| **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | Hecha: ventas por evento (con ocupación y asistencia), control de acceso en la puerta y métricas del superadmin |
 | **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |
 | **8. Cierre** | Deploy, README actualizado, DER exportado para Sistemas de Información | todo | |
 
