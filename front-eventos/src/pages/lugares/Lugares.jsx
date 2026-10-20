@@ -4,7 +4,6 @@ import {
   Alert, App, Button, Card, Empty, Form, Input, InputNumber, Modal, Segmented, Space, Table, Tag, Typography
 } from "antd";
 import { EnvironmentOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { crearLugar, obtenerLugares } from "../../services/adminService.js";
 import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { numero } from "../../utils/formato.js";
@@ -13,14 +12,9 @@ import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 import TagOrigen from "../../components/TagOrigen.jsx";
 import LugarCampos from "./LugarCampos.jsx";
+import { AMBITOS } from "./ambitos.js";
 
-const FILTROS = [
-  { value: "plataforma", label: "De la plataforma" },
-  { value: "propio", label: "Propios de productoras" },
-  { value: "", label: "Todos" }
-];
-
-function NuevoLugarModal({ abierto, onCerrar }) {
+function NuevoLugarModal({ ambito, abierto, onCerrar }) {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { message } = App.useApp();
@@ -31,9 +25,9 @@ function NuevoLugarModal({ abierto, onCerrar }) {
     setGuardando(true);
     setErrorApi("");
     try {
-      const { data } = await crearLugar(valores);
+      const { data } = await ambito.servicio.crearLugar(valores);
       message.success("Lugar creado. Ahora podés cargar sus sectores y escenarios.");
-      navigate(`/admin/lugares/${data.id_lugar}`);
+      navigate(`${ambito.ruta}/${data.id_lugar}`);
     } catch (error) {
       const campos = erroresPorCampo(error);
       if (Object.keys(campos).length > 0) {
@@ -49,7 +43,7 @@ function NuevoLugarModal({ abierto, onCerrar }) {
   return (
     <Modal
       open={abierto}
-      title="Nuevo lugar de la plataforma"
+      title={ambito.tituloNuevo}
       okText="Crear lugar"
       cancelText="Cancelar"
       confirmLoading={guardando}
@@ -74,12 +68,14 @@ function NuevoLugarModal({ abierto, onCerrar }) {
   );
 }
 
-function Lugares() {
+// ambito: "admin" (superadmin) o "panel" (productora)
+function Lugares({ ambito: nombreAmbito }) {
+  const ambito = AMBITOS[nombreAmbito];
   const navigate = useNavigate();
-  const [origen, setOrigen] = useState("plataforma");
+  const [origen, setOrigen] = useState(ambito.filtroInicial);
   const [busqueda, setBusqueda] = useState("");
   const [creando, setCreando] = useState(false);
-  const lugares = useCarga(() => obtenerLugares({ origen: origen || undefined }), origen, "No se pudieron cargar los lugares");
+  const lugares = useCarga(() => ambito.servicio.obtenerLugares({ origen: origen || undefined }), origen, "No se pudieron cargar los lugares");
 
   if (lugares.cargando) return <Cargando texto="Cargando lugares..." />;
   if (lugares.error) return <Alert type="error" showIcon title={lugares.error} />;
@@ -96,7 +92,7 @@ function Lugares() {
       sorter: (a, b) => a.nombre.localeCompare(b.nombre),
       render: (nombre, l) => (
         <Space orientation="vertical" size={0}>
-          <Typography.Link strong onClick={() => navigate(`/admin/lugares/${l.id_lugar}`)}>{nombre}</Typography.Link>
+          <Typography.Link strong onClick={() => navigate(`${ambito.ruta}/${l.id_lugar}`)}>{nombre}</Typography.Link>
           <Typography.Text type="secondary"><EnvironmentOutlined /> {l.ciudad}, {l.provincia}</Typography.Text>
         </Space>
       )
@@ -141,7 +137,7 @@ function Lugares() {
     <div className="pila">
       <Encabezado
         titulo="Lugares"
-        descripcion="El catálogo de la plataforma lo pueden usar todas las productoras. Los propios los carga cada una y acá solo se ven."
+        descripcion={ambito.descripcion}
         acciones={
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreando(true)}>
             Nuevo lugar
@@ -151,7 +147,7 @@ function Lugares() {
 
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-          <Segmented options={FILTROS} value={origen} onChange={setOrigen} />
+          <Segmented options={ambito.filtros} value={origen} onChange={setOrigen} />
           <Input
             allowClear
             prefix={<SearchOutlined />}
@@ -167,12 +163,12 @@ function Lugares() {
           dataSource={filtrados}
           pagination={{ pageSize: 10, hideOnSinglePage: true }}
           scroll={{ x: true }}
-          onRow={(l) => ({ onClick: () => navigate(`/admin/lugares/${l.id_lugar}`), style: { cursor: "pointer" } })}
+          onRow={(l) => ({ onClick: () => navigate(`${ambito.ruta}/${l.id_lugar}`), style: { cursor: "pointer" } })}
           locale={{ emptyText: <Empty description="No hay lugares para mostrar" /> }}
         />
       </Card>
 
-      <NuevoLugarModal abierto={creando} onCerrar={() => setCreando(false)} />
+      <NuevoLugarModal ambito={ambito} abierto={creando} onCerrar={() => setCreando(false)} />
     </div>
   );
 }

@@ -1,54 +1,75 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap");
+/* Estilos: los paneles (admin y productora) usan Ant Design; el sitio público usa Tailwind.
+   Orden de capas: el reset de Tailwind (base) queda debajo de antd, y las utilidades de Tailwind
+   encima. Así el reset no rompe antd y en el sitio público las clases de Tailwind siempre ganan.
+   Los estilos de antd van a la capa "antd" por el <StyleProvider layer> de main.jsx. */
+@layer theme, base, antd, components, utilities;
 
-* {
-  box-sizing: border-box;
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+/* Tokens del sitio público: estética de afiche de recital */
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-afiche: "Anton", Impact, sans-serif;
+  --color-tinta: #0d0a0b;
+  --color-noche: #17121a;
+  --color-papel: #fff6ec;
+  --color-gris: #c2b2bb;
+  --color-borde: #4a3a50;
+  --color-fucsia: #ff3d7f;
+  --color-amarillo: #ffd23f;
+  --color-verde: #3ddc97;
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 15% -10%, rgba(168, 85, 247, 0.25), transparent 40%),
-    radial-gradient(circle at 90% 0%, rgba(236, 72, 153, 0.18), transparent 35%),
-    #0b0b12;
+@layer base {
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% -10%, rgba(168, 85, 247, 0.25), transparent 40%),
+      radial-gradient(circle at 90% 0%, rgba(236, 72, 153, 0.18), transparent 35%),
+      #0b0b12;
+  }
 }
 
-/* Columna de bloques que nunca se estira más que la pantalla */
-.pila {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 24px;
-}
+/* ─── Paneles (Ant Design) ─── */
+@layer components {
+  /* Columna de bloques que nunca se estira más que la pantalla */
+  .pila {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
 
-.contenido {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 16px 48px;
-}
+  .contenido {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
 
-/* Barra superior fija con fondo translúcido */
-.barra {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  backdrop-filter: blur(10px);
-  background: rgba(11, 11, 18, 0.75);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
+  /* Barra superior fija con fondo translúcido */
+  .barra {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    background: rgba(11, 11, 18, 0.75);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
 
-.barra-interior {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
+  .barra-interior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
 
-.barra .contenido.barra-interior {
-  padding-block: 14px;
-}
+  .barra .contenido.barra-interior {
+    padding-block: 14px;
+  }
 
-@media (max-width: 600px) {
-  .ocultar-mobile {
-    display: none;
+  @media (max-width: 600px) {
+    .ocultar-mobile {
+      display: none;
+    }
   }
 }

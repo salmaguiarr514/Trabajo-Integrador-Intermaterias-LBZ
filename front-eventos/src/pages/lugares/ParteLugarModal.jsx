@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Alert, App, ColorPicker, Form, Input, InputNumber, Modal, Segmented } from "antd";
-import { actualizarParteLugar, crearParteLugar } from "../../services/adminService.js";
 import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
 
 const TEXTOS = {
@@ -10,7 +9,8 @@ const TEXTOS = {
 
 // Alta y edición de un sector (espacios) o de un escenario de un lugar.
 // parte: null para crear, o la fila a editar. Se monta solo mientras está abierto.
-function ParteLugarModal({ tipo, idLugar, parte, onCerrar, onGuardado }) {
+// servicio: el de lugaresService según el ámbito (admin o panel)
+function ParteLugarModal({ servicio, tipo, idLugar, parte, onCerrar, onGuardado }) {
   const [form] = Form.useForm();
   const { message } = App.useApp();
   const [guardando, setGuardando] = useState(false);
@@ -24,8 +24,8 @@ function ParteLugarModal({ tipo, idLugar, parte, onCerrar, onGuardado }) {
     setErrorApi("");
     try {
       const { data } = id
-        ? await actualizarParteLugar(idLugar, tipo, id, valores)
-        : await crearParteLugar(idLugar, tipo, valores);
+        ? await servicio.actualizarParte(idLugar, tipo, id, valores)
+        : await servicio.crearParte(idLugar, tipo, valores);
       message.success(id ? textos.guardado : textos.creado);
       onGuardado(data);
     } catch (error) {

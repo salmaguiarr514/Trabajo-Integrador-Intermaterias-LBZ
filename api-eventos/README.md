@@ -1,7 +1,7 @@
 # API Eventos
 
 API del sistema de eventos **multitenant** (Node.js + Express + PostgreSQL).
-Hoy tiene el login y todo el panel del superadmin (fase 4, sin el plano); la base ya tiene el modelo completo.
+Hoy tiene el login, el panel del superadmin (fase 4, sin el plano), el panel de la productora (fase 5) y el sitio público con la compra de entradas (fase 6).
 
 ## Puesta en marcha
 
@@ -76,6 +76,36 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | GET | `/api/admin/eventos?estado=&id_empresa=` | 🔒 superadmin | Eventos de todas las productoras, con entradas vendidas y recaudado | 200 / 400 |
 | PATCH | `/api/admin/eventos/:id/estado` | 🔒 superadmin | `{ estado: "borrador" }` despublica, `{ estado: "cancelado" }` cancela | 200 / 400 / 404 / 409 |
 | GET | `/api/admin/metricas` | 🔒 superadmin | Totales, eventos por estado y recaudación por service charge (por mes y por productora) | 200 |
+| GET | `/api/panel/resumen` | 🔒 empresa | Inicio: publicados, borradores, entradas vendidas, recaudado (subtotal), próximos eventos y últimas ventas | 200 |
+| GET / PUT | `/api/panel/empresa` | 🔒 empresa | Datos de la propia productora (sin CUIT, % ni alta/baja) | 200 / 400 |
+| GET, POST, PUT, DELETE | `/api/panel/lugares/...` | 🔒 empresa | Las mismas rutas de lugares, escenarios y sectores que `/api/admin/lugares` | 200 / 201 / 204 / 400 / 403 / 404 / 409 |
+| GET | `/api/panel/artistas` | 🔒 empresa | Artistas de la productora | 200 |
+| GET | `/api/panel/artistas/:id` | 🔒 empresa | Obtener uno | 200 / 404 |
+| POST | `/api/panel/artistas` | 🔒 empresa | Crear (`nombre` obligatorio; `genero`, `pais`, `bio`, `imagen_url`) | 201 / 400 / 409 |
+| PUT | `/api/panel/artistas/:id` | 🔒 empresa | Editar (solo los campos que vienen) | 200 / 400 / 404 / 409 |
+| DELETE | `/api/panel/artistas/:id` | 🔒 empresa | Borrar (no si tiene presentaciones: se da de baja) | 204 / 404 / 409 |
+| GET | `/api/panel/eventos` | 🔒 empresa | Eventos de la productora, con jornadas, shows, tarifas y entradas vendidas | 200 |
+| GET | `/api/panel/eventos/:id` | 🔒 empresa | Todo el evento para el asistente: escenarios del lugar (con `habilitado`), sectores, jornadas, line-up y tarifas | 200 / 404 |
+| POST | `/api/panel/eventos` | 🔒 empresa | Crear en borrador. Genera una jornada por día y habilita todos los escenarios del lugar | 201 / 400 |
+| PUT | `/api/panel/eventos/:id` | 🔒 empresa | Editar. El lugar solo cambia si no hay line-up ni tarifas (RN-21) | 200 / 400 / 404 / 409 |
+| DELETE | `/api/panel/eventos/:id` | 🔒 empresa | Borrar con todo (no si tiene ventas: se cancela) | 204 / 404 / 409 |
+| PATCH | `/api/panel/eventos/:id/estado` | 🔒 empresa | `publicado` (pide jornada, show y tarifa activa: RN-20), `borrador` (despublicar, sin ventas) o `cancelado` | 200 / 400 / 404 / 409 |
+| GET | `/api/panel/eventos/:id/disponibilidad` | 🔒 empresa | Capacidad, vendidas y libres por jornada y sector (`v_disponibilidad`) | 200 / 404 |
+| POST, PUT, DELETE | `/api/panel/eventos/:id/jornadas[/:idHijo]` | 🔒 empresa | Jornadas (`fecha` dentro del evento, `hora_apertura`, `nombre`) | 201 / 200 / 204 / 400 / 404 / 409 |
+| PUT | `/api/panel/eventos/:id/escenarios` | 🔒 empresa | `{ escenarios: [ids] }` reemplaza los habilitados (no se saca uno con shows) | 200 / 400 / 409 |
+| POST, PUT, DELETE | `/api/panel/eventos/:id/presentaciones[/:idHijo]` | 🔒 empresa | Line-up: `id_jornada`, `id_escenario`, `id_artista`, `inicio`, `fin` (`"2027-02-13T22:30"`), `headliner`. Si se superpone, 409 con quién choca | 201 / 200 / 204 / 400 / 404 / 409 |
+| POST, PUT, DELETE | `/api/panel/eventos/:id/tarifas[/:idHijo]` | 🔒 empresa | `id_espacio`, `id_jornada` (`null` = abono), `nombre`, `precio`, `venta_desde`, `venta_hasta`, `activa`. Sin cupo: es la capacidad del sector | 201 / 200 / 204 / 400 / 404 / 409 |
+| GET | `/api/public/eventos?q=&ciudad=&tipo=` | todos | Cartelera (`v_cartelera`, solo lo que no terminó) | 200 / 400 |
+| GET | `/api/public/ciudades` | todos | Ciudades con eventos en cartelera | 200 |
+| GET | `/api/public/eventos/:id` | todos | Detalle: jornadas, line-up, tarifas activas con `disponibles` y `en_venta`, `cargo_servicio_pct` | 200 / 404 |
+| GET | `/api/public/artistas/:id` | todos | Artista y sus próximas presentaciones (solo si toca en un evento de la cartelera) | 200 / 404 |
+| POST | `/api/cliente/compras/cotizar` | 🔒 cliente | `{ id_evento, items: [{ id_tarifa, cantidad }] }` → detalle, subtotal, service charge y total | 200 / 400 / 404 / 409 |
+| POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` y `tarjeta` (`numero`, `nombre`, `vencimiento`, `cvv`). Pago simulado: termina en 0000 → `rechazada` | 201 / 400 / 404 / 409 |
+| GET | `/api/cliente/compras` | 🔒 cliente | Mis compras (también las rechazadas) | 200 |
+| GET | `/api/cliente/compras/:id` | 🔒 cliente | Una compra con sus entradas | 200 / 404 |
+| GET | `/api/cliente/entradas` | 🔒 cliente | Mis entradas de compras pagadas, con el `codigo` (UUID) para el QR | 200 |
+| GET | `/api/cliente/perfil` | 🔒 cliente | Mis datos | 200 |
+| PUT | `/api/cliente/perfil` | 🔒 cliente | `nombre`, `apellido`, `dni`, `telefono`. Para cambiar la contraseña: `password_actual` y `password_nueva` | 200 / 400 |
 | GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |
 
 - Errores: siempre `{ mensaje }`. Si son de validación, además `errores: [{ campo, mensaje }]`.
@@ -93,8 +123,21 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 - Una productora con usuarios, lugares, artistas o eventos no se borra (409): se da de baja con `activo: false`.
 - Los usuarios no se borran: se dan de baja con `activo: false`. De un cliente solo se puede cambiar `activo`.
   El superadmin no puede darse de baja ni sacarse el rol a sí mismo.
-- Lugares: el superadmin ve también los propios de cada productora, pero solo modifica los de la plataforma (403).
+- Lugares (`/api/admin/lugares` y `/api/panel/lugares` usan el mismo controller): el superadmin ve todos y modifica los de la plataforma;
+  la productora ve los de la plataforma y los suyos, y modifica solo los suyos (403). Un lugar propio de otra productora responde 404.
+- Panel: todo se filtra por el `id_empresa` del token, nunca del body. Lo de otra productora responde 404, como si no existiera.
+- Compra: en una transacción se bloquean las tarifas del evento en los sectores pedidos (`SELECT … FOR UPDATE`) y recién después se mira
+  la disponibilidad, así dos compras simultáneas no venden el mismo último lugar. Un abono ocupa lugar en todas las jornadas. Hasta 10 entradas
+  por compra. Service charge = subtotal × % de la productora. Si se agota todo, el evento pasa a `agotado`.
+- Eventos: un evento cancelado o finalizado ya no se modifica. Las horas de los shows y de la venta viajan como texto `"AAAA-MM-DDTHH:MM"`
+  (hora de Argentina, sin huso) para que el navegador no las corra. Un show puede empezar en la madrugada siguiente a su jornada (antes de las 8).
   Un lugar nuevo arranca con el sector "General" y el escenario "Principal".
+- Compras (RN-22 a RN-30): máximo 10 entradas por compra. Una tarifa se vende si está activa y dentro de su período de venta.
+  Se controla el cupo de cada sector y jornada (un abono ocupa lugar en todas las jornadas): si no alcanza, 409.
+  Todo pasa en una transacción que bloquea las tarifas de los sectores involucrados, así dos compras simultáneas no se pasan del cupo.
+  Service charge = subtotal × % de la productora (queda copiado en la compra). Un evento que ya terminó no se vende (409).
+  Pago simulado: una tarjeta terminada en `0000` se rechaza (201 con `estado: "rechazada"`, sin entradas); cualquier otra
+  tarjeta y la transferencia se aprueban. Si después de una compra no queda lugar en ningún sector, el evento pasa a `agotado`.
 - Cada respuesta trae el header `X-Instancia` (variable `INSTANCIA` o el nombre del equipo), para la demo de réplicas de Sistemas Operativos.
 
 Ejemplo de body para POST `/api/admin/empresas`:
@@ -119,6 +162,7 @@ Los scripts de [database/](database/) se corren **en orden** en Supabase (SQL Ed
 | `01` a `06` | Extensiones y tablas. `02` no pisa la tabla `empresas` existente: le agrega las columnas nuevas |
 | `07_triggers.sql` | Reglas que no entran en FK ni CHECK |
 | `08_vistas.sql` | `v_lugares`, `v_disponibilidad`, `v_cartelera`, `v_asistencia`, `v_recaudacion` |
+| `09_seguridad.sql` | RLS en todas las tablas, para que la API pública de Supabase no exponga datos (a nuestra API no le afecta) |
 | `10_seed_plataforma.sql` | Superadmin y 20 lugares de la plataforma |
 | `11_seed_demo.sql` | 3 productoras, usuarios, artistas, 1 festival, 2 recitales y compras |
 | `12_verificacion_email.sql` | Columna `usuarios.email_verificado` (los que ya existen quedan verificados) y tabla `codigos_verificacion` |
@@ -131,7 +175,8 @@ Los cambios de esquema posteriores van en un script nuevo (`12_agrega_x.sql`), n
 El modelo está explicado en [docs/base-de-datos/der.md](../docs/base-de-datos/der.md).
 
 - CORS solo acepta pedidos desde `FRONTEND_URL` (el front de Vite).
-- Todo el grupo comparte **una sola base** en Supabase (la tabla `empresas` ya está creada ahí).
+- Todo el grupo comparte **una sola base** en Supabase. Los scripts `01` a `11` ya están corridos ahí
+  (2026-10-13): no hace falta volver a correrlos.
   Si uno crea o borra una empresa, los demás lo ven.
 - [src/data/db.js](src/data/db.js) se conecta usando `DATABASE_URL` (con SSL).
 - Si la URL trae `?sslmode=require` al final, sacarlo (el SSL ya lo configura `db.js`).

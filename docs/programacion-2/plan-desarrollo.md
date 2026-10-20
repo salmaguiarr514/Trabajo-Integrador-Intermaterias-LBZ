@@ -93,6 +93,7 @@ Resumen: 15 tablas en 4 grupos.
 ### 3.1 Multitenancy
 
 Nos conectamos a Supabase con el usuario `postgres` por el pooler, así que **RLS no aplica**: el aislamiento lo hace el backend.
+RLS sí está activado (sin políticas, en `09_seguridad.sql`), pero solo para cerrar la API pública de Supabase: no afecta a nuestra API.
 - El JWT lleva `id_usuario`, `rol` e `id_empresa`.
 - Todas las consultas del panel de empresa filtran con `WHERE id_empresa = req.usuario.id_empresa`. El `id_empresa` **nunca** se toma del body.
 - Si una productora pide un recurso de otra, la respuesta es **404** (no 403), para no revelar que existe.
@@ -114,6 +115,7 @@ Carpeta `api-eventos/database/`, numerados y en orden de ejecución (Supabase �
 | `06_ventas.sql` | `tarifas`, `compras`, `entradas`, `ingresos` |
 | `07_triggers.sql` | Los 6 triggers del DER (lugar válido, jornada en rango, presentación en jornada, mínimo un espacio, compras solo de clientes, ingresos válidos) |
 | `08_vistas.sql` | `v_cartelera` (eventos publicados con lugar y headliners), `v_lugares` (con la capacidad total calculada), `v_disponibilidad` (por evento, jornada y espacio: capacidad − vendidas), `v_asistencia` (entradas vs. ingresos por jornada), `v_recaudacion` (service charge por productora y mes) |
+| `09_seguridad.sql` | Activa RLS (sin políticas) en todas las tablas y `security_invoker` en las vistas, para que la API pública de Supabase no exponga datos |
 | `10_seed_plataforma.sql` | Superadmin y **20 lugares predefinidos** con escenarios, espacios con capacidad y, en algunos, el plano dibujado |
 | `11_seed_demo.sql` | 3 productoras con usuarios, lugares y artistas propios, 1 festival de 3 días completo, 2 recitales y clientes con compras (con service charge) |
 | `12_verificacion_email.sql` | Verificación del email por código (idea del grupo, no la pide ninguna consigna): `usuarios.email_verificado` y `codigos_verificacion` |
@@ -194,13 +196,13 @@ src/
 - `POST /entradas/validar` → recibe un `codigo` y registra el ingreso de la entrada en la jornada (control de acceso).
 
 **Cliente** (`/api/cliente`)
-- `GET /compras/cotizar` → devuelve subtotal, service charge y total antes de pagar.
+- `POST /compras/cotizar` → devuelve subtotal, service charge y total antes de pagar (es POST porque lleva los items en el body).
 - `POST /compras` → `{ id_evento, items: [{ id_tarifa, cantidad }], medio_pago, tarjeta_ficticia }`. En una transacción: bloquea las tarifas del evento en los espacios involucrados,
   verifica que haya lugar en cada espacio y jornada (las de abono cuentan en todas),
   calcula `subtotal`, `cargo_servicio = subtotal × empresas.cargo_servicio_pct / 100` y `total`, **simula el pago**,
   y crea la compra y las entradas. Para poder probar el rechazo: una tarjeta terminada en `0000` se rechaza; cualquier otra se aprueba.
-- `GET /compras` y `GET /entradas` (mis entradas, con código para mostrar como QR).
-- `PUT /perfil`.
+- `GET /compras`, `GET /compras/:id` y `GET /entradas` (mis entradas, con código para mostrar como QR).
+- `GET/PUT /perfil`.
 
 ---
 
@@ -257,12 +259,12 @@ src/
 | Fase | Entregable | Depende de | Estado |
 | --- | --- | --- | --- |
 | **0. Acuerdo** | Este documento revisado por los 3; dudas cerradas | — | |
-| **1. Base de datos** | Scripts 01–08 corriendo en Supabase, más los seeds 10 y 11 | 0 | Scripts listos y probados; falta correrlos en Supabase |
+| **1. Base de datos** | Scripts 01–08 corriendo en Supabase, más los seeds 10 y 11 | 0 | Hecha: 01–11 corridos en Supabase el 2026-10-13 (con `09_seguridad.sql`) |
 | **2. Base del backend** | Auth, middlewares, manejo de errores, mover `empresas` a `/api/admin` | 1 | Hecha |
 | **3. Base del front** | AuthContext, api.js, layouts, RutaProtegida, login | 2 | Hecha |
 | **4. Superadmin** | Productoras, usuarios, catálogo de lugares (escenarios, espacios) y artistas | 2, 3 | Hecha (dashboard, productoras, usuarios, lugares con escenarios y sectores, artistas, eventos con moderación); el plano queda para 7b |
-| **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | |
-| **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Registro hecho |
+| **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | Hecha: inicio (próximos eventos y ventas), lugares propios, artistas, datos de la productora y asistente de eventos completo con publicar |
+| **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Hecha: cartelera, detalle con grilla, registro (con verificación del email), compra con service charge y pago simulado, mis entradas con QR. El checkout elige sectores de una lista: el plano queda para 7b |
 | **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | |
 | **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |
 | **8. Cierre** | Deploy, README actualizado, DER exportado para Sistemas de Información | todo | |

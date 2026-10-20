@@ -4,7 +4,6 @@ import {
   Alert, App, Button, Card, Descriptions, Empty, Form, Popconfirm, Result, Space, Switch, Table, Tabs, Tag, Tooltip, Typography
 } from "antd";
 import { ArrowLeftOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
-import { actualizarLugar, eliminarLugar, eliminarParteLugar, obtenerLugar } from "../../services/adminService.js";
 import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { numero } from "../../utils/formato.js";
@@ -13,10 +12,9 @@ import Cargando from "../../components/Cargando.jsx";
 import TagOrigen from "../../components/TagOrigen.jsx";
 import LugarCampos from "./LugarCampos.jsx";
 import ParteLugarModal from "./ParteLugarModal.jsx";
+import { AMBITOS } from "./ambitos.js";
 
-const LISTADO = "/admin/lugares";
-
-function DatosLugar({ lugar, editable, onGuardado }) {
+function DatosLugar({ ambito, lugar, editable, onGuardado }) {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { message } = App.useApp();
@@ -31,7 +29,7 @@ function DatosLugar({ lugar, editable, onGuardado }) {
     setGuardando(true);
     setErrorApi("");
     try {
-      const { data } = await actualizarLugar(lugar.id_lugar, valores);
+      const { data } = await ambito.servicio.actualizarLugar(lugar.id_lugar, valores);
       message.success("Lugar actualizado");
       onGuardado(data);
     } catch (error) {
@@ -48,9 +46,9 @@ function DatosLugar({ lugar, editable, onGuardado }) {
 
   const eliminar = async () => {
     try {
-      await eliminarLugar(lugar.id_lugar);
+      await ambito.servicio.eliminarLugar(lugar.id_lugar);
       message.success("Lugar eliminado");
-      navigate(LISTADO);
+      navigate(ambito.ruta);
     } catch (error) {
       message.error(mensajeDeError(error, "No se pudo eliminar el lugar"));
     }
@@ -91,7 +89,7 @@ function DatosLugar({ lugar, editable, onGuardado }) {
 }
 
 // Tabla de sectores o escenarios del lugar, con alta, edición y baja
-function PartesLugar({ tipo, lugar, editable, onCambio }) {
+function PartesLugar({ ambito, tipo, lugar, editable, onCambio }) {
   const { message } = App.useApp();
   const [modal, setModal] = useState({ abierto: false, parte: null });
   const esSector = tipo === "espacios";
@@ -100,7 +98,7 @@ function PartesLugar({ tipo, lugar, editable, onCambio }) {
 
   const eliminar = async (p) => {
     try {
-      await eliminarParteLugar(lugar.id_lugar, tipo, idDe(p));
+      await ambito.servicio.eliminarParte(lugar.id_lugar, tipo, idDe(p));
       message.success(esSector ? "Sector eliminado" : "Escenario eliminado");
       onCambio();
     } catch (error) {
@@ -205,6 +203,7 @@ function PartesLugar({ tipo, lugar, editable, onCambio }) {
       />
       {modal.abierto && (
         <ParteLugarModal
+          servicio={ambito.servicio}
           tipo={tipo}
           idLugar={lugar.id_lugar}
           parte={modal.parte}
@@ -219,10 +218,12 @@ function PartesLugar({ tipo, lugar, editable, onCambio }) {
   );
 }
 
-function LugarDetalle() {
+// ambito: "admin" (superadmin) o "panel" (productora)
+function LugarDetalle({ ambito: nombreAmbito }) {
+  const ambito = AMBITOS[nombreAmbito];
   const { id } = useParams();
   const navigate = useNavigate();
-  const lugar = useCarga(() => obtenerLugar(id), id, "No se pudo cargar el lugar");
+  const lugar = useCarga(() => ambito.servicio.obtenerLugar(id), id, "No se pudo cargar el lugar");
 
   if (lugar.cargando) return <Cargando />;
   if (lugar.error) {
@@ -231,18 +232,18 @@ function LugarDetalle() {
         status="404"
         title="Lugar no encontrado"
         subTitle={lugar.error}
-        extra={<Button type="primary" onClick={() => navigate(LISTADO)}>Volver a lugares</Button>}
+        extra={<Button type="primary" onClick={() => navigate(ambito.ruta)}>Volver a lugares</Button>}
       />
     );
   }
 
   const l = lugar.datos;
-  const editable = l.origen === "plataforma";
+  const editable = ambito.puedeEditar(l);
 
   return (
     <div className="pila">
       <div>
-        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(LISTADO)} style={{ paddingInline: 0 }}>
+        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(ambito.ruta)} style={{ paddingInline: 0 }}>
           Lugares
         </Button>
         <Typography.Title level={2} style={{ margin: "8px 0 8px" }}>{l.nombre}</Typography.Title>
@@ -254,12 +255,7 @@ function LugarDetalle() {
       </div>
 
       {!editable && (
-        <Alert
-          type="info"
-          showIcon
-          title={`Es un lugar propio de ${l.productora}`}
-          description="Solo la productora lo puede modificar. Desde acá se ve en modo lectura."
-        />
+        <Alert type="info" showIcon {...ambito.avisoSoloLectura(l)} />
       )}
 
       <Card>
@@ -281,17 +277,17 @@ function LugarDetalle() {
             {
               key: "espacios",
               label: `Sectores (${l.espacios.length})`,
-              children: <PartesLugar tipo="espacios" lugar={l} editable={editable} onCambio={lugar.recargar} />
+              children: <PartesLugar ambito={ambito} tipo="espacios" lugar={l} editable={editable} onCambio={lugar.recargar} />
             },
             {
               key: "escenarios",
               label: `Escenarios (${l.escenarios.length})`,
-              children: <PartesLugar tipo="escenarios" lugar={l} editable={editable} onCambio={lugar.recargar} />
+              children: <PartesLugar ambito={ambito} tipo="escenarios" lugar={l} editable={editable} onCambio={lugar.recargar} />
             },
             {
               key: "datos",
               label: "Datos",
-              children: <DatosLugar lugar={l} editable={editable} onGuardado={() => lugar.recargar()} />
+              children: <DatosLugar ambito={ambito} lugar={l} editable={editable} onGuardado={() => lugar.recargar()} />
             }
           ]}
         />

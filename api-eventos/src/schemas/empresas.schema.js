@@ -17,3 +17,15 @@ export const crearEmpresaSchema = z.object(campos);
 
 // En la edición todo es opcional: lo que no viene queda como está.
 export const editarEmpresaSchema = z.object(campos).partial();
+
+// La productora edita sus propios datos de contacto. El CUIT, el % de service charge (RN-05)
+// y el alta/baja los maneja solo el superadmin.
+export const miEmpresaSchema = z
+  .object({
+    nombre: campos.nombre,
+    email: campos.email,
+    telefono: campos.telefono,
+    direccion: campos.direccion,
+    logo_url: campos.logo_url
+  })
+  .partial();

@@ -22,3 +22,19 @@ const pool = process.env.DATABASE_URL
     });
 
 export default pool;
+
+// Corre fn(cliente) en una transacción: COMMIT si termina bien, ROLLBACK si lanza un error.
+export const enTransaccion = async (fn) => {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query("BEGIN");
+    const resultado = await fn(cliente);
+    await cliente.query("COMMIT");
+    return resultado;
+  } catch (error) {
+    await cliente.query("ROLLBACK");
+    throw error;
+  } finally {
+    cliente.release();
+  }
+};

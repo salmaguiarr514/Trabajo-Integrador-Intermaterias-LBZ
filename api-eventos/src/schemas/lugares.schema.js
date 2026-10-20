@@ -46,9 +46,3 @@ const camposEspacio = {
 
 export const crearEspacioSchema = z.object(camposEspacio);
 export const editarEspacioSchema = z.object(camposEspacio).partial();
-
-// /lugares/:id/escenarios/:idHijo
-export const idHijoParams = z.object({
-  id: z.coerce.number().int().positive("El id debe ser un número entero"),
-  idHijo: z.coerce.number().int().positive("El id debe ser un número entero")
-});

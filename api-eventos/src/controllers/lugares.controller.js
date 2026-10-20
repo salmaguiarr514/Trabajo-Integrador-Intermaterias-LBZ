@@ -1,82 +1,106 @@
-import pool from "../../data/db.js";
-import { ErrorHttp } from "../../utils/ErrorHttp.js";
-import { actualizar, insertar } from "../../utils/sql.js";
-import { filtrosLugaresSchema } from "../../schemas/lugares.schema.js";
+import pool from "../data/db.js";
+import { ErrorHttp } from "../utils/ErrorHttp.js";
+import { actualizar, insertar } from "../utils/sql.js";
+import { filtrosLugaresSchema } from "../schemas/lugares.schema.js";
 
-// El superadmin ve todos los lugares, pero solo modifica los de la plataforma (id_empresa NULL).
-// Los propios son de cada productora: los ve, no los toca (matriz de permisos del plan).
+// Lo usan el superadmin (/api/admin/lugares) y la productora (/api/panel/lugares).
+// Lo que cambia es el alcance, que sale del usuario del token (docs/comun/dominio.md, RN-06 y RN-07):
+//   superadmin → ve todos los lugares y modifica los de la plataforma (id_empresa NULL)
+//   empresa    → ve los de la plataforma y los suyos, y modifica solo los suyos.
+//                Un lugar propio de otra productora no existe para ella (404).
 
 const COLUMNAS_LUGAR = ["nombre", "tipo", "direccion", "ciudad", "provincia", "imagen_url", "activo"];
 const COLUMNAS_ESCENARIO = ["nombre", "descripcion"];
 const COLUMNAS_ESPACIO = ["nombre", "modalidad", "capacidad", "color"];
 
-// v_lugares ya trae origen, capacidad_total, cantidad_espacios, cantidad_escenarios y tiene_plano
+// null = superadmin (sin filtro); un número = la productora del usuario
+const empresaDe = (req) => (req.usuario.rol === "superadmin" ? null : req.usuario.id_empresa);
+
+// v_lugares ya trae origen, capacidad_total, cantidad_espacios, cantidad_escenarios y tiene_plano.
+// Los conteos de uso, para una productora, cuentan solo sus eventos: no se le muestra la actividad de las demás.
+// $1 = id_empresa del usuario, o NULL para el superadmin.
 const SELECT_LUGAR = `
   SELECT v.*, e.nombre AS productora,
-         (SELECT COUNT(*) FROM eventos ev WHERE ev.id_lugar = v.id_lugar)::INT AS cantidad_eventos
+         (SELECT COUNT(*) FROM eventos ev
+           WHERE ev.id_lugar = v.id_lugar AND ($1::INT IS NULL OR ev.id_empresa = $1))::INT AS cantidad_eventos
   FROM v_lugares v
-  LEFT JOIN empresas e ON e.id_empresa = v.id_empresa`;
+  LEFT JOIN empresas e ON e.id_empresa = v.id_empresa
+  WHERE ($1::INT IS NULL OR v.id_empresa IS NULL OR v.id_empresa = $1)`;
 
-const buscarLugar = async (id) => {
-  const { rows } = await pool.query(`${SELECT_LUGAR} WHERE v.id_lugar = $1`, [id]);
+const buscarLugar = async (req, id) => {
+  const { rows } = await pool.query(`${SELECT_LUGAR} AND v.id_lugar = $2`, [empresaDe(req), id]);
   if (!rows[0]) {
     throw new ErrorHttp(404, "Lugar no encontrado");
   }
   return rows[0];
 };
 
-const lugarDePlataforma = async (id) => {
-  const lugar = await buscarLugar(id);
-  if (lugar.origen !== "plataforma") {
-    throw new ErrorHttp(403, "Es un lugar propio de una productora: solo ella lo puede modificar");
+// El lugar que se quiere modificar tiene que ser del usuario
+const lugarEditable = async (req, id) => {
+  const lugar = await buscarLugar(req, id);
+  const idEmpresa = empresaDe(req);
+  if (lugar.id_empresa !== idEmpresa) {
+    throw new ErrorHttp(
+      403,
+      idEmpresa === null
+        ? "Es un lugar propio de una productora: solo ella lo puede modificar"
+        : "Es un lugar de la plataforma: lo puede usar en sus eventos, pero solo lo modifica el equipo de Backstage"
+    );
   }
   return lugar;
 };
 
 const contar = async (sql, params) => (await pool.query(sql, params)).rows[0].cantidad;
 
+// ?origen=plataforma | propio
+// Primero van los que el usuario puede modificar: los de la plataforma para el superadmin, los propios para la productora.
 export const obtenerLugares = async (req, res) => {
   const { origen } = filtrosLugaresSchema.parse(req.query);
   const { rows } = await pool.query(
-    `${SELECT_LUGAR}
-     WHERE ($1::TEXT IS NULL OR v.origen = $1)
-     ORDER BY v.origen, v.provincia, v.nombre`,
-    [origen ?? null]
+    `${SELECT_LUGAR} AND ($2::TEXT IS NULL OR v.origen = $2)
+     ORDER BY CASE WHEN $1::INT IS NULL THEN v.id_empresa IS NOT NULL ELSE v.id_empresa IS NULL END,
+              v.provincia, v.nombre`,
+    [empresaDe(req), origen ?? null]
   );
   res.json(rows);
 };
 
 export const obtenerLugar = async (req, res) => {
-  const lugar = await buscarLugar(req.params.id);
+  const lugar = await buscarLugar(req, req.params.id);
+  const params = [lugar.id_lugar, empresaDe(req)];
   const [escenarios, espacios] = await Promise.all([
     pool.query(
-      `SELECT sc.*, (SELECT COUNT(*) FROM evento_escenarios ee WHERE ee.id_escenario = sc.id_escenario)::INT AS cantidad_eventos
+      `SELECT sc.*,
+              (SELECT COUNT(*) FROM evento_escenarios ee JOIN eventos ev ON ev.id_evento = ee.id_evento
+                WHERE ee.id_escenario = sc.id_escenario AND ($2::INT IS NULL OR ev.id_empresa = $2))::INT AS cantidad_eventos
        FROM escenarios sc WHERE sc.id_lugar = $1 ORDER BY sc.nombre`,
-      [lugar.id_lugar]
+      params
     ),
     pool.query(
-      `SELECT es.*, (SELECT COUNT(*) FROM tarifas t WHERE t.id_espacio = es.id_espacio)::INT AS cantidad_tarifas
+      `SELECT es.*,
+              (SELECT COUNT(*) FROM tarifas t JOIN eventos ev ON ev.id_evento = t.id_evento
+                WHERE t.id_espacio = es.id_espacio AND ($2::INT IS NULL OR ev.id_empresa = $2))::INT AS cantidad_tarifas
        FROM espacios es WHERE es.id_lugar = $1 ORDER BY es.capacidad DESC`,
-      [lugar.id_lugar]
+      params
     )
   ]);
   res.json({ ...lugar, escenarios: escenarios.rows, espacios: espacios.rows });
 };
 
-// Un lugar nuevo de la plataforma arranca con el sector "General" (con la capacidad enviada)
-// y el escenario "Principal". Todo en una transacción.
+// Un lugar nuevo arranca con el sector "General" (con la capacidad enviada) y el escenario "Principal".
+// Todo en una transacción. Es de la plataforma si lo crea el superadmin, o propio si lo crea una productora.
 export const crearLugar = async (req, res) => {
   const { capacidad, ...datos } = req.body;
   const cliente = await pool.connect();
   try {
     await cliente.query("BEGIN");
-    const { texto, valores } = insertar("lugares", datos, COLUMNAS_LUGAR);
+    const { texto, valores } = insertar("lugares", datos, COLUMNAS_LUGAR, { id_empresa: empresaDe(req) });
     const { rows } = await cliente.query(texto, valores);
     const id = rows[0].id_lugar;
     await cliente.query("INSERT INTO espacios (id_lugar, nombre, capacidad) VALUES ($1, 'General', $2)", [id, capacidad]);
     await cliente.query("INSERT INTO escenarios (id_lugar, nombre) VALUES ($1, 'Principal')", [id]);
     await cliente.query("COMMIT");
-    res.status(201).json(await buscarLugar(id));
+    res.status(201).json(await buscarLugar(req, id));
   } catch (error) {
     await cliente.query("ROLLBACK");
     throw error;
@@ -86,17 +110,18 @@ export const crearLugar = async (req, res) => {
 };
 
 export const editarLugar = async (req, res) => {
-  await lugarDePlataforma(req.params.id);
+  await lugarEditable(req, req.params.id);
   const consulta = actualizar("lugares", req.body, COLUMNAS_LUGAR, { id_lugar: req.params.id });
   if (consulta) {
     await pool.query(consulta.texto, consulta.valores);
   }
-  res.json(await buscarLugar(req.params.id));
+  res.json(await buscarLugar(req, req.params.id));
 };
 
 export const eliminarLugar = async (req, res) => {
-  const lugar = await lugarDePlataforma(req.params.id);
-  if (lugar.cantidad_eventos > 0) {
+  const lugar = await lugarEditable(req, req.params.id);
+  const conEventos = await contar("SELECT COUNT(*)::INT AS cantidad FROM eventos WHERE id_lugar = $1", [lugar.id_lugar]);
+  if (conEventos > 0) {
     throw new ErrorHttp(409, "El lugar tiene eventos: dalo de baja en lugar de eliminarlo");
   }
   await pool.query("DELETE FROM lugares WHERE id_lugar = $1", [lugar.id_lugar]);
@@ -105,14 +130,14 @@ export const eliminarLugar = async (req, res) => {
 
 // ─── Escenarios ─────────────────────────────────────────────────────────────
 export const crearEscenario = async (req, res) => {
-  await lugarDePlataforma(req.params.id);
+  await lugarEditable(req, req.params.id);
   const { texto, valores } = insertar("escenarios", req.body, COLUMNAS_ESCENARIO, { id_lugar: req.params.id });
   const { rows } = await pool.query(texto, valores);
   res.status(201).json(rows[0]);
 };
 
 export const editarEscenario = async (req, res) => {
-  await lugarDePlataforma(req.params.id);
+  await lugarEditable(req, req.params.id);
   const donde = { id_escenario: req.params.idHijo, id_lugar: req.params.id };
   const consulta = actualizar("escenarios", req.body, COLUMNAS_ESCENARIO, donde);
   const { rows } = consulta
@@ -125,7 +150,7 @@ export const editarEscenario = async (req, res) => {
 };
 
 export const eliminarEscenario = async (req, res) => {
-  await lugarDePlataforma(req.params.id);
+  await lugarEditable(req, req.params.id);
   const enUso = await contar(
     "SELECT COUNT(*)::INT AS cantidad FROM evento_escenarios WHERE id_escenario = $1",
     [req.params.idHijo]
@@ -145,14 +170,14 @@ export const eliminarEscenario = async (req, res) => {
 
 // ─── Espacios (sectores) ────────────────────────────────────────────────────
 export const crearEspacio = async (req, res) => {
-  await lugarDePlataforma(req.params.id);
+  await lugarEditable(req, req.params.id);
   const { texto, valores } = insertar("espacios", req.body, COLUMNAS_ESPACIO, { id_lugar: req.params.id });
   const { rows } = await pool.query(texto, valores);
   res.status(201).json(rows[0]);
 };
 
 export const editarEspacio = async (req, res) => {
-  await lugarDePlataforma(req.params.id);
+  await lugarEditable(req, req.params.id);
   const donde = { id_espacio: req.params.idHijo, id_lugar: req.params.id };
   const consulta = actualizar("espacios", req.body, COLUMNAS_ESPACIO, donde);
   const { rows } = consulta
@@ -165,7 +190,7 @@ export const editarEspacio = async (req, res) => {
 };
 
 export const eliminarEspacio = async (req, res) => {
-  const lugar = await lugarDePlataforma(req.params.id);
+  const lugar = await lugarEditable(req, req.params.id);
   if (lugar.cantidad_espacios <= 1) {
     throw new ErrorHttp(409, "Un lugar necesita al menos un sector: agregá otro antes de eliminar este");
   }

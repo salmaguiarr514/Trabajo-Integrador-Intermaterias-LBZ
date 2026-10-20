@@ -13,7 +13,7 @@ Cada carpeta corresponde a una materia. Lo que usan varias materias está en `co
 | | [consigna.md](sistemas-de-informacion/consigna.md) | Texto original de la cátedra | Sistemas de Información |
 | | [relevamiento/](sistemas-de-informacion/relevamiento/) | Guía de preguntas, transcripciones de las entrevistas y preguntas de la próxima | Sistemas de Información |
 | | [analisis/](sistemas-de-informacion/analisis/) | Versiones del análisis (v0: comparación con el alcance; v1: después de la entrevista 1) | Sistemas de Información |
-| `sistemas-operativos/` | [plan.md](sistemas-operativos/plan.md) | Qué hay que mostrar, cómo encaja con lo existente y dudas | Sistemas Operativos |
+| `sistemas-operativos/` | [plan.md](sistemas-operativos/plan.md) | Cómo entendemos la consigna, Supabase vs. base dockerizada, qué hay en la rama `docker-nginx`, pasos, guion de la demo, dudas y riesgos | Sistemas Operativos |
 | | [consigna.md](sistemas-operativos/consigna.md) | Texto original de la cátedra | Sistemas Operativos |
 
 Los scripts SQL no están acá sino junto al código, en [api-eventos/database/](../api-eventos/database/).
