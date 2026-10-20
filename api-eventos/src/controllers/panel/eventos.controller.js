@@ -1,6 +1,6 @@
-import pool from "../../data/db.js";
+import pool, { enTransaccion } from "../../data/db.js";
 import { ErrorHttp } from "../../utils/ErrorHttp.js";
-import { actualizar, insertar } from "../../utils/sql.js";
+import { actualizar, hora, insertar } from "../../utils/sql.js";
 
 // Eventos de la productora del usuario (fase 5): el evento y todo lo que cuelga de él
 // (jornadas, escenarios habilitados, line-up y tarifas). Todo filtra por req.usuario.id_empresa:
@@ -10,10 +10,6 @@ const COLUMNAS_EVENTO = ["nombre", "descripcion", "tipo", "id_lugar", "fecha_ini
 const COLUMNAS_JORNADA = ["fecha", "hora_apertura", "nombre"];
 const COLUMNAS_PRESENTACION = ["id_jornada", "id_escenario", "id_artista", "inicio", "fin", "headliner"];
 const COLUMNAS_TARIFA = ["id_espacio", "id_jornada", "nombre", "precio", "venta_desde", "venta_hasta", "activa"];
-
-// Los TIMESTAMP se devuelven como texto "2027-02-13T22:30": son horas de Argentina sin huso,
-// y si viajaran como Date el navegador las correría.
-const hora = (col, alias = col.split(".").pop()) => `to_char(${col}, 'YYYY-MM-DD"T"HH24:MI') AS ${alias}`;
 
 const SELECT_EVENTO = `
   SELECT ev.*, l.nombre AS lugar, l.ciudad, l.provincia,
@@ -67,21 +63,6 @@ const habilitarTodosLosEscenarios = (cliente, idEvento, idLugar) =>
      SELECT $1, id_escenario, id_lugar FROM escenarios WHERE id_lugar = $2`,
     [idEvento, idLugar]
   );
-
-const enTransaccion = async (fn) => {
-  const cliente = await pool.connect();
-  try {
-    await cliente.query("BEGIN");
-    const resultado = await fn(cliente);
-    await cliente.query("COMMIT");
-    return resultado;
-  } catch (error) {
-    await cliente.query("ROLLBACK");
-    throw error;
-  } finally {
-    cliente.release();
-  }
-};
 
 // ─── Eventos ────────────────────────────────────────────────────────────────
 export const obtenerEventos = async (req, res) => {

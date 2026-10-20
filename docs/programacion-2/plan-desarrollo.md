@@ -196,13 +196,13 @@ src/
 - `POST /entradas/validar` → recibe un `codigo` y registra el ingreso de la entrada en la jornada (control de acceso).
 
 **Cliente** (`/api/cliente`)
-- `GET /compras/cotizar` → devuelve subtotal, service charge y total antes de pagar.
+- `POST /compras/cotizar` → devuelve subtotal, service charge y total antes de pagar (es POST porque lleva los items en el body).
 - `POST /compras` → `{ id_evento, items: [{ id_tarifa, cantidad }], medio_pago, tarjeta_ficticia }`. En una transacción: bloquea las tarifas del evento en los espacios involucrados,
   verifica que haya lugar en cada espacio y jornada (las de abono cuentan en todas),
   calcula `subtotal`, `cargo_servicio = subtotal × empresas.cargo_servicio_pct / 100` y `total`, **simula el pago**,
   y crea la compra y las entradas. Para poder probar el rechazo: una tarjeta terminada en `0000` se rechaza; cualquier otra se aprueba.
-- `GET /compras` y `GET /entradas` (mis entradas, con código para mostrar como QR).
-- `PUT /perfil`.
+- `GET /compras`, `GET /compras/:id` y `GET /entradas` (mis entradas, con código para mostrar como QR).
+- `GET/PUT /perfil`.
 
 ---
 
@@ -264,7 +264,7 @@ src/
 | **3. Base del front** | AuthContext, api.js, layouts, RutaProtegida, login | 2 | Hecha |
 | **4. Superadmin** | Productoras, usuarios, catálogo de lugares (escenarios, espacios) y artistas | 2, 3 | Hecha (dashboard, productoras, usuarios, lugares con escenarios y sectores, artistas, eventos con moderación); el plano queda para 7b |
 | **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | Casi hecha: lugares propios, artistas, datos de la productora y asistente de eventos completo (con publicar); falta el inicio del panel |
-| **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Registro hecho |
+| **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Backend hecho (cartelera, detalle, artista, cotizar, comprar, mis compras y entradas, perfil); en el front, solo el registro |
 | **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | |
 | **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |
 | **8. Cierre** | Deploy, README actualizado, DER exportado para Sistemas de Información | todo | |
