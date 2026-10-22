@@ -68,8 +68,12 @@ Las PCs con réplicas pueden ser Windows con Docker Desktop. Si el profesor pide
 
 ## 3. Supabase y la base dockerizada
 
-**¿Es al pedo seguir usando Supabase?** No (decidido: seguimos desarrollando contra Supabase). Es lo que nos deja trabajar a los 3 sobre los
-mismos datos sin tener la PC de acceso prendida. La base dockerizada es para **el despliegue y la demo** de esta materia.
+> **Cambio del 2026-10-22:** la base dockerizada ya no es solo para esta demo. Pasa a ser **la base de producción** del sitio, que se publica en Vercel
+> y se conecta a ella por internet; Supabase queda solo hasta la migración. La demo de SO (nginx + réplicas) se mantiene y usa **ese mismo Postgres**.
+> Detalle en [infraestructura.md](../comun/infraestructura.md). Esto también puede responder la duda 1 de la sección 7 ("la SQL dockerizada y la otra vía web").
+
+**¿Es al pedo seguir usando Supabase?** Por ahora no: seguimos desarrollando contra Supabase hasta que el Postgres propio esté expuesto y probado.
+Después se migran los datos y se deja de usar.
 
 **¿Cómo se cambia de una base a la otra?** Sin tocar código. [db.js](../../api-eventos/src/data/db.js) ya elige según el `.env`:
 

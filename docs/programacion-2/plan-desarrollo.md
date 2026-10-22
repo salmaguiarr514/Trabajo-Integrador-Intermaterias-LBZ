@@ -267,7 +267,17 @@ src/
 | **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Hecha: cartelera, detalle con grilla, registro (con verificación del email), compra con service charge y pago simulado, mis entradas con QR. El checkout elige sectores de una lista: el plano queda para 7b |
 | **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | Hecha: ventas por evento (con ocupación y asistencia), control de acceso en la puerta y métricas del superadmin |
 | **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |
-| **8. Cierre** | Deploy, README actualizado, DER exportado para Sistemas de Información | todo | |
+| **8. Deploy en Vercel** | Front y API publicados en Vercel (dos proyectos), todavía **contra Supabase**: `vercel.json` del front, variables de entorno, región `gru1`, CORS | 7 | |
+| **9. Postgres dockerizado** | Compose con Postgres solo (volumen, `restart`, backup diario), scripts `01`–`12` probados en una base vacía, usuario `backstage_app` sin superusuario | 1 | |
+| **10. Exponer la base** | Prueba de CGNAT en la PC servidor; port forwarding + DuckDNS o túnel TCP; SSL obligatorio; la API local conectada a la base por la dirección pública | 9 | |
+| **11. Migración** | Datos de Supabase copiados al Postgres propio, filas verificadas, `DATABASE_URL` de Vercel cambiada, sitio público probado. Supabase queda dos semanas de respaldo | 8, 10 | |
+| **12. Data warehouse** (Base de Datos) | Esquema `dw`, ETL en PL/pgSQL y consultas analíticas. Detalle y subfases en [data-warehouse.md](../base-de-datos/data-warehouse.md) | 9 (se prueba en un Postgres local) | |
+| **13. Demo de SO** | nginx + réplicas contra el mismo Postgres dockerizado. Detalle en el [plan de SO](../sistemas-operativos/plan.md) | 9 | |
+| **14. Cierre** | README actualizado, DER y modelo dimensional exportados, guion de la defensa | todo | |
+
+La infraestructura nueva (por qué Vercel, cómo llega Vercel a la base de la PC, migración y riesgos) está en [infraestructura.md](../comun/infraestructura.md).
+**Orden recomendado:** la 8 primero, porque es la de menos riesgo (el sitio queda público contra Supabase, que ya anda). La 9 y la 12 pueden ir en paralelo.
+La 11 es la única que corta algo y se hace cuando 8 y 10 ya están probadas.
 
 ### Reparto sugerido (después de hacer juntos las fases 1–3)
 - **Persona A, superadmin:** fase 4 completa (backend y front), métricas de recaudación y **el plano (7b)**, porque nace en la pantalla de lugares.
@@ -275,7 +285,8 @@ src/
 - **Persona C, público y cliente:** fase 6, checkout con service charge, pago simulado, mis entradas y validación.
 
 Cada uno trabaja en ramas `feature/<tarea>` y abre un PR a `main`. Los cambios de esquema se avisan en el grupo **antes** de correrlos,
-porque la base es una sola: cada cambio va como un archivo SQL nuevo (`12_agrega_x.sql`), nunca se edita en vivo.
+porque la base es una sola: cada cambio va como un archivo SQL nuevo (`13_agrega_x.sql`), nunca se edita en vivo.
+Después de la migración (fase 11) la regla es más importante todavía: el script nuevo se corre en el Postgres de producción **y** queda en el repo para recrear la base.
 
 ---
 
@@ -288,3 +299,12 @@ porque la base es una sola: cada cambio va como un archivo SQL nuevo (`12_agrega
 5. **Pago:** simulado, todo es ficticio.
 6. **Cupos:** salen de la **capacidad de cada espacio del lugar**, que carga quien registra el lugar (nosotros o la productora). La productora solo pone precios por sector.
 7. **Plano:** cada lugar puede tener un dibujo con sectores (platea, VIP, campo), escenarios y elementos de referencia (cabina de DJ, barras…). Es opcional y sirve para vender por sector.
+
+## 9. Decisiones tomadas (2026-10-22)
+
+1. **Hosting:** front y API en **Vercel**, como dos proyectos.
+2. **Base de producción:** un **Postgres propio en Docker**, en una PC del grupo, al que Vercel se conecta por internet. Ver [infraestructura.md](../comun/infraestructura.md).
+3. **Supabase:** se sigue usando hasta que el sitio ande en Vercel y el Postgres propio esté expuesto; después se migran los datos y se deja.
+4. **Data warehouse** para Base de Datos: esquema `dw` en la misma base, ETL con procedimientos SQL, entrega con consultas analíticas documentadas.
+   Responde ventas, asistencia, ocupación y clientes. Ver [data-warehouse.md](../base-de-datos/data-warehouse.md).
+5. **Sistemas Operativos:** el despliegue con nginx + réplicas se mantiene aparte, para la demo, contra el mismo Postgres.
