@@ -308,3 +308,5 @@ Después de la migración (fase 11) la regla es más importante todavía: el scr
 4. **Data warehouse** para Base de Datos: esquema `dw` en la misma base, ETL con procedimientos SQL, entrega con consultas analíticas documentadas.
    Responde ventas, asistencia, ocupación y clientes. Ver [data-warehouse.md](../base-de-datos/data-warehouse.md).
 5. **Sistemas Operativos:** el despliegue con nginx + réplicas se mantiene aparte, para la demo, contra el mismo Postgres.
+6. **Servidor y Vercel:** la PC servidor de la base y la cuenta de Vercel son de Salma (2026-10-22).
+7. **Registro de clientes:** guarda fecha de nacimiento y provincia, obligatorias para cliente nuevo; script `13_…` (2026-10-22). Detalle en [plan-despliegue.md](../comun/plan-despliegue.md) F3.5.

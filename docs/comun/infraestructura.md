@@ -84,9 +84,8 @@ Se hace **una sola vez**, cuando el Postgres dockerizado ya está expuesto y pro
 A partir de ahí, para desarrollar en local cada uno puede apuntar al Postgres de la PC servidor (el mismo de producción, con cuidado)
 o levantar su propio Postgres en Docker con los seeds. Recomendado: **cada uno el suyo** con los seeds, y la base de la PC servidor solo para el sitio público.
 
-## 5. Decisiones pendientes
+## 5. Decisiones
 
-1. **Cuál es la PC servidor.** Tiene que poder quedar prendida y tener una conexión sin CGNAT (o aceptar el túnel).
-   El plan de SO proponía la PC de Salma con Linux como PC de acceso; puede ser la misma o no.
-2. **Port forwarding o túnel:** depende del punto 1 y de la prueba de CGNAT.
-3. **Cuándo se migra** (sección 4): después de que el sitio ande en Vercel contra Supabase y el Postgres propio esté expuesto.
+1. **PC servidor:** la de Salma (decidido el 2026-10-22). Tiene que quedar prendida y, de preferencia, sin CGNAT. La cuenta de Vercel también es la de Salma.
+2. **Port forwarding o túnel:** se decide en F7, según la prueba de CGNAT en esa PC.
+3. **Migración de Supabase:** se define cuando el sitio y la base propia estén andando (F8 del [plan de despliegue](plan-despliegue.md)).

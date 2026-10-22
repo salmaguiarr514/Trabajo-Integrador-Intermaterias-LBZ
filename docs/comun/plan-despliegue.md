@@ -210,6 +210,28 @@ Se crea `front-eventos/vercel.json`:
 
 Los archivos que existen (`/assets/...`, `/favicon…`) se siguen sirviendo tal cual: la regla solo aplica a lo que no es archivo.
 
+### F3.5. Fecha de nacimiento y provincia en el registro
+
+Decidido el 2026-10-22. Cada cliente que se registra carga su fecha de nacimiento y su provincia. Sirve para el análisis de clientes del data warehouse
+([data-warehouse.md](../base-de-datos/data-warehouse.md)). Es un cambio de esquema, así que va como script numerado y se avisa en el grupo antes de correrlo.
+
+1. **Script nuevo** `api-eventos/database/13_usuarios_nacimiento_provincia.sql`:
+   ```sql
+   ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS fecha_nacimiento DATE;
+   ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS provincia VARCHAR(100);
+   ```
+   Las columnas son **nullable** en la base: los usuarios que ya existen (los de los seeds y los de Supabase) no tienen esos datos, y no se les pide nada después.
+   Quien se registra desde ahora **sí** los tiene que cargar: la obligatoriedad se controla en la API, no en la base.
+2. **Montaje en Docker:** el script se agrega al `docker-compose.yml` como `13_…`. Como el volumen de desarrollo ya existe, en las bases que ya están creadas se corre a mano con `psql -f`, en orden. Nunca con `down -v`.
+3. **Supabase:** el script se corre también ahí, **avisando antes en el grupo**, porque la base es compartida.
+4. **Lista cerrada de provincias:** las 24 jurisdicciones argentinas, en una constante compartida entre API y front. Una lista cerrada evita textos libres que después no se pueden agrupar en el DW.
+5. **API:** en la validación del registro de clientes (`POST` de registro, con zod), `fecha_nacimiento` es obligatoria, tiene que ser una fecha pasada y no puede ser de hace más de 120 años; `provincia` tiene que estar en la lista.
+6. **Front:** el formulario de `/registro` suma los dos campos, con mensajes de error por campo (ya existen para el resto del formulario).
+7. **Aviso legal:** el formulario explica para qué se usan los datos (análisis estadístico interno) y pide el consentimiento, según la Ley 25.326 de protección de datos personales. El texto lo revisa el grupo antes de publicarlo.
+8. **Prueba:** lista de humo, ítem 11. Además, `SELECT fecha_nacimiento, provincia FROM usuarios WHERE rol = 'cliente' ORDER BY id_usuario DESC LIMIT 1;` muestra los datos del cliente recién creado.
+
+**Listo cuando:** el registro exige los dos datos, la base los guarda, los usuarios viejos siguen entrando sin cambios, y la lista de humo pasa.
+
 ### F3.4. Región de la función
 
 Solo después de la migración (F8), cuando la base esté en la PC de Argentina, se agrega a `api-eventos/vercel.json`:
@@ -222,13 +244,14 @@ Solo después de la migración (F8), cuando la base esté en la PC de Argentina,
 
 Antes de F8, Supabase está en EE. UU. (según `.env.example`, `aws-1-us-west-2`; confirmar la región real en el panel de Supabase). Ahí conviene una región de EE. UU. como `sfo1`, para que la función esté cerca de la base. Cambiar la región no rompe nada, pero sí hay que medir la latencia después.
 
-**Listo cuando:** los cuatro commits están en `main`, `npm run build` del front pasa, y la lista de humo pasa en local.
+**Listo cuando:** los cambios de F3 y F3.5 están en `main`, `npm run build` del front pasa, y la lista de humo pasa en local.
 
 ---
 
 ## 6. Desplegar en Vercel (F4 y F5)
 
 Hay dos proyectos de Vercel, uno por carpeta. Los dos se conectan al mismo repo de GitHub.
+La cuenta de Vercel es la de Salma. Los demás integrantes entran como miembros del equipo para ver los deployments y los logs, sin tocar las variables de entorno.
 
 ### F4. API
 
@@ -292,6 +315,7 @@ Se corre en local (F2) y en producción (F6), y antes de cada despliegue. Si un 
 | 8 | Control de acceso: escanear una entrada válida y repetirla | La primera entra; la segunda se rechaza |
 | 9 | Consola del navegador | Sin errores de CORS |
 | 10 | Vencer la sesión (token viejo o borrar el token) y pedir algo | Vuelve al login |
+| 11 | Registrar un cliente nuevo con fecha de nacimiento y provincia | Se crea la cuenta; sin esos dos datos, el formulario no deja enviar |
 
 Los usuarios y contraseñas de demo están en los seeds `10_seed_plataforma.sql` y `11_seed_demo.sql`. No se escriben en este documento.
 
@@ -406,11 +430,21 @@ Se cargan a mano con `psql`, en orden, y solo en bases de desarrollo. En producc
 
 ---
 
-## 14. Decisiones pendientes
+## 14. Decisiones
 
-1. **Cuál PC es el servidor** (la base y la PC de acceso). Tiene que quedar prendida y, idealmente, sin CGNAT.
-2. **Port forwarding o túnel**, según el resultado de la prueba de CGNAT (F7).
-3. **Preview de Vercel:** ¿se acepta una lista de orígenes en el CORS (cambio de código) o se prueba solo en producción?
-4. **Registro de clientes:** ¿se agregan fecha de nacimiento y provincia para análisis demográfico? Es un script nuevo y un cambio en el front.
-5. **Fecha de la migración (F8)** y quién la ejecuta.
-6. **Cuenta de Vercel:** ¿la del grupo o la de una persona? Debe quedar en la cuenta que vaya a administrar los dos proyectos.
+Resueltas el 2026-10-22:
+
+| Tema | Decisión | Cuándo se ejecuta |
+| --- | --- | --- |
+| PC servidor (base y PC de acceso) | **La PC de Salma** | Desde F7 |
+| Cuenta de Vercel | **La de Salma**; los demás integrantes entran como miembros del equipo | Desde F4 |
+| Datos del cliente en el registro | **Fecha de nacimiento y provincia**, obligatorios para registrarse como cliente (ver F3.5) | F3.5 |
+| Migración de Supabase | **Se define cuando el sitio y la base propia estén andando** (F8) | Más adelante |
+
+Quedan abiertas, y se responden en la fase que corresponda:
+
+| Pregunta | Fase en la que se responde |
+| --- | --- |
+| Port forwarding o túnel, según la prueba de CGNAT en la PC de Salma | F7 |
+| Si el CORS acepta una lista de orígenes para las previews de Vercel | F3 o F5, cuando se pruebe el primer deploy |
+| Fecha y quién ejecuta la migración | F8 |
