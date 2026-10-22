@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/auth.js";
 import MenuUsuario from "../components/MenuUsuario.jsx";
+import Marca from "../components/Marca.jsx";
 
 // Sitio público (cartelera, evento, compra, mis entradas): Tailwind con estética de afiche.
 // Los links llevan su color explícito: antd pinta todos los <a> de azul.
@@ -16,9 +17,9 @@ function PublicLayout() {
     <div className="sitio flex min-h-dvh flex-col bg-tinta font-sans text-papel antialiased">
       <header className="sticky top-0 z-10 border-b-2 border-papel bg-tinta">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-4">
-          <Link to="/" className="flex shrink-0 items-center gap-2 text-papel">
-            <span className="grid size-8 place-items-center bg-amarillo font-afiche text-lg text-tinta">B</span>
-            <span className="font-afiche text-2xl uppercase tracking-wide">Backstage</span>
+          <Link to="/" className="flex shrink-0 items-center gap-2.5 text-papel" aria-label="Backstage, ir a la cartelera">
+            <Marca alto={30} />
+            <span aria-hidden="true" className="font-afiche text-2xl uppercase tracking-wide">Backstage</span>
           </Link>
           <nav className="flex min-w-0 flex-1 gap-1">
             <NavLink to="/" end className={(e) => `hidden sm:block ${linkClase(e)}`}>

@@ -22,6 +22,12 @@ export const PANEL = {
   destacado: "#fadb14"
 };
 
+// Colores del logo "Pase" (components/Marca.jsx) en cada zona
+export const MARCA = {
+  sitio: { fondo: "#ffd23f", letra: AFICHE.tinta, punto: "#ff3d7f" },
+  panel: { fondo: PANEL.violeta, letra: "#ffffff", punto: PANEL.violetaTexto }
+};
+
 export const temaAntd = {
   algorithm: theme.darkAlgorithm,
   token: {

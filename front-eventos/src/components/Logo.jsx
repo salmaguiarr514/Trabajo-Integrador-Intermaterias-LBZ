@@ -1,17 +1,22 @@
 import { Link } from "react-router-dom";
 import { Typography } from "antd";
-import { SoundOutlined } from "@ant-design/icons";
-import { PANEL } from "../tema.js";
+import Marca from "./Marca.jsx";
+import { MARCA } from "../tema.js";
 
+// Logo de los paneles: el mismo "Pase" de la cartelera, en violeta, con el nombre en Anton
 function Logo({ to = "/", subtitulo }) {
   return (
-    <Link to={to} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <SoundOutlined style={{ fontSize: 24, color: PANEL.violetaTexto }} />
-      <Typography.Title level={4} style={{ margin: 0 }}>
+    <Link
+      to={to}
+      aria-label={`Backstage, inicio${subtitulo ? ` de ${subtitulo}` : ""}`}
+      style={{ display: "flex", alignItems: "center", gap: 10, color: "#fff" }}
+    >
+      <Marca alto={28} colores={MARCA.panel} />
+      <span aria-hidden="true" className="font-afiche" style={{ fontSize: 24, lineHeight: 1, letterSpacing: "0.02em", textTransform: "uppercase" }}>
         Backstage
-      </Typography.Title>
+      </span>
       {subtitulo && (
-        <Typography.Text type="secondary" className="ocultar-mobile">
+        <Typography.Text type="secondary" className="ocultar-mobile" aria-hidden="true">
           {subtitulo}
         </Typography.Text>
       )}
