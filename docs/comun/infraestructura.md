@@ -3,6 +3,8 @@
 Decidido el 2026-10-22. Reemplaza la idea de "desarrollar contra Supabase y dockerizar solo para la demo de Sistemas Operativos":
 ahora **la base de producción es un Postgres dockerizado nuestro**, y el sitio público corre en **Vercel**.
 
+> Los pasos concretos para llevar esto a cabo (y la lista de humo antes de cada despliegue) están en [plan-despliegue.md](plan-despliegue.md).
+
 ## 1. Esquema final
 
 ```mermaid
