@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { obtenerCartelera, obtenerCiudades } from "../../services/publicService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { diaMes, pesos } from "../../utils/formato.js";
+import { useTitulo } from "../../hooks/useTitulo.js";
+import { ErrorCarga, Hueco } from "../../components/afiche.jsx";
 
 const TIPOS = [
   { valor: "", texto: "Todos" },
@@ -17,6 +19,7 @@ function TarjetaEvento({ evento }) {
   return (
     <Link
       to={`/eventos/${evento.id_evento}`}
+      state={{ previa: evento }} // el detalle muestra esto al instante, mientras llega el resto
       className="group flex flex-col border-2 border-papel bg-noche text-papel shadow-[6px_6px_0_var(--color-fucsia)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_var(--color-fucsia)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amarillo"
     >
       <div className="flex items-stretch border-b-2 border-papel">
@@ -54,6 +57,26 @@ function TarjetaEvento({ evento }) {
   );
 }
 
+// Lugar reservado de una tarjeta mientras carga la cartelera (mismo alto que TarjetaEvento)
+function TarjetaHueco() {
+  return (
+    <div className="flex flex-col border-2 border-linea">
+      <div className="flex border-b-2 border-linea">
+        <Hueco className="h-[5.75rem] w-20" fondo="bg-linea" />
+        <div className="grid flex-1 content-center gap-2 px-4">
+          <Hueco className="h-3 w-20" />
+          <Hueco className="h-4 w-40 max-w-full" />
+        </div>
+      </div>
+      <div className="grid gap-3 p-4">
+        <Hueco className="h-8 w-3/4" />
+        <Hueco className="h-4 w-1/2" />
+        <Hueco className="mt-8 h-7 w-24 justify-self-end" />
+      </div>
+    </div>
+  );
+}
+
 function Cartelera() {
   const [eventos, setEventos] = useState(null);
   const [error, setError] = useState("");
@@ -61,24 +84,32 @@ function Cartelera() {
   const [busqueda, setBusqueda] = useState("");
   const [tipo, setTipo] = useState("");
   const [ciudad, setCiudad] = useState("");
+  const [intento, setIntento] = useState(0); // "Reintentar" lo suma y vuelve a pedir
+  useTitulo("Cartelera");
 
   useEffect(() => {
     obtenerCiudades().then(({ data }) => setCiudades(data)).catch(() => {});
   }, []);
 
-  // La búsqueda la hace la API (nombre, artistas, géneros, lugar, productora). Se espera a que se deje de tipear.
+  // La búsqueda la hace la API (nombre, artistas, géneros, lugar, productora). Solo si hay texto se espera
+  // a que se deje de tipear; la primera carga y los filtros piden enseguida.
   useEffect(() => {
     let vigente = true;
     const espera = setTimeout(() => {
       obtenerCartelera({ q: busqueda.trim() || undefined, tipo: tipo || undefined, ciudad: ciudad || undefined })
         .then(({ data }) => vigente && (setEventos(data), setError("")))
         .catch((e) => vigente && setError(mensajeDeError(e, "No se pudo cargar la cartelera")));
-    }, 300);
+    }, busqueda.trim() ? 300 : 0);
     return () => {
       vigente = false;
       clearTimeout(espera);
     };
-  }, [busqueda, tipo, ciudad]);
+  }, [busqueda, tipo, ciudad, intento]);
+
+  const reintentar = () => {
+    setError("");
+    setIntento((n) => n + 1);
+  };
 
   const filtrando = busqueda || tipo || ciudad;
 
@@ -136,12 +167,14 @@ function Cartelera() {
       </section>
 
       {error ? (
-        <div className="border-2 border-fucsia px-6 py-8 text-center">
-          <p className="font-afiche text-2xl uppercase">No pudimos cargar la cartelera</p>
-          <p className="mt-1 text-sm text-gris">{error}</p>
-        </div>
+        <ErrorCarga titulo="No pudimos cargar la cartelera" mensaje={error} onReintentar={reintentar} />
       ) : eventos === null ? (
-        <p className="py-16 text-center font-afiche text-2xl uppercase tracking-wide text-gris">Cargando cartelera…</p>
+        <section aria-busy="true" className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <p role="status" className="sr-only">Cargando la cartelera…</p>
+          <TarjetaHueco />
+          <TarjetaHueco />
+          <TarjetaHueco />
+        </section>
       ) : eventos.length === 0 ? (
         <div className="border-2 border-dashed border-linea px-6 py-12 text-center">
           <p className="font-afiche text-2xl uppercase">{filtrando ? "No hay shows con esa búsqueda" : "Todavía no hay shows publicados"}</p>

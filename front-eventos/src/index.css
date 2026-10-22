@@ -1,10 +1,10 @@
 /* Estilos: los paneles (admin y productora) usan Ant Design; el sitio público usa Tailwind.
    Orden de capas: el reset de Tailwind (base) queda debajo de antd, y las utilidades de Tailwind
    encima. Así el reset no rompe antd y en el sitio público las clases de Tailwind siempre ganan.
-   Los estilos de antd van a la capa "antd" por el <StyleProvider layer> de main.jsx. */
+   Los estilos de antd van a la capa "antd" por el <StyleProvider layer> de layouts/ProveedorAntd.jsx.
+   Las fuentes (Anton e Inter) se cargan desde index.html, en paralelo con el JS. */
 @layer theme, base, antd, components, utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 /* Tokens del sitio público: estética de afiche de recital (los colores de JS están en tema.js) */
@@ -81,6 +81,30 @@
   @media (max-width: 600px) {
     .ocultar-mobile {
       display: none;
+    }
+  }
+}
+
+/* Ruedita de carga sin antd (la usan también las rutas públicas) */
+@keyframes girar {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@layer components {
+  .ruedita {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    border-top-color: currentColor;
+    animation: girar 0.8s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ruedita {
+      animation-duration: 2.4s;
     }
   }
 }

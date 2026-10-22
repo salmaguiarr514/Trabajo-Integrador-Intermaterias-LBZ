@@ -4,6 +4,7 @@ import { comprar, cotizar } from "../../services/clienteService.js";
 import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
 import { itemsDelCarrito, leerCarrito, vaciarCarrito } from "../../utils/carrito.js";
 import { pesos } from "../../utils/formato.js";
+import { useTitulo } from "../../hooks/useTitulo.js";
 
 const MEDIOS = [
   { valor: "credito", texto: "Crédito" },
@@ -99,6 +100,7 @@ function Resultado({ compra, idEvento, onReintentar }) {
 function Checkout() {
   const { id } = useParams();
   const [items] = useState(() => itemsDelCarrito(leerCarrito(id)));
+  useTitulo("Pagar");
   const [cotizacion, setCotizacion] = useState(null);
   const [errorCotizar, setErrorCotizar] = useState(items.length === 0 ? "No elegiste entradas todavía." : "");
   const [medio, setMedio] = useState("credito");

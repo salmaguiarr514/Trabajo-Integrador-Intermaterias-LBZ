@@ -7,6 +7,7 @@ import { useAuth } from "../../context/auth.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 // Datos de la propia productora. El CUIT y el % de service charge (RN-05) los maneja el superadmin.
 function MiProductora() {
@@ -18,7 +19,7 @@ function MiProductora() {
   const empresa = useCarga(obtenerMiEmpresa, "mi-empresa", "No se pudieron cargar los datos de la productora");
 
   if (empresa.cargando) return <Cargando />;
-  if (empresa.error) return <Alert type="error" showIcon title={empresa.error} />;
+  if (empresa.error) return <ErrorPanel mensaje={empresa.error} onReintentar={empresa.recargar} />;
 
   const guardar = async (valores) => {
     setGuardando(true);

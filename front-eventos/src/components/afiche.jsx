@@ -45,3 +45,22 @@ export function Aviso({ tipo = "error", children }) {
     </p>
   );
 }
+
+// Error al cargar una pantalla, con la salida: volver a intentar
+export function ErrorCarga({ titulo, mensaje, onReintentar }) {
+  return (
+    <div role="alert" className="grid justify-items-center gap-3 border-2 border-fucsia px-6 py-10 text-center">
+      <p className="font-afiche text-2xl uppercase">{titulo}</p>
+      <p className="text-sm text-gris">{mensaje}</p>
+      <button type="button" onClick={onReintentar} className={botonSecundario}>
+        Reintentar
+      </button>
+    </div>
+  );
+}
+
+// Bloque que reserva el lugar de algo que todavía está cargando (así la página no salta al llegar los datos).
+// Sobre el fondo tinta va en noche; dentro de una caja noche, fondo="bg-linea".
+export function Hueco({ className = "", fondo = "bg-noche" }) {
+  return <span aria-hidden="true" className={`block ${fondo} motion-safe:animate-pulse ${className}`} />;
+}

@@ -1,4 +1,4 @@
-import { Alert, Card, Col, Empty, Progress, Row, Space, Statistic, Table, Tag, Typography } from "antd";
+import { Card, Col, Empty, Progress, Row, Space, Statistic, Table, Tag, Typography } from "antd";
 import {
   DollarOutlined, FireOutlined, ShopOutlined, TagsOutlined, TeamOutlined, UserOutlined
 } from "@ant-design/icons";
@@ -7,16 +7,17 @@ import { useCarga } from "../../hooks/useCarga.js";
 import { mesAnio, numero, pesos } from "../../utils/formato.js";
 import { COLOR_ESTADO } from "../../utils/estados.js";
 import { PANEL } from "../../tema.js";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 
 const formatoPesos = { prefix: "$", groupSeparator: ".", decimalSeparator: ",", precision: 0 };
 
 function Dashboard() {
-  const { datos: m, cargando, error } = useCarga(obtenerMetricas, "metricas", "No se pudieron cargar las métricas");
+  const { datos: m, cargando, error, recargar } = useCarga(obtenerMetricas, "metricas", "No se pudieron cargar las métricas");
 
-  if (cargando) return <Cargando texto="Cargando métricas..." />;
-  if (error) return <Alert type="error" showIcon title={error} />;
+  if (cargando) return <Cargando texto="Cargando métricas…" />;
+  if (error) return <ErrorPanel mensaje={error} onReintentar={recargar} />;
 
   const maxProductora = Math.max(1, ...m.recaudacion_por_productora.map((p) => p.service_charge));
 

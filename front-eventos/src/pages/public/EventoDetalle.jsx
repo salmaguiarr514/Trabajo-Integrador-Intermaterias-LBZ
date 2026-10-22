@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { obtenerEventoPublico } from "../../services/publicService.js";
 import { useAuth } from "../../context/auth.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaMes, hora, numero, pesos, rangoLargo } from "../../utils/formato.js";
 import { guardarCarrito, leerCarrito } from "../../utils/carrito.js";
+import { useTitulo } from "../../hooks/useTitulo.js";
+import { botonPrimario, botonSecundario, Hueco } from "../../components/afiche.jsx";
 
 const ABONO = "abono";
 const MAX_ENTRADAS = 10; // RN-30
@@ -88,6 +90,34 @@ function Contador({ valor, maximo, onCambio, nombre }) {
   );
 }
 
+// Portada del evento. Con los datos de la tarjeta de la cartelera (previa) se muestra al instante;
+// lo que la tarjeta no trae (descripción, dirección, jornadas) aparece cuando llega el detalle.
+function Portada({ e }) {
+  const jornadas = e.jornadas?.length;
+  return (
+    <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
+      <span className="justify-self-start bg-tinta px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amarillo">
+        {e.tipo}
+        {jornadas ? ` · ${jornadas} ${jornadas === 1 ? "jornada" : "jornadas"}` : ""}
+        {e.estado === "agotado" && " · agotado"}
+      </span>
+      <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-7xl">{e.nombre}</h1>
+      {e.descripcion && <p className="max-w-prose font-medium">{e.descripcion}</p>}
+      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold">
+        <span>{rangoLargo(e.fecha_inicio, e.fecha_fin)}</span>
+        <span>{e.lugar} · {e.direccion ? `${e.direccion}, ` : ""}{e.ciudad}</span>
+        <span>Organiza {e.productora}</span>
+      </div>
+    </section>
+  );
+}
+
+const volver = (
+  <Link to="/" className="justify-self-start text-xs font-bold uppercase tracking-widest text-gris hover:text-papel">
+    ← Cartelera
+  </Link>
+);
+
 function EventoDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -96,17 +126,44 @@ function EventoDetalle() {
   const [pestaña, setPestaña] = useState(null);
   const [carrito, setCarrito] = useState(() => leerCarrito(id)); // { id_tarifa: cantidad }
   const [aviso, setAviso] = useState("");
+  const previa = useLocation().state?.previa; // lo que ya traía la tarjeta de la cartelera
+  useTitulo(evento.datos?.nombre ?? previa?.nombre ?? "Evento");
 
-  if (evento.cargando) return <p className="py-16 text-center font-afiche text-2xl uppercase text-gris">Cargando evento…</p>;
+  // Mientras carga: la portada con lo que ya se sabe y el lugar reservado para la grilla y las entradas
+  if (evento.cargando) {
+    return (
+      <div className="grid grid-cols-1 gap-8" aria-busy="true">
+        <p role="status" className="sr-only">Cargando el evento…</p>
+        {volver}
+        {previa ? <Portada e={previa} /> : <Hueco className="h-64" />}
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+          <div className="grid gap-3 border-2 border-linea p-4">
+            <Hueco className="h-4 w-32" />
+            <Hueco className="h-12" />
+            <Hueco className="h-12" />
+          </div>
+          <div className="grid gap-3 border-2 border-linea p-4">
+            <Hueco className="h-4 w-24" />
+            <Hueco className="h-16" />
+            <Hueco className="h-12" />
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (evento.error) {
     return (
       <section className="grid justify-items-start gap-4 py-16">
-        <span className="bg-fucsia px-3 py-1 font-afiche text-xl text-tinta">404</span>
-        <h1 className="font-afiche text-5xl uppercase leading-none">Evento no encontrado</h1>
+        <h1 className="font-afiche text-5xl uppercase leading-none">No pudimos abrir este evento</h1>
         <p className="text-gris">{evento.error}</p>
-        <Link to="/" className="border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
-          Volver a la cartelera
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={evento.recargar} className={botonPrimario}>
+            Reintentar
+          </button>
+          <Link to="/" className={botonSecundario}>
+            Volver a la cartelera
+          </Link>
+        </div>
       </section>
     );
   }
@@ -146,23 +203,9 @@ function EventoDetalle() {
 
   return (
     <div className="grid grid-cols-1 gap-8">
-      <Link to="/" className="justify-self-start text-xs font-bold uppercase tracking-widest text-gris hover:text-papel">
-        ← Cartelera
-      </Link>
+      {volver}
 
-      <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
-        <span className="justify-self-start bg-tinta px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amarillo">
-          {e.tipo} · {e.jornadas.length} {e.jornadas.length === 1 ? "jornada" : "jornadas"}
-          {e.estado === "agotado" && " · agotado"}
-        </span>
-        <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-7xl">{e.nombre}</h1>
-        {e.descripcion && <p className="max-w-prose font-medium">{e.descripcion}</p>}
-        <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold">
-          <span>{rangoLargo(e.fecha_inicio, e.fecha_fin)}</span>
-          <span>{e.lugar} · {e.direccion}, {e.ciudad}</span>
-          <span>Organiza {e.productora}</span>
-        </div>
-      </section>
+      <Portada e={e} />
 
       {pestañas.length > 1 && (
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Jornadas">

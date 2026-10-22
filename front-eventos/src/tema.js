@@ -1,6 +1,5 @@
-import { theme } from "antd";
-
-// Colores de la marca, para el código JS (antd, QR, colores de estado).
+// Colores de la marca, para el código JS (QR, logo, colores de estado, tema de antd).
+// Sin imports: lo usa el sitio público, que no carga antd (el tema de antd está en layouts/ProveedorAntd.jsx).
 // Los del sitio público también están en index.css (@theme) para Tailwind: si cambia uno, se cambia en los dos.
 
 // Sitio público y cliente: estética de afiche
@@ -26,23 +25,4 @@ export const PANEL = {
 export const MARCA = {
   sitio: { fondo: "#ffd23f", letra: AFICHE.tinta, punto: "#ff3d7f" },
   panel: { fondo: PANEL.violeta, letra: "#ffffff", punto: PANEL.violetaTexto }
-};
-
-export const temaAntd = {
-  algorithm: theme.darkAlgorithm,
-  token: {
-    colorPrimary: PANEL.violeta,
-    colorLink: PANEL.violetaTexto,
-    colorLinkHover: PANEL.violetaTextoHover,
-    colorLinkActive: PANEL.violetaTexto,
-    colorPrimaryText: PANEL.violetaTexto,
-    colorPrimaryTextHover: PANEL.violetaTextoHover,
-    colorPrimaryTextActive: PANEL.violetaTexto,
-    colorBgLayout: PANEL.fondo,
-    borderRadius: 10,
-    fontFamily: "'Inter', system-ui, sans-serif"
-  },
-  components: {
-    Menu: { itemSelectedColor: PANEL.violetaTextoHover }
-  }
 };

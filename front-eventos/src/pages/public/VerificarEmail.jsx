@@ -5,6 +5,7 @@ import { MailOutlined, SafetyOutlined } from "@ant-design/icons";
 import { inicioDeRol, useAuth } from "../../context/auth.js";
 import { mensajeDeError } from "../../services/api.js";
 import * as authService from "../../services/authService.js";
+import { useTitulo } from "../../hooks/useTitulo.js";
 
 const SEGUNDOS_ENTRE_ENVIOS = 60;
 
@@ -12,6 +13,7 @@ const SEGUNDOS_ENTRE_ENVIOS = 60;
 // El email viene en location.state; si se entra directo, se pide.
 function VerificarEmail() {
   const { usuario, verificar } = useAuth();
+  useTitulo("Verificá tu email");
   const navigate = useNavigate();
   const { state } = useLocation();
   const [email, setEmail] = useState(state?.email ?? "");

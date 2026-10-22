@@ -52,7 +52,7 @@ function Empresas() {
   };
 
   if (loading) {
-    return <Cargando texto="Cargando productoras..." />;
+    return <Cargando texto="Cargando productoras…" />;
   }
 
   if (error) {

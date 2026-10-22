@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { Alert, Button, Card, Col, Empty, Input, Row, Select, Space, Tag, Typography } from "antd";
+import { Button, Card, Col, Empty, Input, Row, Select, Space, Tag, Typography } from "antd";
 import { CheckCircleFilled, CloseCircleFilled, ScanOutlined } from "@ant-design/icons";
 import { obtenerEvento, obtenerEventos, obtenerVentasEvento, validarEntrada } from "../../services/panelService.js";
 import { mensajeDeError } from "../../services/api.js";
@@ -10,6 +10,7 @@ import { diaCorto, numero } from "../../utils/formato.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 import { PANEL } from "../../tema.js";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 const VERDE = PANEL.ok;
 const ROJO = PANEL.error;
@@ -89,7 +90,7 @@ function ControlAcceso() {
   }, [idEvento, jornada?.id_jornada]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (eventos.cargando) return <Cargando />;
-  if (eventos.error) return <Alert type="error" showIcon title={eventos.error} />;
+  if (eventos.error) return <ErrorPanel mensaje={eventos.error} onReintentar={eventos.recargar} />;
 
   // Solo tiene sentido controlar eventos que se venden
   const opcionesEventos = eventos.datos

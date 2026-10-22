@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Alert, App, Button, Card, Empty, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { App, Button, Card, Empty, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { BarChartOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, PlusOutlined } from "@ant-design/icons";
 import { eliminarEvento, obtenerEventos } from "../../services/panelService.js";
 import { mensajeDeError } from "../../services/api.js";
@@ -8,6 +8,7 @@ import { numero, rangoFechas } from "../../utils/formato.js";
 import { COLOR_ESTADO } from "../../utils/estados.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 // Qué le falta a un borrador para poder publicarse (RN-20)
 const faltante = (e) =>
@@ -22,8 +23,8 @@ function Eventos() {
   const { message } = App.useApp();
   const eventos = useCarga(obtenerEventos, "eventos", "No se pudieron cargar los eventos");
 
-  if (eventos.cargando) return <Cargando texto="Cargando eventos..." />;
-  if (eventos.error) return <Alert type="error" showIcon title={eventos.error} />;
+  if (eventos.cargando) return <Cargando texto="Cargando eventos…" />;
+  if (eventos.error) return <ErrorPanel mensaje={eventos.error} onReintentar={eventos.recargar} />;
 
   const eliminar = async (e) => {
     try {

@@ -4,10 +4,12 @@ import { Alert, Button, Card, Col, Form, Input, Row, Typography } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import { inicioDeRol, useAuth } from "../../context/auth.js";
 import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
+import { useTitulo } from "../../hooks/useTitulo.js";
 
 // Alta de clientes (el público que compra entradas)
 function Registro() {
   const { usuario, registro } = useAuth();
+  useTitulo("Crear cuenta");
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [error, setError] = useState("");

@@ -6,6 +6,8 @@ import { obtenerCompras, obtenerEntradas } from "../../services/clienteService.j
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaMes, pesos, rangoLargo } from "../../utils/formato.js";
 import { AFICHE } from "../../tema.js";
+import { useTitulo } from "../../hooks/useTitulo.js";
+import { ErrorCarga, Hueco } from "../../components/afiche.jsx";
 
 const etiquetaDia = (iso) => {
   const { dia, mes, semana } = diaMes(iso);
@@ -52,12 +54,56 @@ function Entrada({ entrada }) {
   );
 }
 
+const encabezado = (
+  <section className="grid gap-3">
+    <span className="justify-self-start bg-fucsia px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-tinta">Tu acceso</span>
+    <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-7xl">Mis entradas</h1>
+    <p className="max-w-prose text-gris">Mostrá el QR en la puerta. Tocalo para agrandarlo.</p>
+  </section>
+);
+
+// Lugar reservado de una entrada mientras cargan (mismo alto que Entrada)
+function EntradaHueco() {
+  return (
+    <div className="flex flex-col border-2 border-linea sm:flex-row">
+      <Hueco className="h-[8.5rem] sm:w-[8.5rem]" fondo="bg-linea" />
+      <div className="grid flex-1 content-start gap-2 p-4">
+        <Hueco className="h-3 w-24" />
+        <Hueco className="h-7 w-40" />
+        <Hueco className="h-4 w-32" />
+      </div>
+    </div>
+  );
+}
+
 function MisEntradas() {
   const entradas = useCarga(obtenerEntradas, "entradas", "No se pudieron cargar tus entradas");
   const compras = useCarga(obtenerCompras, "compras", "No se pudieron cargar tus compras");
+  useTitulo("Mis entradas");
 
-  if (entradas.cargando) return <p className="py-16 text-center font-afiche text-2xl uppercase text-gris">Cargando tus entradas…</p>;
-  if (entradas.error) return <p className="border-2 border-fucsia px-4 py-6 text-center">{entradas.error}</p>;
+  if (entradas.cargando) {
+    return (
+      <div className="grid grid-cols-1 gap-10" aria-busy="true">
+        {encabezado}
+        <p role="status" className="sr-only">Cargando tus entradas…</p>
+        <div className="grid gap-4">
+          <Hueco className="h-9 w-2/3" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <EntradaHueco />
+            <EntradaHueco />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (entradas.error) {
+    return (
+      <div className="grid grid-cols-1 gap-10">
+        {encabezado}
+        <ErrorCarga titulo="No pudimos cargar tus entradas" mensaje={entradas.error} onReintentar={entradas.recargar} />
+      </div>
+    );
+  }
 
   // Agrupadas por evento, en orden de fecha
   const porEvento = [];
@@ -72,11 +118,7 @@ function MisEntradas() {
 
   return (
     <div className="grid grid-cols-1 gap-10">
-      <section className="grid gap-3">
-        <span className="justify-self-start bg-fucsia px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-tinta">Tu acceso</span>
-        <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-7xl">Mis entradas</h1>
-        <p className="max-w-prose text-gris">Mostrá el QR en la puerta. Tocalo para agrandarlo.</p>
-      </section>
+      {encabezado}
 
       {porEvento.length === 0 ? (
         <div className="border-2 border-dashed border-linea px-6 py-12 text-center">

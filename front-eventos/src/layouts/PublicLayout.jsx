@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/auth.js";
-import MenuUsuario from "../components/MenuUsuario.jsx";
+import MenuCliente from "../components/MenuCliente.jsx";
+import Cargando from "../components/Cargando.jsx";
 import Marca from "../components/Marca.jsx";
 
 // Sitio público (cartelera, evento, compra, mis entradas): Tailwind con estética de afiche.
@@ -32,7 +34,7 @@ function PublicLayout() {
             )}
           </nav>
           {usuario ? (
-            <MenuUsuario />
+            <MenuCliente />
           ) : (
             <div className="flex shrink-0 items-center gap-2">
               <Link to="/registro" className="hidden px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-gris hover:text-papel sm:block">
@@ -50,7 +52,9 @@ function PublicLayout() {
       </header>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16">
-        <Outlet />
+        <Suspense fallback={<Cargando />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="border-t-2 border-dashed border-linea">

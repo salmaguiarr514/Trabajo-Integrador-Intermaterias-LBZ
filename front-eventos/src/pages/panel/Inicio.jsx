@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Alert, Button, Card, Col, Empty, Row, Space, Statistic, Table, Tag, Typography } from "antd";
+import { Button, Card, Col, Empty, Row, Space, Statistic, Table, Tag, Typography } from "antd";
 import { CalendarOutlined, DollarOutlined, EditOutlined, PlusOutlined, RocketOutlined, TagsOutlined } from "@ant-design/icons";
 import { useAuth } from "../../context/auth.js";
 import { obtenerResumen } from "../../services/panelService.js";
@@ -9,6 +9,7 @@ import { numero, pesos, rangoFechas } from "../../utils/formato.js";
 import { COLOR_ESTADO } from "../../utils/estados.js";
 import Cargando from "../../components/Cargando.jsx";
 import { PANEL } from "../../tema.js";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 // Inicio del panel de la productora: cómo viene y qué tiene por delante
 function Inicio() {
@@ -28,8 +29,8 @@ function Inicio() {
     </div>
   );
 
-  if (resumen.cargando) return <Cargando texto="Cargando tu panel..." />;
-  if (resumen.error) return <div className="pila">{encabezado}<Alert type="error" showIcon title={resumen.error} /></div>;
+  if (resumen.cargando) return <Cargando texto="Cargando tu panel…" />;
+  if (resumen.error) return <div className="pila">{encabezado}<ErrorPanel mensaje={resumen.error} onReintentar={resumen.recargar} /></div>;
 
   const r = resumen.datos;
   const abrir = (id) => navigate(`/panel/eventos/${id}`);

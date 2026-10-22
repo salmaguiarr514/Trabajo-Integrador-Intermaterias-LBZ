@@ -36,9 +36,19 @@ function VentasEvento() {
   const navigate = useNavigate();
   const ventas = useCarga(() => obtenerVentasEvento(id), id, "No se pudieron cargar las ventas");
 
-  if (ventas.cargando) return <Cargando texto="Cargando ventas..." />;
+  if (ventas.cargando) return <Cargando texto="Cargando ventas…" />;
   if (ventas.error) {
-    return <Result status="404" title="Evento no encontrado" subTitle={ventas.error} extra={<Button type="primary" onClick={() => navigate("/panel/eventos")}>Volver a eventos</Button>} />;
+    return (
+      <Result
+        status="404"
+        title="Evento no encontrado"
+        subTitle={ventas.error}
+        extra={[
+          <Button key="reintentar" onClick={ventas.recargar}>Reintentar</Button>,
+          <Button key="volver" type="primary" onClick={() => navigate("/panel/eventos")}>Volver a eventos</Button>
+        ]}
+      />
+    );
   }
 
   const v = ventas.datos;

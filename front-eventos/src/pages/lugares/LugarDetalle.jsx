@@ -232,7 +232,10 @@ function LugarDetalle({ ambito: nombreAmbito }) {
         status="404"
         title="Lugar no encontrado"
         subTitle={lugar.error}
-        extra={<Button type="primary" onClick={() => navigate(ambito.ruta)}>Volver a lugares</Button>}
+        extra={[
+          <Button key="reintentar" onClick={lugar.recargar}>Reintentar</Button>,
+          <Button key="volver" type="primary" onClick={() => navigate(ambito.ruta)}>Volver a lugares</Button>
+        ]}
       />
     );
   }

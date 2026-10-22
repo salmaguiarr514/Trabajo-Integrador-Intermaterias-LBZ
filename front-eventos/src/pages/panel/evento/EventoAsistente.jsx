@@ -62,14 +62,17 @@ function EventoExistente({ id }) {
   const paso = Math.min(Math.max(Number(params.get("paso")) || 0, 0), PASOS.length - 1);
   const irA = (n) => setParams({ paso: String(n) }, { replace: true });
 
-  if (evento.cargando) return <Cargando texto="Cargando evento..." />;
+  if (evento.cargando) return <Cargando texto="Cargando evento…" />;
   if (evento.error) {
     return (
       <Result
         status="404"
         title="Evento no encontrado"
         subTitle={evento.error}
-        extra={<Button type="primary" onClick={() => navigate(LISTADO)}>Volver a eventos</Button>}
+        extra={[
+          <Button key="reintentar" onClick={evento.recargar}>Reintentar</Button>,
+          <Button key="volver" type="primary" onClick={() => navigate(LISTADO)}>Volver a eventos</Button>
+        ]}
       />
     );
   }

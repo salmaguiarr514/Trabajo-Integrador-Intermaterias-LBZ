@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Alert, Card, Empty, Input, Select, Table, Tag, Typography } from "antd";
+import { Card, Empty, Input, Select, Table, Tag, Typography } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { obtenerArtistas } from "../../services/adminService.js";
 import { obtenerEmpresas } from "../../services/empresasService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 // Solo lectura: cada productora carga sus artistas desde su panel
 function Artistas() {
@@ -14,8 +15,8 @@ function Artistas() {
   const artistas = useCarga(() => obtenerArtistas({ id_empresa: idEmpresa }), idEmpresa, "No se pudieron cargar los artistas");
   const empresas = useCarga(obtenerEmpresas, "empresas", "No se pudieron cargar las productoras");
 
-  if (artistas.cargando) return <Cargando texto="Cargando artistas..." />;
-  if (artistas.error) return <Alert type="error" showIcon title={artistas.error} />;
+  if (artistas.cargando) return <Cargando texto="Cargando artistas…" />;
+  if (artistas.error) return <ErrorPanel mensaje={artistas.error} onReintentar={artistas.recargar} />;
 
   const texto = busqueda.trim().toLowerCase();
   const filtrados = artistas.datos.filter((a) =>
