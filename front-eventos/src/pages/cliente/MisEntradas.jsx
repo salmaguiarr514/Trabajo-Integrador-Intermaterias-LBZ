@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { QRCodeSVG } from "qrcode.react";
@@ -21,26 +21,47 @@ const ESTADO_COMPRA = {
   cancelada: "text-gris"
 };
 
-// Una entrada: el QR lleva el código (UUID, RN-29) que se escanea en la puerta
+// Una entrada: el QR lleva el código (UUID, RN-29) que se escanea en la puerta.
+// Tocándolo se abre a pantalla completa, en blanco, para que el lector lo tome fácil (Escape o "Cerrar" vuelve).
 function Entrada({ entrada }) {
-  const [grande, setGrande] = useState(false);
+  const pantalla = useRef(null);
   const anulada = entrada.estado !== "valida";
   const usada = entrada.ingresos > 0;
+  const dia = entrada.id_jornada ? etiquetaDia(entrada.fecha_jornada) : `Abono · ${entrada.cantidad_jornadas} jornadas`;
 
   return (
     <article className={`flex flex-col border-2 bg-noche sm:flex-row ${anulada ? "border-borde" : "border-papel"}`}>
       <button
         type="button"
-        onClick={() => setGrande(!grande)}
-        aria-label={grande ? "Achicar el QR" : "Agrandar el QR para mostrarlo en la puerta"}
+        disabled={anulada}
+        onClick={() => pantalla.current?.showModal()}
+        aria-label={`Mostrar en pantalla completa el QR de ${entrada.espacio}, ${dia}`}
         className={`grid shrink-0 place-items-center border-b-2 border-papel bg-papel p-3 sm:border-r-2 sm:border-b-0 ${anulada ? "opacity-40" : ""}`}
       >
-        <QRCodeSVG value={entrada.codigo} size={grande ? 220 : 112} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
+        <QRCodeSVG value={entrada.codigo} size={112} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
       </button>
+      <dialog
+        ref={pantalla}
+        aria-label={`QR de la entrada: ${entrada.espacio}, ${dia}`}
+        onClick={(ev) => ev.target === pantalla.current && pantalla.current.close()}
+        className="fixed inset-0 m-0 size-full max-h-none max-w-none bg-papel p-0 text-tinta backdrop:bg-tinta"
+      >
+        <div className="mx-auto grid h-full max-w-md content-center justify-items-center gap-4 p-6 text-center">
+          <p className="font-afiche text-3xl uppercase leading-tight text-balance">{entrada.evento}</p>
+          <p className="text-base font-semibold">{dia} · {entrada.espacio} · {entrada.tarifa}</p>
+          <QRCodeSVG value={entrada.codigo} size={512} style={{ width: "100%", height: "auto" }} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
+          <p className="font-mono text-sm break-all">{entrada.codigo}</p>
+          <button
+            type="button"
+            onClick={() => pantalla.current?.close()}
+            className="border-2 border-tinta px-5 py-2.5 text-sm font-bold uppercase tracking-widest hover:bg-tinta hover:text-papel"
+          >
+            Cerrar
+          </button>
+        </div>
+      </dialog>
       <div className="flex min-w-0 flex-1 flex-col gap-1 p-4">
-        <span className="text-xs font-bold uppercase tracking-[0.18em] text-fucsia">
-          {entrada.id_jornada ? etiquetaDia(entrada.fecha_jornada) : `Abono · ${entrada.cantidad_jornadas} jornadas`}
-        </span>
+        <span className="text-xs font-bold uppercase tracking-[0.18em] text-fucsia">{dia}</span>
         <p className="font-afiche text-2xl uppercase leading-tight">{entrada.espacio}</p>
         <p className="text-sm text-gris">{entrada.tarifa} · {pesos(entrada.precio_pagado)}</p>
         <p className="mt-auto pt-2 font-mono text-xs break-all text-gris">{entrada.codigo}</p>
@@ -58,7 +79,7 @@ const encabezado = (
   <section className="grid gap-3">
     <span className="justify-self-start bg-fucsia px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-tinta">Tu acceso</span>
     <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-7xl">Mis entradas</h1>
-    <p className="max-w-prose text-gris">Mostrá el QR en la puerta. Tocalo para agrandarlo.</p>
+    <p className="max-w-prose text-gris">Mostrá el QR en la puerta. Tocalo para verlo en pantalla completa.</p>
   </section>
 );
 

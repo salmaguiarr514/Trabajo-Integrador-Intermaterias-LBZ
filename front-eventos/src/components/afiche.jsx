@@ -18,7 +18,8 @@ export function Campo({ etiqueta, error, ayuda, children }) {
   const id = useId();
   const idDetalle = `${id}-detalle`;
   return (
-    <div className="grid gap-1.5 text-sm">
+    // content-start: si el campo de al lado muestra un error, este no se estira ni se corre
+    <div className="grid content-start gap-1.5 text-sm">
       <label htmlFor={id} className="font-semibold text-papel">
         {etiqueta}
       </label>

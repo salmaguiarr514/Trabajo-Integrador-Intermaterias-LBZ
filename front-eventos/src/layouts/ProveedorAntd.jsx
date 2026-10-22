@@ -23,8 +23,7 @@ const temaAntd = {
   }
 };
 
-// antd (tema violeta, en español) solo donde se usa: los paneles y, hasta pasarlas a Tailwind,
-// registro y verificación. Así el sitio público no lo descarga.
+// antd (tema violeta, en español) solo en los paneles: el sitio público no lo descarga.
 // StyleProvider layer: los estilos de antd van a la capa CSS "antd" (ver el orden en index.css).
 function ProveedorAntd({ children }) {
   return (

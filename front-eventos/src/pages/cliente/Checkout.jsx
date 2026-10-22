@@ -5,6 +5,7 @@ import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
 import { itemsDelCarrito, leerCarrito, vaciarCarrito } from "../../utils/carrito.js";
 import { pesos } from "../../utils/formato.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
+import { Aviso, botonPrimario, botonSecundario, Campo, campoClase } from "../../components/afiche.jsx";
 
 const MEDIOS = [
   { valor: "credito", texto: "Crédito" },
@@ -12,25 +13,12 @@ const MEDIOS = [
   { valor: "transferencia", texto: "Transferencia" }
 ];
 
-const campoClase =
-  "w-full border-2 border-borde bg-tinta px-3 py-2.5 text-papel placeholder:text-gris focus:border-amarillo focus:outline-none";
-
 // 4111 1111 1111 1111 mientras se escribe
 const formatearTarjeta = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
 const formatearVencimiento = (v) => {
   const d = v.replace(/\D/g, "").slice(0, 4);
   return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
 };
-
-function Campo({ etiqueta, error, children }) {
-  return (
-    <label className="grid gap-1.5 text-sm">
-      <span className="font-bold uppercase tracking-widest text-gris">{etiqueta}</span>
-      {children}
-      {error && <span className="text-fucsia">{error}</span>}
-    </label>
-  );
-}
 
 function Resumen({ cotizacion }) {
   return (
@@ -80,15 +68,15 @@ function Resultado({ compra, idEvento, onReintentar }) {
       {aprobada && <p className="text-sm text-gris">Comprobante: <span className="font-mono text-papel">{compra.referencia_pago}</span></p>}
       <div className="flex flex-wrap gap-3">
         {aprobada ? (
-          <Link to="/mis-entradas" className="border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
+          <Link to="/mis-entradas" className={botonPrimario}>
             Ver mis entradas
           </Link>
         ) : (
-          <button type="button" onClick={onReintentar} className="border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
+          <button type="button" onClick={onReintentar} className={botonPrimario}>
             Probar con otra tarjeta
           </button>
         )}
-        <Link to={`/eventos/${idEvento}`} className="border-2 border-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-papel hover:bg-noche">
+        <Link to={`/eventos/${idEvento}`} className={botonSecundario}>
           Volver al evento
         </Link>
       </div>
@@ -146,7 +134,7 @@ function Checkout() {
       <section className="grid justify-items-start gap-4 py-12">
         <h1 className="font-afiche text-5xl uppercase leading-none">No se puede comprar así</h1>
         <p className="max-w-prose text-gris">{errorCotizar}</p>
-        <Link to={`/eventos/${id}`} className="border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
+        <Link to={`/eventos/${id}`} className={botonPrimario}>
           Elegir entradas
         </Link>
       </section>
@@ -170,24 +158,27 @@ function Checkout() {
             Pago simulado: no se cobra nada. Para probar un rechazo, usá una tarjeta terminada en <strong>0000</strong>.
           </div>
 
-          <div className="grid gap-1.5">
-            <span className="text-sm font-bold uppercase tracking-widest text-gris">Medio de pago</span>
+          {/* Botones de opción nativos: se recorren con las flechas y se leen como "1 de 3, seleccionado" */}
+          <fieldset className="grid gap-1.5">
+            <legend className="mb-1.5 text-sm font-semibold">Medio de pago</legend>
             <div className="flex flex-wrap gap-2">
               {MEDIOS.map((m) => (
-                <button
-                  key={m.valor}
-                  type="button"
-                  aria-pressed={medio === m.valor}
-                  onClick={() => setMedio(m.valor)}
-                  className={`border-2 px-4 py-2 text-xs font-bold uppercase tracking-widest ${
-                    medio === m.valor ? "border-papel bg-papel text-tinta" : "border-borde text-gris hover:border-papel hover:text-papel"
-                  }`}
-                >
-                  {m.texto}
-                </button>
+                <label key={m.valor} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="medio"
+                    value={m.valor}
+                    checked={medio === m.valor}
+                    onChange={() => setMedio(m.valor)}
+                    className="peer sr-only"
+                  />
+                  <span className="block border-2 border-borde px-4 py-2 text-xs font-bold uppercase tracking-widest text-gris hover:border-papel hover:text-papel peer-checked:border-papel peer-checked:bg-papel peer-checked:text-tinta peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-amarillo">
+                    {m.texto}
+                  </span>
+                </label>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           {medio === "transferencia" ? (
             <p className="text-sm text-gris">Se aprueba al instante (es una simulación).</p>
@@ -240,14 +231,10 @@ function Checkout() {
           )}
 
           {(errores.general || errores.tarjeta) && (
-            <p role="alert" className="border-2 border-fucsia px-3 py-2 text-sm text-fucsia">{errores.general ?? errores.tarjeta}</p>
+            <Aviso>{errores.general ?? errores.tarjeta}</Aviso>
           )}
 
-          <button
-            type="submit"
-            disabled={pagando}
-            className="border-2 border-papel bg-papel py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-tinta hover:border-fucsia hover:bg-fucsia disabled:opacity-50"
-          >
+          <button type="submit" disabled={pagando} className={`${botonPrimario} py-3`}>
             {pagando ? "Procesando…" : `Pagar ${pesos(cotizacion.total)}`}
           </button>
         </form>

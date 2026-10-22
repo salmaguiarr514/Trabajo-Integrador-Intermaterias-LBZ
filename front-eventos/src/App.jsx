@@ -13,8 +13,7 @@ const Registro = lazy(() => import("./pages/public/Registro.jsx"));
 const VerificarEmail = lazy(() => import("./pages/public/VerificarEmail.jsx"));
 const Checkout = lazy(() => import("./pages/cliente/Checkout.jsx"));
 const MisEntradas = lazy(() => import("./pages/cliente/MisEntradas.jsx"));
-// Registro, verificación y la 404 todavía usan antd: lo traen solo ellas (se pasan a Tailwind en la fase 3)
-const ProveedorAntd = lazy(() => import("./layouts/ProveedorAntd.jsx"));
+const NoEncontradaPublica = lazy(() => import("./pages/public/NoEncontrada.jsx"));
 
 const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard.jsx"));
@@ -51,14 +50,14 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Cartelera />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<ProveedorAntd><Registro /></ProveedorAntd>} />
-          <Route path="/verificar" element={<ProveedorAntd><VerificarEmail /></ProveedorAntd>} />
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/verificar" element={<VerificarEmail />} />
           <Route path="/eventos/:id" element={<EventoDetalle />} />
           <Route element={<RutaProtegida roles={["cliente"]} />}>
             <Route path="/checkout/:id" element={<Checkout />} />
             <Route path="/mis-entradas" element={<MisEntradas />} />
           </Route>
-          <Route path="*" element={<ProveedorAntd><NoEncontrada /></ProveedorAntd>} />
+          <Route path="*" element={<NoEncontradaPublica />} />
         </Route>
 
         {/* Superadmin */}

@@ -1,6 +1,7 @@
 // Formatos en español de Argentina
 
-export const pesos = (n) => `$ ${Math.round(n ?? 0).toLocaleString("es-AR")}`;
+// Espacio que no se corta (\u00a0): el signo nunca queda en una línea y el número en otra
+export const pesos = (n) => `$\u00a0${Math.round(n ?? 0).toLocaleString("es-AR")}`;
 
 export const numero = (n) => (n ?? 0).toLocaleString("es-AR");
 

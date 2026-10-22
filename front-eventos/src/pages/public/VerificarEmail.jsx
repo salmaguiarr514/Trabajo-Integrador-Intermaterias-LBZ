@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { Alert, Button, Card, Form, Input, Typography } from "antd";
-import { MailOutlined, SafetyOutlined } from "@ant-design/icons";
 import { inicioDeRol, useAuth } from "../../context/auth.js";
 import { mensajeDeError } from "../../services/api.js";
 import * as authService from "../../services/authService.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
+import { Aviso, botonPrimario, Campo, campoClase } from "../../components/afiche.jsx";
 
 const SEGUNDOS_ENTRE_ENVIOS = 60;
 
@@ -13,16 +12,17 @@ const SEGUNDOS_ENTRE_ENVIOS = 60;
 // El email viene en location.state; si se entra directo, se pide.
 function VerificarEmail() {
   const { usuario, verificar } = useAuth();
-  useTitulo("Verificá tu email");
   const navigate = useNavigate();
   const { state } = useLocation();
   const [email, setEmail] = useState(state?.email ?? "");
   const [codigo, setCodigo] = useState("");
   const [error, setError] = useState("");
-  const [aviso, setAviso] = useState(state?.email ? `Te mandamos un código de 6 números a ${state.email}` : "");
+  const [aviso, setAviso] = useState(state?.email ? `Te mandamos un código de 6 números a ${state.email}.` : "");
   const [enviando, setEnviando] = useState(false);
   const [espera, setEspera] = useState(state?.reenviar ? 0 : SEGUNDOS_ENTRE_ENVIOS);
   const reenvioInicial = useRef(false);
+  const campoCodigo = useRef(null);
+  useTitulo("Verificá tu email");
 
   // Cuenta regresiva para poder pedir otro código
   useEffect(() => {
@@ -35,10 +35,10 @@ function VerificarEmail() {
     setError("");
     try {
       await authService.reenviarCodigo(destino);
-      setAviso(`Te mandamos un código nuevo a ${destino}`);
+      setAviso(`Te mandamos un código nuevo a ${destino}.`);
       setEspera(SEGUNDOS_ENTRE_ENVIOS);
     } catch (err) {
-      setError(mensajeDeError(err, "No se pudo mandar el código"));
+      setError(mensajeDeError(err, "No se pudo mandar el código. Probá de nuevo en un rato."));
     }
   };
 
@@ -66,50 +66,72 @@ function VerificarEmail() {
       setError(mensajeDeError(err, "No se pudo verificar el código"));
       setCodigo("");
       setEnviando(false);
+      campoCodigo.current?.focus();
     }
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto" }}>
-      <Card>
-        <Typography.Title level={3} style={{ marginTop: 0 }}>Verificá tu email</Typography.Title>
-        <Typography.Paragraph type="secondary">
-          Ingresá el código que te llegó por mail. Si no lo ves, fijate en spam.
-        </Typography.Paragraph>
-        {aviso && !error && <Alert type="info" showIcon title={aviso} style={{ marginBottom: 16 }} />}
-        {error && <Alert type="error" showIcon title={error} style={{ marginBottom: 16 }} />}
+    <div className="mx-auto grid w-full max-w-xl gap-8">
+      <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
+        <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-6xl">Verificá tu email</h1>
+        <p className="text-base font-medium">Ingresá el código que te llegó por mail. Si no lo ves, fijate en spam.</p>
+      </section>
 
-        <Form layout="vertical" requiredMark={false} onFinish={() => enviarCodigo()}>
-          {!state?.email && (
-            <Form.Item label="Email">
-              <Input prefix={<MailOutlined />} type="email" value={email} onChange={(e) => setEmail(e.target.value.trim())} autoComplete="email" />
-            </Form.Item>
-          )}
-          <Form.Item label="Código">
-            <Input.OTP
-              length={6}
-              value={codigo}
-              onChange={(valor) => {
-                setCodigo(valor);
-                enviarCodigo(valor);
-              }}
-              formatter={(v) => v.replace(/\D/g, "")}
-              disabled={enviando}
-            />
-          </Form.Item>
-          <Button type="primary" htmlType="submit" icon={<SafetyOutlined />} loading={enviando} disabled={codigo.length !== 6 || !email} block>
-            Verificar
-          </Button>
-        </Form>
+      <form
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          enviarCodigo();
+        }}
+        noValidate
+        className="grid gap-5 border-2 border-papel bg-noche p-5 sm:p-6"
+      >
+        {aviso && !error && <Aviso tipo="info">{aviso}</Aviso>}
+        {error && <Aviso>{error}</Aviso>}
 
-        <Button type="link" block style={{ marginTop: 8 }} disabled={espera > 0 || !email} onClick={() => reenviar()}>
-          {espera > 0 ? `Pedir otro código en ${espera} s` : "Mandarme otro código"}
-        </Button>
+        {!state?.email && (
+          <Campo etiqueta="Email">
+            <input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value.trim())} placeholder="nombre@ejemplo.com" className={campoClase} />
+          </Campo>
+        )}
 
-        <Typography.Paragraph type="secondary" style={{ marginTop: 8, marginBottom: 0, textAlign: "center" }}>
-          <Link to="/login">Volver al ingreso</Link>
-        </Typography.Paragraph>
-      </Card>
+        {/* Se envía solo al completar los 6 números */}
+        <Campo etiqueta="Código de 6 números">
+          <input
+            ref={campoCodigo}
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            autoFocus={Boolean(state?.email)}
+            maxLength={6}
+            placeholder="123456"
+            value={codigo}
+            disabled={enviando}
+            onChange={(e) => {
+              const valor = e.target.value.replace(/\D/g, "").slice(0, 6);
+              setCodigo(valor);
+              enviarCodigo(valor);
+            }}
+            className={`${campoClase} font-afiche text-3xl tracking-[0.4em] tabular-nums`}
+          />
+        </Campo>
+
+        <button type="submit" disabled={enviando || codigo.length !== 6 || !email} className={botonPrimario}>
+          {enviando ? "Verificando…" : "Verificar"}
+        </button>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+          <button
+            type="button"
+            disabled={espera > 0 || !email}
+            onClick={() => reenviar()}
+            className="font-semibold text-papel underline underline-offset-4 hover:text-amarillo disabled:cursor-not-allowed disabled:text-gris disabled:no-underline"
+          >
+            {espera > 0 ? `Pedir otro código en ${espera} s` : "Mandarme otro código"}
+          </button>
+          <Link to="/login" className="text-gris underline underline-offset-4 hover:text-papel">
+            Volver al ingreso
+          </Link>
+        </div>
+      </form>
     </div>
   );
 }

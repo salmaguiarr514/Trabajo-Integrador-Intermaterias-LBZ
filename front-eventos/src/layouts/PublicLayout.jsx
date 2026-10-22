@@ -5,10 +5,9 @@ import MenuCliente from "../components/MenuCliente.jsx";
 import Cargando from "../components/Cargando.jsx";
 import Marca from "../components/Marca.jsx";
 
-// Sitio público (cartelera, evento, compra, mis entradas): Tailwind con estética de afiche.
-// Los links llevan su color explícito: antd pinta todos los <a> de azul.
+// Sitio público (cartelera, evento, ingreso, compra, mis entradas): Tailwind con estética de afiche.
 const linkClase = ({ isActive }) =>
-  `px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors ${
+  `px-2.5 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors sm:px-3 ${
     isActive ? "bg-papel text-tinta" : "text-gris hover:text-papel"
   }`;
 
@@ -18,17 +17,18 @@ function PublicLayout() {
   return (
     <div className="sitio flex min-h-dvh flex-col bg-tinta font-sans text-papel antialiased">
       <header className="sticky top-0 z-10 border-b-2 border-papel bg-tinta">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-4">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:gap-4">
           <Link to="/" className="flex shrink-0 items-center gap-2.5 text-papel" aria-label="Backstage, ir a la cartelera">
             <Marca alto={30} />
-            <span aria-hidden="true" className="font-afiche text-2xl uppercase tracking-wide">Backstage</span>
+            {/* En pantallas muy angostas queda solo el logo, para que entren Cartelera y Mis entradas */}
+            <span aria-hidden="true" className="hidden font-afiche text-2xl uppercase tracking-wide min-[440px]:inline">Backstage</span>
           </Link>
-          <nav className="flex min-w-0 flex-1 gap-1">
-            <NavLink to="/" end className={(e) => `hidden sm:block ${linkClase(e)}`}>
+          <nav aria-label="Principal" className="flex min-w-0 flex-1 gap-1">
+            <NavLink to="/" end className={linkClase}>
               Cartelera
             </NavLink>
             {usuario?.rol === "cliente" && (
-              <NavLink to="/mis-entradas" className={(e) => `hidden sm:block ${linkClase(e)}`}>
+              <NavLink to="/mis-entradas" className={linkClase}>
                 Mis entradas
               </NavLink>
             )}

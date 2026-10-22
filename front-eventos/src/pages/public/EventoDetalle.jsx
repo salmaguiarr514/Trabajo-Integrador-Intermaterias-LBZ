@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { obtenerEventoPublico } from "../../services/publicService.js";
@@ -118,6 +118,42 @@ const volver = (
   </Link>
 );
 
+// Pestañas de jornadas (patrón de pestañas de ARIA): Tab entra a la elegida y las flechas,
+// Inicio y Fin pasan de una a otra; el panel de abajo (grilla y entradas) cambia con ellas.
+function Pestañas({ pestañas, actual, onElegir }) {
+  const lista = useRef(null);
+  const tecla = (ev) => {
+    const i = pestañas.findIndex((p) => p.valor === actual);
+    const destino = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: pestañas.length - 1 }[ev.key];
+    if (destino === undefined) return;
+    ev.preventDefault();
+    const nueva = pestañas[(destino + pestañas.length) % pestañas.length];
+    onElegir(nueva.valor);
+    lista.current?.querySelector(`#tab-${nueva.valor}`)?.focus();
+  };
+  return (
+    <div ref={lista} className="flex flex-wrap gap-2" role="tablist" aria-label="Jornadas" onKeyDown={tecla}>
+      {pestañas.map((p) => (
+        <button
+          key={p.valor}
+          id={`tab-${p.valor}`}
+          type="button"
+          role="tab"
+          aria-selected={actual === p.valor}
+          aria-controls="panel-jornada"
+          tabIndex={actual === p.valor ? 0 : -1}
+          onClick={() => onElegir(p.valor)}
+          className={`border-2 px-4 py-2 text-sm font-extrabold uppercase tracking-wider ${
+            actual === p.valor ? "border-papel bg-papel text-tinta" : "border-papel text-papel hover:bg-noche"
+          }`}
+        >
+          {p.texto}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function EventoDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -201,32 +237,22 @@ function EventoDetalle() {
     }
   };
 
+  const conPestañas = pestañas.length > 1;
+  const total = pesos(subtotal + cargo);
+
   return (
-    <div className="grid grid-cols-1 gap-8">
+    // En el celular deja lugar abajo para la barra de compra fija
+    <div className="grid grid-cols-1 gap-8 pb-24 lg:pb-0">
       {volver}
 
       <Portada e={e} />
 
-      {pestañas.length > 1 && (
-        <div className="flex flex-wrap gap-2" role="tablist" aria-label="Jornadas">
-          {pestañas.map((p) => (
-            <button
-              key={p.valor}
-              type="button"
-              role="tab"
-              aria-selected={actual === p.valor}
-              onClick={() => setPestaña(p.valor)}
-              className={`border-2 px-4 py-2 text-sm font-extrabold uppercase tracking-wider ${
-                actual === p.valor ? "border-papel bg-papel text-tinta" : "border-papel text-papel hover:bg-noche"
-              }`}
-            >
-              {p.texto}
-            </button>
-          ))}
-        </div>
-      )}
+      {conPestañas && <Pestañas pestañas={pestañas} actual={actual} onElegir={setPestaña} />}
 
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div
+        className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
+        {...(conPestañas && { id: "panel-jornada", role: "tabpanel", "aria-labelledby": `tab-${actual}` })}
+      >
         <section className="border-2 border-papel bg-noche">
           <h2 className="border-b-2 border-papel px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em]">
             {actual === ABONO ? "Cierres incluidos en el abono" : "Grilla del día"}
@@ -234,7 +260,7 @@ function EventoDetalle() {
           <Grilla evento={e} jornada={actual} />
         </section>
 
-        <section className="border-2 border-papel bg-noche lg:sticky lg:top-24">
+        <section id="entradas" className="scroll-mt-24 border-2 border-papel bg-noche lg:sticky lg:top-24">
           <h2 className="border-b-2 border-papel px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em]">Entradas</h2>
           <div className="grid gap-3 p-4">
             {tarifas.length === 0 && <p className="py-4 text-center text-sm text-gris">No hay entradas a la venta para este día.</p>}
@@ -291,18 +317,40 @@ function EventoDetalle() {
               )}
             </div>
 
-            <button
-              type="button"
-              disabled={cantidadTotal === 0}
-              onClick={comprar}
-              className="border-2 border-papel bg-papel py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-tinta hover:border-fucsia hover:bg-fucsia disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-papel disabled:hover:bg-papel"
-            >
+            <button type="button" disabled={cantidadTotal === 0} onClick={comprar} className={`${botonPrimario} py-3`}>
               {cantidadTotal > 0 ? `Comprar ${cantidadTotal} ${cantidadTotal === 1 ? "entrada" : "entradas"}` : "Comprar entradas"}
             </button>
             {!usuario && cantidadTotal > 0 && <p className="text-center text-xs text-gris">Te vamos a pedir que ingreses o crees una cuenta.</p>}
             {aviso && <p role="status" className="border-2 border-amarillo px-3 py-2 text-sm text-amarillo">{aviso}</p>}
           </div>
         </section>
+      </div>
+
+      {/* Celular: la compra siempre a mano, sin bajar hasta las entradas */}
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-papel bg-tinta lg:hidden">
+        {aviso && <p className="px-4 pt-2 text-sm text-amarillo">{aviso}</p>}
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          {cantidadTotal > 0 ? (
+            <>
+              <p className="leading-tight">
+                <span className="block font-afiche text-2xl tabular-nums">{total}</span>
+                <span className="text-sm text-gris">
+                  {cantidadTotal} {cantidadTotal === 1 ? "entrada" : "entradas"}, con el cargo por servicio
+                </span>
+              </p>
+              <button type="button" onClick={comprar} className={botonPrimario}>
+                Comprar
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-gris">{e.tarifas.length > 0 ? "Elegí día, sector y cantidad." : "Todavía no hay entradas a la venta."}</p>
+              <a href="#entradas" className={botonPrimario}>
+                Elegir entradas
+              </a>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
