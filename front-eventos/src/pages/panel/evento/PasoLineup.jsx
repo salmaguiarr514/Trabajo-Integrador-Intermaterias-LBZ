@@ -8,11 +8,12 @@ import { diaCorto, hora } from "../../../utils/formato.js";
 import { minutosDesde } from "../../../utils/horarios.js";
 import Cargando from "../../../components/Cargando.jsx";
 import PresentacionModal from "./PresentacionModal.jsx";
+import { PANEL } from "../../../tema.js";
 
 const PX_POR_MINUTO = 1; // 60 px por hora
 const ANCHO_HORAS = 56;
 const ANCHO_COLUMNA = 180;
-const COLOR = "#a855f7";
+const COLOR = PANEL.violeta;
 
 const aMinutos = (hhmm) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
 const etiquetaHora = (min) => `${String(Math.floor(min / 60) % 24).padStart(2, "0")}:00`;
@@ -101,7 +102,7 @@ function Grilla({ jornada, escenarios, shows, soloLectura, onNuevo, onEditar }) 
                     }}
                   >
                     <Typography.Text strong ellipsis style={{ display: "block", lineHeight: 1.3 }}>
-                      {p.headliner && <CrownOutlined style={{ color: "#fadb14", marginRight: 4 }} />}
+                      {p.headliner && <CrownOutlined style={{ color: PANEL.destacado, marginRight: 4 }} />}
                       {p.artista}
                     </Typography.Text>
                     {dur >= 40 && (

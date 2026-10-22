@@ -4,6 +4,7 @@ import { Button, Grid, Layout, Menu } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import Logo from "../components/Logo.jsx";
 import MenuUsuario from "../components/MenuUsuario.jsx";
+import { PANEL } from "../tema.js";
 
 // Estructura común de los paneles (admin y productora): barra superior y menú lateral.
 // items: [{ key: "/admin/empresas", icon, label }] → la key es la ruta.
@@ -45,7 +46,7 @@ function PanelBase({ inicio, subtitulo, items }) {
           collapsed={esMovil && !menuAbierto}
           trigger={null}
           style={{
-            background: esMovil ? "#14141f" : "rgba(255, 255, 255, 0.03)",
+            background: PANEL.lateral,
             borderRight: esMovil && !menuAbierto ? "none" : "1px solid rgba(255, 255, 255, 0.08)",
             ...(esMovil && { position: "absolute", insetBlock: 0, left: 0, zIndex: 20 })
           }}

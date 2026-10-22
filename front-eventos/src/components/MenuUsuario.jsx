@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Dropdown, Space, Typography } from "antd";
 import { AppstoreOutlined, LogoutOutlined, TagsOutlined, UserOutlined } from "@ant-design/icons";
 import { inicioDeRol, useAuth } from "../context/auth.js";
+import { PANEL } from "../tema.js";
 
 const NOMBRE_ROL = { superadmin: "Equipo Backstage", empresa: "Productora", cliente: "Cliente" };
 
@@ -44,9 +45,9 @@ function MenuUsuario() {
 
   return (
     <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
-      <Button type="text" style={{ height: "auto", paddingBlock: 4 }}>
+      <Button type="text" style={{ height: "auto", paddingBlock: 4 }} aria-label={`Cuenta de ${usuario.nombre}`}>
         <Space>
-          <Avatar style={{ background: "#a855f7" }} icon={<UserOutlined />} />
+          <Avatar style={{ background: PANEL.violeta }} icon={<UserOutlined />} />
           <span className="ocultar-mobile">{usuario.nombre}</span>
         </Space>
       </Button>

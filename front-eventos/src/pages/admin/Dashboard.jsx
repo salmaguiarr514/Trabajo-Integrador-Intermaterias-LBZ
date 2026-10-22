@@ -6,6 +6,7 @@ import { obtenerMetricas } from "../../services/adminService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { mesAnio, numero, pesos } from "../../utils/formato.js";
 import { COLOR_ESTADO } from "../../utils/estados.js";
+import { PANEL } from "../../tema.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 
@@ -31,7 +32,7 @@ function Dashboard() {
               value={m.service_charge_total}
               {...formatoPesos}
               prefix={<DollarOutlined />}
-              styles={{ content: { color: "#a855f7", fontWeight: 700 } }}
+              styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }}
             />
             <Typography.Text type="secondary">
               Sobre {pesos(m.ventas_total)} vendidos en total (lo demás es de las productoras)
@@ -91,7 +92,7 @@ function Dashboard() {
                     <Progress
                       percent={(p.service_charge / maxProductora) * 100}
                       showInfo={false}
-                      strokeColor="#a855f7"
+                      strokeColor={PANEL.violeta}
                       size="small"
                     />
                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>

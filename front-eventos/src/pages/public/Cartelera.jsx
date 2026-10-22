@@ -21,12 +21,12 @@ function TarjetaEvento({ evento }) {
     >
       <div className="flex items-stretch border-b-2 border-papel">
         <div className="grid w-20 shrink-0 place-items-center border-r-2 border-papel bg-amarillo py-2 text-tinta">
-          <span className="text-[11px] font-bold uppercase tracking-widest">{semana}</span>
+          <span className="text-xs font-bold uppercase tracking-widest">{semana}</span>
           <span className="font-afiche text-4xl leading-none">{dia}</span>
           <span className="text-xs font-bold uppercase tracking-widest">{mes}</span>
         </div>
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-4 py-3">
-          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-fucsia">
+          <span className="text-xs font-bold uppercase tracking-[0.18em] text-fucsia">
             {evento.tipo}
             {varios && " · varias jornadas"}
             {evento.estado === "agotado" && " · agotado"}
@@ -44,7 +44,7 @@ function TarjetaEvento({ evento }) {
           <span className="text-xs text-gris">por {evento.productora}</span>
           {evento.precio_desde != null && (
             <span className="text-right">
-              <span className="block text-[11px] uppercase tracking-widest text-gris">Desde</span>
+              <span className="block text-xs uppercase tracking-widest text-gris">Desde</span>
               <span className="font-afiche text-2xl tabular-nums">{pesos(evento.precio_desde)}</span>
             </span>
           )}
@@ -143,7 +143,7 @@ function Cartelera() {
       ) : eventos === null ? (
         <p className="py-16 text-center font-afiche text-2xl uppercase tracking-wide text-gris">Cargando cartelera…</p>
       ) : eventos.length === 0 ? (
-        <div className="border-2 border-dashed border-borde px-6 py-12 text-center">
+        <div className="border-2 border-dashed border-linea px-6 py-12 text-center">
           <p className="font-afiche text-2xl uppercase">{filtrando ? "No hay shows con esa búsqueda" : "Todavía no hay shows publicados"}</p>
           <p className="mt-1 text-sm text-gris">{filtrando ? "Probá con otro artista o ciudad." : "Volvé pronto."}</p>
         </div>

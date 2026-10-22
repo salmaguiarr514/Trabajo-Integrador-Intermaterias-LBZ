@@ -5,6 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { obtenerCompras, obtenerEntradas } from "../../services/clienteService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaMes, pesos, rangoLargo } from "../../utils/formato.js";
+import { AFICHE } from "../../tema.js";
 
 const etiquetaDia = (iso) => {
   const { dia, mes, semana } = diaMes(iso);
@@ -25,22 +26,22 @@ function Entrada({ entrada }) {
   const usada = entrada.ingresos > 0;
 
   return (
-    <article className={`flex flex-col border-2 border-papel bg-noche sm:flex-row ${anulada ? "opacity-50" : ""}`}>
+    <article className={`flex flex-col border-2 bg-noche sm:flex-row ${anulada ? "border-borde" : "border-papel"}`}>
       <button
         type="button"
         onClick={() => setGrande(!grande)}
         aria-label={grande ? "Achicar el QR" : "Agrandar el QR para mostrarlo en la puerta"}
-        className="grid shrink-0 place-items-center border-b-2 border-papel bg-papel p-3 sm:border-r-2 sm:border-b-0"
+        className={`grid shrink-0 place-items-center border-b-2 border-papel bg-papel p-3 sm:border-r-2 sm:border-b-0 ${anulada ? "opacity-40" : ""}`}
       >
-        <QRCodeSVG value={entrada.codigo} size={grande ? 220 : 112} bgColor="#fff6ec" fgColor="#0d0a0b" level="M" />
+        <QRCodeSVG value={entrada.codigo} size={grande ? 220 : 112} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
       </button>
       <div className="flex min-w-0 flex-1 flex-col gap-1 p-4">
-        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-fucsia">
+        <span className="text-xs font-bold uppercase tracking-[0.18em] text-fucsia">
           {entrada.id_jornada ? etiquetaDia(entrada.fecha_jornada) : `Abono · ${entrada.cantidad_jornadas} jornadas`}
         </span>
         <p className="font-afiche text-2xl uppercase leading-tight">{entrada.espacio}</p>
         <p className="text-sm text-gris">{entrada.tarifa} · {pesos(entrada.precio_pagado)}</p>
-        <p className="mt-auto pt-2 font-mono text-[11px] break-all text-gris">{entrada.codigo}</p>
+        <p className="mt-auto pt-2 font-mono text-xs break-all text-gris">{entrada.codigo}</p>
         {(anulada || usada) && (
           <span className="mt-1 justify-self-start text-xs font-bold uppercase tracking-widest text-amarillo">
             {anulada ? "Anulada" : entrada.id_jornada ? "Ya ingresó" : `Ingresó ${entrada.ingresos} de ${entrada.cantidad_jornadas} jornadas`}
@@ -78,7 +79,7 @@ function MisEntradas() {
       </section>
 
       {porEvento.length === 0 ? (
-        <div className="border-2 border-dashed border-borde px-6 py-12 text-center">
+        <div className="border-2 border-dashed border-linea px-6 py-12 text-center">
           <p className="font-afiche text-2xl uppercase">Todavía no tenés entradas</p>
           <Link to="/" className="mt-4 inline-block border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
             Ver la cartelera
@@ -113,10 +114,10 @@ function MisEntradas() {
       {compras.datos?.length > 0 && (
         <section className="grid gap-3">
           <h2 className="text-xs font-extrabold uppercase tracking-[0.18em] text-gris">Historial de compras</h2>
-          <div className="overflow-x-auto border-2 border-borde">
+          <div className="overflow-x-auto border-2 border-linea">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="border-b-2 border-borde text-left text-xs uppercase tracking-widest text-gris">
+                <tr className="border-b-2 border-linea text-left text-xs uppercase tracking-widest text-gris">
                   <th className="px-3 py-2 font-bold">Fecha</th>
                   <th className="px-3 py-2 font-bold">Evento</th>
                   <th className="px-3 py-2 text-right font-bold">Entradas</th>
@@ -126,7 +127,7 @@ function MisEntradas() {
               </thead>
               <tbody>
                 {compras.datos.map((c) => (
-                  <tr key={c.id_compra} className="border-b border-borde last:border-b-0">
+                  <tr key={c.id_compra} className="border-b border-linea last:border-b-0">
                     <td className="px-3 py-2 whitespace-nowrap tabular-nums text-gris">{dayjs(c.fecha).format("DD/MM/YYYY HH:mm")}</td>
                     <td className="px-3 py-2">{c.evento}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{c.cantidad}</td>

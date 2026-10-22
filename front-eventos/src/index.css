@@ -7,7 +7,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
-/* Tokens del sitio público: estética de afiche de recital */
+/* Tokens del sitio público: estética de afiche de recital (los colores de JS están en tema.js) */
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
   --font-afiche: "Anton", Impact, sans-serif;
@@ -15,19 +15,35 @@
   --color-noche: #17121a;
   --color-papel: #fff6ec;
   --color-gris: #c2b2bb;
-  --color-borde: #4a3a50;
+  /* borde: controles (campos, filtros, tarjetas de tarifa), 3,4:1 sobre noche.
+     linea: separadores decorativos, que no necesitan contraste. */
+  --color-borde: #75637c;
+  --color-linea: #4a3a50;
   --color-fucsia: #ff3d7f;
   --color-amarillo: #ffd23f;
   --color-verde: #3ddc97;
 }
 
 @layer base {
+  html {
+    /* La barra superior es fija: lo que recibe foco o se ancla no queda tapado */
+    scroll-padding-top: 5rem;
+  }
+
   body {
-    min-height: 100vh;
-    background:
-      radial-gradient(circle at 15% -10%, rgba(168, 85, 247, 0.25), transparent 40%),
-      radial-gradient(circle at 90% 0%, rgba(236, 72, 153, 0.18), transparent 35%),
-      #0b0b12;
+    min-height: 100dvh;
+    background: #0b0b12;
+  }
+
+  /* Sitio público: anillo de foco y selección con los colores del afiche */
+  .sitio :focus-visible {
+    outline: 2px solid var(--color-amarillo);
+    outline-offset: 2px;
+  }
+
+  .sitio ::selection {
+    background: var(--color-amarillo);
+    color: var(--color-tinta);
   }
 }
 
@@ -46,13 +62,12 @@
     padding: 24px 16px 48px;
   }
 
-  /* Barra superior fija con fondo translúcido */
+  /* Barra superior fija */
   .barra {
     position: sticky;
     top: 0;
     z-index: 10;
-    backdrop-filter: blur(10px);
-    background: rgba(11, 11, 18, 0.75);
+    background: #0b0b12;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -61,10 +76,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-  }
-
-  .barra .contenido.barra-interior {
-    padding-block: 14px;
   }
 
   @media (max-width: 600px) {

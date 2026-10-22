@@ -13,8 +13,8 @@ function PublicLayout() {
   const { usuario } = useAuth();
 
   return (
-    <div className="flex min-h-screen flex-col bg-tinta font-sans text-papel antialiased">
-      <header className="sticky top-0 z-10 border-b-2 border-papel bg-tinta/95 backdrop-blur">
+    <div className="sitio flex min-h-dvh flex-col bg-tinta font-sans text-papel antialiased">
+      <header className="sticky top-0 z-10 border-b-2 border-papel bg-tinta">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-4">
           <Link to="/" className="flex shrink-0 items-center gap-2 text-papel">
             <span className="grid size-8 place-items-center bg-amarillo font-afiche text-lg text-tinta">B</span>
@@ -52,7 +52,7 @@ function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t-2 border-dashed border-borde">
+      <footer className="border-t-2 border-dashed border-linea">
         <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-gris">
           Backstage · entradas para recitales y festivales. El pago es simulado: todo es ficticio.
         </div>

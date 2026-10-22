@@ -12,7 +12,7 @@ const MEDIOS = [
 ];
 
 const campoClase =
-  "w-full border-2 border-borde bg-tinta px-3 py-2.5 text-papel placeholder:text-gris/60 focus:border-amarillo focus:outline-none";
+  "w-full border-2 border-borde bg-tinta px-3 py-2.5 text-papel placeholder:text-gris focus:border-amarillo focus:outline-none";
 
 // 4111 1111 1111 1111 mientras se escribe
 const formatearTarjeta = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
@@ -46,7 +46,7 @@ function Resumen({ cotizacion }) {
             <span className="tabular-nums">{pesos(l.importe)}</span>
           </div>
         ))}
-        <div className="mt-1 flex justify-between gap-3 border-t-2 border-dashed border-borde pt-2">
+        <div className="mt-1 flex justify-between gap-3 border-t-2 border-dashed border-linea pt-2">
           <span className="text-gris">Subtotal</span>
           <span className="tabular-nums">{pesos(cotizacion.subtotal)}</span>
         </div>

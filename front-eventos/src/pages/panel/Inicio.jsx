@@ -8,6 +8,7 @@ import { useCarga } from "../../hooks/useCarga.js";
 import { numero, pesos, rangoFechas } from "../../utils/formato.js";
 import { COLOR_ESTADO } from "../../utils/estados.js";
 import Cargando from "../../components/Cargando.jsx";
+import { PANEL } from "../../tema.js";
 
 // Inicio del panel de la productora: cómo viene y qué tiene por delante
 function Inicio() {
@@ -61,7 +62,7 @@ function Inicio() {
               precision={0}
               groupSeparator="."
               prefix={<DollarOutlined />}
-              styles={{ content: { color: "#a855f7", fontWeight: 700 } }}
+              styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }}
             />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Sin el service charge</Typography.Text>
           </Card>

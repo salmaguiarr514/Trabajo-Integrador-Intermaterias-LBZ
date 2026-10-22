@@ -34,7 +34,7 @@ function Grilla({ evento, jornada }) {
         {evento.jornadas.map((j) => {
           const cierre = evento.presentaciones.find((p) => p.id_jornada === j.id_jornada && p.headliner);
           return (
-            <li key={j.id_jornada} className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-4 border-b-2 border-dashed border-borde px-4 py-3 last:border-b-0">
+            <li key={j.id_jornada} className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-4 border-b-2 border-dashed border-linea px-4 py-3 last:border-b-0">
               <span className="text-sm uppercase text-gris">{etiquetaDia(j.fecha)}</span>
               <span className="font-afiche text-xl uppercase leading-tight">
                 {cierre?.artista ?? "—"}
@@ -54,7 +54,7 @@ function Grilla({ evento, jornada }) {
   return (
     <ul>
       {shows.map((p) => (
-        <li key={p.id_presentacion} className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-4 border-b-2 border-dashed border-borde px-4 py-3 last:border-b-0">
+        <li key={p.id_presentacion} className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-4 border-b-2 border-dashed border-linea px-4 py-3 last:border-b-0">
           <span className="text-sm tabular-nums text-gris">{hora(p.inicio)}</span>
           <span className="min-w-0 font-afiche text-xl uppercase leading-tight">
             {p.artista}
@@ -64,7 +64,7 @@ function Grilla({ evento, jornada }) {
             </span>
           </span>
           {p.headliner ? (
-            <span className="border-2 border-amarillo px-2 text-[10px] font-extrabold uppercase tracking-widest text-amarillo">Cierre</span>
+            <span className="border-2 border-amarillo px-2 text-xs font-extrabold uppercase tracking-widest text-amarillo">Cierre</span>
           ) : (
             <span />
           )}
@@ -77,11 +77,11 @@ function Grilla({ evento, jornada }) {
 function Contador({ valor, maximo, onCambio, nombre }) {
   return (
     <div className="flex items-center border-2 border-papel">
-      <button type="button" aria-label={`Una entrada menos de ${nombre}`} disabled={valor <= 0} onClick={() => onCambio(valor - 1)} className="size-9 font-bold disabled:opacity-30">
+      <button type="button" aria-label={`Una entrada menos de ${nombre}`} disabled={valor <= 0} onClick={() => onCambio(valor - 1)} className="size-9 font-bold disabled:text-borde">
         −
       </button>
       <span className="w-8 text-center font-bold tabular-nums" aria-live="polite">{valor}</span>
-      <button type="button" aria-label={`Una entrada más de ${nombre}`} disabled={valor >= maximo} onClick={() => onCambio(valor + 1)} className="size-9 font-bold disabled:opacity-30">
+      <button type="button" aria-label={`Una entrada más de ${nombre}`} disabled={valor >= maximo} onClick={() => onCambio(valor + 1)} className="size-9 font-bold disabled:text-borde">
         +
       </button>
     </div>
@@ -203,8 +203,8 @@ function EventoDetalle() {
                 <div
                   key={t.id_tarifa}
                   className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-2 px-4 py-3 ${
-                    cantidad > 0 ? "border-amarillo" : "border-borde"
-                  } ${motivo ? "opacity-50" : ""}`}
+                    cantidad > 0 ? "border-amarillo" : motivo ? "border-linea" : "border-borde"
+                  }`}
                 >
                   <div className="min-w-0">
                     <p className="font-bold">
@@ -214,7 +214,7 @@ function EventoDetalle() {
                       <span className="font-bold">{pesos(t.precio)}</span>
                       <span className="text-gris">
                         {" · "}
-                        {motivo ?? (t.disponibles < 100 ? `Últimas ${t.disponibles}` : `Quedan ${numero(t.disponibles)}`)}
+                        {motivo ? <span className="font-semibold text-amarillo">{motivo}</span> : t.disponibles < 100 ? `Últimas ${t.disponibles}` : `Quedan ${numero(t.disponibles)}`}
                       </span>
                     </p>
                   </div>
@@ -223,7 +223,7 @@ function EventoDetalle() {
               );
             })}
 
-            <div className="mt-2 grid gap-1 border-t-2 border-dashed border-borde pt-3 text-sm">
+            <div className="mt-2 grid gap-1 border-t-2 border-dashed border-linea pt-3 text-sm">
               {elegidas.length === 0 ? (
                 <p className="text-gris">Elegí tus entradas. Podés combinar días, sectores y abonos (hasta {MAX_ENTRADAS} por compra).</p>
               ) : (

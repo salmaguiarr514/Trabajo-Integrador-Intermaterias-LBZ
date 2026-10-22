@@ -5,6 +5,7 @@ import { BarChartOutlined, CheckCircleFilled, CloseCircleFilled, EyeInvisibleOut
 import { cambiarEstadoEvento } from "../../../services/panelService.js";
 import { mensajeDeError } from "../../../services/api.js";
 import { numero, pesos, rangoFechas } from "../../../utils/formato.js";
+import { PANEL } from "../../../tema.js";
 
 // Lo que pide RN-20 para publicar, con el paso donde se arregla cada cosa
 const requisitos = (e) => [
@@ -59,7 +60,7 @@ function PasoRevisar({ evento, soloLectura, onCambio, irA }) {
           {lista.map((r) => (
             <div key={r.paso} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
               <Space>
-                {r.ok ? <CheckCircleFilled style={{ color: "#52c41a" }} /> : <CloseCircleFilled style={{ color: "#ff4d4f" }} />}
+                {r.ok ? <CheckCircleFilled style={{ color: PANEL.ok }} /> : <CloseCircleFilled style={{ color: PANEL.error }} />}
                 <Typography.Text>{r.ok ? r.texto : r.falta}</Typography.Text>
               </Space>
               {!r.ok && !soloLectura && (

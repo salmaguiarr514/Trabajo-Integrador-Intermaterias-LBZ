@@ -9,9 +9,10 @@ import { useCarga } from "../../hooks/useCarga.js";
 import { diaCorto, numero } from "../../utils/formato.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import { PANEL } from "../../tema.js";
 
-const VERDE = "#52c41a";
-const ROJO = "#ff4d4f";
+const VERDE = PANEL.ok;
+const ROJO = PANEL.error;
 
 // La jornada que conviene controlar: la de hoy, o la próxima, o la última
 const jornadaSugerida = (jornadas) => {

@@ -7,9 +7,10 @@ import { useCarga } from "../../hooks/useCarga.js";
 import { diaCorto, numero, pesos } from "../../utils/formato.js";
 import { COLOR_ESTADO } from "../../utils/estados.js";
 import Cargando from "../../components/Cargando.jsx";
+import { PANEL } from "../../tema.js";
 
-const VIOLETA = "#a855f7";
-const VERDE = "#52c41a";
+const VIOLETA = PANEL.violeta;
+const VERDE = PANEL.ok;
 const MEDIO = { credito: "Crédito", debito: "Débito", transferencia: "Transferencia" };
 const COLOR_COMPRA = { pagada: "green", rechazada: "red", pendiente: "gold", cancelada: "default" };
 
@@ -73,7 +74,7 @@ function VentasEvento() {
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Para la productora" value={v.subtotal} precision={0} groupSeparator="." prefix="$" styles={{ content: { color: VIOLETA, fontWeight: 700 } }} />
+            <Statistic title="Para la productora" value={v.subtotal} precision={0} groupSeparator="." prefix="$" styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal de las entradas</Typography.Text>
           </Card>
         </Col>
