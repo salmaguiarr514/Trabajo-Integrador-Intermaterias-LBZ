@@ -6,7 +6,9 @@ import { sinMovimiento } from "./movimiento.js";
 // resplandor en la lente y destellos alrededor del elemento. El elemento en foco recibe la clase
 // "en-foco" (queda por encima de la penumbra y se adelanta; ver "Foco de escenario" en index.css).
 //   const foco = crearReflector();  foco.encender(contenedor);  foco.apagar();  foco.destruir();
-// El haz se dibuja en un canvas solo mientras hay algo iluminado.
+// El haz se dibuja solo mientras hay algo iluminado, en dos canvas: el cono y el charco en uno chico
+// (a un octavo de la pantalla, que el navegador estira y así queda suave sin filtros, que costarían
+// cada cuadro) y el polvo, la lente y los destellos en otro a resolución normal.
 
 const CABEZA_SVG = `<svg viewBox="0 0 56 96" aria-hidden="true">
   <rect x="22" y="0" width="12" height="10" rx="2" fill="#2b2630" stroke="#6b6370" stroke-width="1.5"/>
@@ -18,36 +20,42 @@ const CABEZA_SVG = `<svg viewBox="0 0 56 96" aria-hidden="true">
 </svg>`;
 const PIVOTE = 18; // altura del eje de giro (la abrazadera) desde el borde del rig
 const LENTE = 82; // distancia del eje a la lente
+const ESCALA_HAZ = 0.125; // resolución del canvas del cono (un octavo: al estirarlo queda suave)
 
 export function crearReflector() {
   const penumbra = Object.assign(document.createElement("div"), { className: "foco-penumbra" });
+  const haz = Object.assign(document.createElement("canvas"), { className: "foco-escena", hidden: true });
   const escena = Object.assign(document.createElement("canvas"), { className: "foco-escena", hidden: true });
   const rig = Object.assign(document.createElement("div"), { className: "foco-rig", innerHTML: '<div class="foco-truss"></div>' });
-  for (const el of [penumbra, escena, rig]) el.setAttribute("aria-hidden", "true");
+  for (const el of [penumbra, haz, escena, rig]) el.setAttribute("aria-hidden", "true");
   const cabezas = [0.16, 0.5, 0.84].map((x) => {
     const el = Object.assign(document.createElement("div"), { className: "foco-cabeza", innerHTML: CABEZA_SVG });
     el.style.left = `${x * 100}%`;
     rig.append(el);
     return { el, x, ang: 0 };
   });
-  document.body.append(penumbra, escena, rig);
+  document.body.append(penumbra, haz, escena, rig);
 
-  let enFoco = null, ctx = null, luz = 0, bucle = 0, encendidoEn = 0, motas = [], destellos = [], ultimoDestello = 0, ultimo = null;
+  let enFoco = null, ctx = null, ctxHaz = null, luz = 0, bucle = 0, encendidoEn = 0, motas = [], destellos = [], ultimoDestello = 0, ultimo = null;
 
   const preparar = () => {
-    const dpr = Math.min(2, devicePixelRatio || 1);
+    const dpr = Math.min(1.5, devicePixelRatio || 1);
     escena.width = innerWidth * dpr;
     escena.height = innerHeight * dpr;
     ctx = escena.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    haz.width = Math.ceil(innerWidth * ESCALA_HAZ);
+    haz.height = Math.ceil(innerHeight * ESCALA_HAZ);
+    ctxHaz = haz.getContext("2d");
+    ctxHaz.setTransform(ESCALA_HAZ, 0, 0, ESCALA_HAZ, 0, 0);
   };
-  const alRedimensionar = () => { if (!escena.hidden) preparar(); };
+  const alRedimensionar = () => { if (bucle) preparar(); };
   addEventListener("resize", alRedimensionar);
 
   const iniciar = () => {
     if (bucle) return;
     preparar();
-    escena.hidden = false;
+    escena.hidden = haz.hidden = false;
     rig.classList.add("prendido");
     encendidoEn = performance.now();
     motas = Array.from({ length: 80 }, () => ({ t: Math.random(), s: Math.random() - 0.5, v: 0.0005 + Math.random() * 0.0012, f: Math.random() * 6.28, r: 0.6 + Math.random() * 1.7 }));
@@ -56,22 +64,22 @@ export function crearReflector() {
   const detener = () => {
     cancelAnimationFrame(bucle);
     bucle = 0;
-    escena.hidden = true;
+    escena.hidden = haz.hidden = true;
     rig.classList.remove("prendido");
     destellos = [];
     ultimo = null;
-    for (const c of cabezas) { c.ang = 0; c.el.style.rotate = "0rad"; c.el.classList.remove("activa"); }
+    for (const c of cabezas) { c.ang = 0; c.giro = 0; c.el.style.rotate = "0rad"; c.el.classList.remove("activa"); }
   };
   // La lámpara arranca con unos tirones (como un foco que se enciende) y después tiembla apenas
   const parpadeo = (dt) => (dt < 540 ? [0.12, 0.85, 0.25, 1, 0.5, 1][Math.floor(dt / 90)] ?? 1 : 0.95 + 0.05 * Math.sin(dt / 90) * Math.sin(dt / 37));
   const poligono = (L, E, nx, ny, w0, w1) => {
-    ctx.beginPath();
-    ctx.moveTo(L.x + nx * w0, L.y + ny * w0);
-    ctx.lineTo(E.x + nx * w1, E.y + ny * w1);
-    ctx.lineTo(E.x - nx * w1, E.y - ny * w1);
-    ctx.lineTo(L.x - nx * w0, L.y - ny * w0);
-    ctx.closePath();
-    ctx.fill();
+    ctxHaz.beginPath();
+    ctxHaz.moveTo(L.x + nx * w0, L.y + ny * w0);
+    ctxHaz.lineTo(E.x + nx * w1, E.y + ny * w1);
+    ctxHaz.lineTo(E.x - nx * w1, E.y - ny * w1);
+    ctxHaz.lineTo(L.x - nx * w0, L.y - ny * w0);
+    ctxHaz.closePath();
+    ctxHaz.fill();
   };
 
   function dibujarHaz(c, rigTop, r, ahora) {
@@ -85,31 +93,32 @@ export function crearReflector() {
     const ancho = r.width * 0.62;
     const k = luz * parpadeo(ahora - encendidoEn);
 
-    // Haz: cono exterior suave y núcleo más brillante, de la lente al elemento; charco de luz donde pega
-    ctx.save();
-    ctx.globalAlpha = k;
-    ctx.filter = "blur(12px)";
-    const g = ctx.createLinearGradient(L.x, L.y, E.x, E.y);
+    // Haz: cono exterior en capas (bordes suaves) y núcleo más brillante, de la lente al elemento;
+    // charco de luz donde pega. Va al canvas chico.
+    ctxHaz.save();
+    const g = ctxHaz.createLinearGradient(L.x, L.y, E.x, E.y);
     g.addColorStop(0, "rgba(255,244,214,0.6)");
     g.addColorStop(0.45, "rgba(255,236,190,0.22)");
     g.addColorStop(1, "rgba(255,228,170,0.14)");
-    ctx.fillStyle = g;
-    poligono(L, E, nx, ny, 14, ancho + 20);
-    ctx.filter = "blur(6px)";
-    const g2 = ctx.createLinearGradient(L.x, L.y, E.x, E.y);
+    ctxHaz.fillStyle = g;
+    for (const [w0, w1, a] of [[26, ancho + 50, 0.18], [20, ancho + 32, 0.25], [14, ancho + 14, 0.32], [10, ancho * 0.85, 0.38], [7, ancho * 0.6, 0.4]]) {
+      ctxHaz.globalAlpha = k * a;
+      poligono(L, E, nx, ny, w0, w1);
+    }
+    const g2 = ctxHaz.createLinearGradient(L.x, L.y, E.x, E.y);
     g2.addColorStop(0, "rgba(255,252,240,0.55)");
     g2.addColorStop(1, "rgba(255,240,205,0.04)");
-    ctx.fillStyle = g2;
+    ctxHaz.fillStyle = g2;
+    ctxHaz.globalAlpha = k;
     poligono(L, E, nx, ny, 6, ancho * 0.42);
-    ctx.filter = "none";
-    ctx.translate(E.x, E.y);
-    ctx.scale(1, 0.55);
-    const charco = ctx.createRadialGradient(0, 0, 0, 0, 0, ancho * 1.15);
+    ctxHaz.translate(E.x, E.y);
+    ctxHaz.scale(1, 0.55);
+    const charco = ctxHaz.createRadialGradient(0, 0, 0, 0, 0, ancho * 1.15);
     charco.addColorStop(0, "rgba(255,238,196,0.34)");
     charco.addColorStop(1, "rgba(255,238,196,0)");
-    ctx.fillStyle = charco;
-    ctx.fillRect(-ancho * 1.2, -ancho * 1.2, ancho * 2.4, ancho * 2.4);
-    ctx.restore();
+    ctxHaz.fillStyle = charco;
+    ctxHaz.fillRect(-ancho * 1.2, -ancho * 1.2, ancho * 2.4, ancho * 2.4);
+    ctxHaz.restore();
 
     // Polvo en suspensión dentro del haz
     for (const m of motas) {
@@ -174,8 +183,9 @@ export function crearReflector() {
 
   function cuadro(ahora) {
     const objetivo = enFoco?.firstElementChild ?? null;
-    luz += ((objetivo ? 1 : 0) - luz) * 0.12;
+    luz += ((objetivo ? 1 : 0) - luz) * 0.2;
     ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctxHaz.clearRect(0, 0, innerWidth, innerHeight);
     const rigTop = rig.getBoundingClientRect().top;
     const r = objetivo?.getBoundingClientRect();
     const centro = r ? r.left + r.width / 2 : 0;
@@ -183,8 +193,9 @@ export function crearReflector() {
     const elegida = r ? cabezas.reduce((a, b) => (Math.abs(b.x * innerWidth - centro) < Math.abs(a.x * innerWidth - centro) ? b : a)) : null;
     for (const c of cabezas) {
       const meta = c === elegida ? Math.atan2(centro - c.x * innerWidth, r.top + r.height * 0.55 - (rigTop + PIVOTE)) : 0;
-      c.ang += (meta - c.ang) * 0.1;
-      c.el.style.rotate = `${-c.ang}rad`;
+      c.ang += (meta - c.ang) * 0.18;
+      // solo se toca el estilo si el giro cambió a la vista (evita recalcular estilos en cada cuadro)
+      if (Math.abs(c.ang - (c.giro ?? 0)) > 0.002) c.el.style.rotate = `${-(c.giro = c.ang)}rad`;
       c.el.classList.toggle("activa", (c === elegida || c === ultimo?.c) && luz > 0.3);
     }
     if (elegida) ultimo = { c: elegida, r };
@@ -213,6 +224,7 @@ export function crearReflector() {
       this.apagar(true);
       removeEventListener("resize", alRedimensionar);
       penumbra.remove();
+      haz.remove();
       escena.remove();
       rig.remove();
     }

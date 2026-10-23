@@ -80,21 +80,35 @@ export function lluviaDeEntradas(duracion = 1700) {
 
 // Tarjeta que se inclina en 3D siguiendo el mouse (con la clase "tarjeta-afiche"). Solo con mouse.
 //   <a className="tarjeta-afiche" onPointerMove={inclinar} onPointerLeave={enderezar}>
+// La caja se mide una vez al entrar y el estilo se escribe a lo sumo una vez por cuadro.
+const inclinadas = new WeakMap();
+const entre0y1 = (v) => Math.min(1, Math.max(0, v));
+
 export function inclinar(ev) {
   if (ev.pointerType !== "mouse" || sinMovimiento()) return;
   const t = ev.currentTarget;
-  const r = t.getBoundingClientRect();
-  const x = (ev.clientX - r.left) / r.width;
-  const y = (ev.clientY - r.top) / r.height;
-  t.classList.add("siguiendo");
-  t.style.setProperty("--ry", `${(x - 0.5) * 14}deg`);
-  t.style.setProperty("--rx", `${(0.5 - y) * 12}deg`);
-  t.style.setProperty("--mx", `${x * 100}%`);
-  t.style.setProperty("--my", `${y * 100}%`);
+  let e = inclinadas.get(t);
+  if (!e) {
+    e = { caja: t.getBoundingClientRect(), cuadro: 0 };
+    inclinadas.set(t, e);
+    t.classList.add("siguiendo");
+  }
+  e.x = entre0y1((ev.clientX - e.caja.left) / e.caja.width);
+  e.y = entre0y1((ev.clientY - e.caja.top) / e.caja.height);
+  if (e.cuadro) return;
+  e.cuadro = requestAnimationFrame(() => {
+    e.cuadro = 0;
+    t.style.setProperty("--ry", `${(e.x - 0.5) * 14}deg`);
+    t.style.setProperty("--rx", `${(0.5 - e.y) * 12}deg`);
+    t.style.setProperty("--mx", `${e.x * 100}%`);
+    t.style.setProperty("--my", `${e.y * 100}%`);
+  });
 }
 
 export function enderezar(ev) {
   const t = ev.currentTarget;
+  cancelAnimationFrame(inclinadas.get(t)?.cuadro);
+  inclinadas.delete(t);
   t.classList.remove("siguiendo");
   t.style.setProperty("--rx", "0deg");
   t.style.setProperty("--ry", "0deg");

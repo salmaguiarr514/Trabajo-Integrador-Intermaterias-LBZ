@@ -301,7 +301,7 @@
   background: rgb(5 3 4 / 0.76);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 340ms cubic-bezier(0.2, 0, 0, 1);
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .foco-penumbra.prendida {
@@ -320,7 +320,6 @@
   height: 100%;
   z-index: 32;
   pointer-events: none;
-  mix-blend-mode: screen;
 }
 
 .foco-rig {
@@ -330,7 +329,7 @@
   z-index: 33;
   pointer-events: none;
   translate: 0 -130px;
-  transition: translate 520ms cubic-bezier(0.2, 1.35, 0.35, 1);
+  transition: translate 380ms cubic-bezier(0.2, 1.35, 0.35, 1);
 }
 
 .foco-rig.prendido {
@@ -372,27 +371,40 @@
   filter: drop-shadow(0 0 8px #ffe8a8) drop-shadow(0 0 22px #ffd23f);
 }
 
-/* Tarjeta de evento: se inclina en 3D siguiendo el mouse (--rx/--ry), con un brillo que lo sigue */
+/* Tarjeta de evento: se inclina en 3D siguiendo el mouse (--rx/--ry), con un brillo que lo sigue (--mx/--my).
+   Las variables se registran sin herencia: al moverse el mouse solo se recalcula la tarjeta, no todo lo que tiene adentro. */
+@property --rx {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --ry {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --mx {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --my {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
 .tarjeta-afiche {
-  --rx: 0deg;
-  --ry: 0deg;
-  --mx: 50%;
-  --my: 50%;
   position: relative;
 }
 
-.tarjeta-afiche::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at var(--mx) var(--my), rgb(255 246 236 / 0.14), transparent 45%);
-  opacity: 0;
-  transition: opacity 250ms;
-}
-
-.tarjeta-afiche:hover::after {
-  opacity: 1;
+@media (hover: hover) {
+  .tarjeta-afiche:hover {
+    background-image: radial-gradient(circle at var(--mx) var(--my), rgb(255 246 236 / 0.14), transparent 45%);
+  }
 }
 
 /* Sello de pago */
@@ -434,13 +446,14 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Cambio de pantalla más marcado: sale achicándose y borroneándose, entra subiendo con rebote */
+  /* Cambio de pantalla más marcado: sale achicándose, entra subiendo con rebote (sin desenfoque: costaría
+     redibujar la pantalla entera en cada cuadro) */
   ::view-transition-old(root) {
-    animation: salir-pantalla-fuerte 220ms ease-in both;
+    animation: salir-pantalla-fuerte 140ms ease-in both;
   }
 
   ::view-transition-new(root) {
-    animation: entrar-pantalla-fuerte 520ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation: entrar-pantalla-fuerte 340ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
   }
 
   html[data-transicion="local"]::view-transition-old(root),
@@ -449,48 +462,45 @@
   }
 
   ::view-transition-group(*) {
-    animation-duration: 480ms;
+    animation-duration: 340ms;
     animation-timing-function: cubic-bezier(0.2, 1.35, 0.35, 1);
   }
 
   @keyframes salir-pantalla-fuerte {
     to {
       opacity: 0;
-      translate: 0 -28px;
-      scale: 0.97;
-      filter: blur(4px);
+      translate: 0 -16px;
+      scale: 0.98;
     }
   }
 
   @keyframes entrar-pantalla-fuerte {
     from {
       opacity: 0;
-      translate: 0 44px;
-      scale: 0.98;
-      filter: blur(6px);
+      translate: 0 28px;
     }
   }
 
   /* Cascada con rebote */
   .entra {
     transition:
-      opacity 520ms cubic-bezier(0.2, 0, 0, 1),
-      translate 620ms cubic-bezier(0.2, 1.35, 0.35, 1);
-    transition-delay: calc(min(var(--i, 0), 8) * 80ms);
+      opacity 320ms cubic-bezier(0.2, 0, 0, 1),
+      translate 420ms cubic-bezier(0.2, 1.35, 0.35, 1);
+    transition-delay: calc(min(var(--i, 0), 8) * 40ms);
   }
 
   @starting-style {
     .entra {
       opacity: 0;
-      translate: 0 36px;
+      translate: 0 24px;
     }
   }
 
   /* Títulos de afiche que caen letra por letra (TituloLetras) */
   .letra {
     display: inline-block;
-    animation: cae-letra 760ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
-    animation-delay: calc(var(--n) * 50ms);
+    animation: cae-letra 500ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(var(--n) * 28ms);
   }
 
   @keyframes cae-letra {
@@ -531,18 +541,18 @@
   .tarjeta-afiche {
     transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
     transition:
-      transform 550ms cubic-bezier(0.2, 1.35, 0.35, 1),
-      scale 480ms cubic-bezier(0.2, 1.35, 0.35, 1),
-      translate 480ms cubic-bezier(0.2, 1.35, 0.35, 1),
-      box-shadow 300ms cubic-bezier(0.2, 0, 0, 1);
+      transform 420ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      scale 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      translate 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      box-shadow 200ms cubic-bezier(0.2, 0, 0, 1);
   }
 
   .tarjeta-afiche.siguiendo {
     transition:
-      transform 90ms linear,
-      scale 480ms cubic-bezier(0.2, 1.35, 0.35, 1),
-      translate 480ms cubic-bezier(0.2, 1.35, 0.35, 1),
-      box-shadow 300ms cubic-bezier(0.2, 0, 0, 1);
+      transform 50ms linear,
+      scale 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      translate 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      box-shadow 200ms cubic-bezier(0.2, 0, 0, 1);
   }
 
   .tarjeta-afiche:hover {
@@ -557,8 +567,8 @@
 
   /* Line-up: cada show entra deslizándose; el cierre late dos veces */
   .fila-show {
-    animation: entra-show 520ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
-    animation-delay: calc(min(var(--i, 0), 10) * 70ms);
+    animation: entra-show 380ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 35ms);
   }
 
   @keyframes entra-show {
@@ -569,8 +579,8 @@
   }
 
   .cierre-late {
-    animation: late 700ms ease-in-out 2 both;
-    animation-delay: 600ms;
+    animation: late 600ms ease-in-out 2 both;
+    animation-delay: 300ms;
   }
 
   @keyframes late {
@@ -584,8 +594,8 @@
   /* Mis entradas: cada entrada se da vuelta al aparecer */
   .voltea {
     transform-origin: 50% 0;
-    animation: voltea 760ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
-    animation-delay: calc(min(var(--i, 0), 10) * 110ms + 150ms);
+    animation: voltea 540ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 60ms + 60ms);
   }
 
   @keyframes voltea {
@@ -602,7 +612,7 @@
   /* QR a pantalla completa: línea de escaneo, tres pasadas */
   .dialogo-qr[open] .escaneo {
     animation: escanea 900ms ease-in-out 3 alternate both;
-    animation-delay: 350ms;
+    animation-delay: 200ms;
   }
 
   @keyframes escanea {
@@ -619,8 +629,8 @@
 
   /* Pago: el sello cae con rebote; si se rechaza, la caja se sacude */
   .sello {
-    animation: cae-sello 620ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
-    animation-delay: 150ms;
+    animation: cae-sello 480ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: 60ms;
   }
 
   @keyframes cae-sello {

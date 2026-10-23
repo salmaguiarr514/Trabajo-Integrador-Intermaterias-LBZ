@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useViewTransitionState } from "react-router-dom";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { obtenerCartelera, obtenerCiudades } from "../../services/publicService.js";
+import { adelantarEvento, obtenerCartelera, obtenerCiudades } from "../../services/publicService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { diaMes, pesos } from "../../utils/formato.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
@@ -28,6 +28,8 @@ function TarjetaEvento({ evento, onAbrir }) {
       style={viaja ? { viewTransitionName: "portada-evento" } : undefined}
       state={{ previa: evento }} // el detalle muestra esto al instante, mientras llega el resto
       onClick={onAbrir}
+      onPointerEnter={() => adelantarEvento(evento.id_evento)}
+      onFocus={() => adelantarEvento(evento.id_evento)}
       // tarjeta-afiche: se inclina en 3D siguiendo el mouse y se adelanta bajo el foco (index.css)
       onPointerMove={inclinar}
       onPointerLeave={enderezar}
@@ -88,15 +90,18 @@ function TarjetaHueco() {
   );
 }
 
+// Lo último que llegó sin filtros: al volver a la cartelera se muestra al instante y se actualiza por detrás
+const memoria = { eventos: null, ciudades: [], artistas: [] };
+
 function Cartelera() {
-  const [eventos, setEventos] = useState(null);
+  const [eventos, setEventos] = useState(memoria.eventos);
   const [error, setError] = useState("");
-  const [ciudades, setCiudades] = useState([]);
+  const [ciudades, setCiudades] = useState(memoria.ciudades);
   const [busqueda, setBusqueda] = useState("");
   const [tipo, setTipo] = useState("");
   const [ciudad, setCiudad] = useState("");
   const [intento, setIntento] = useState(0); // "Reintentar" lo suma y vuelve a pedir
-  const [artistas, setArtistas] = useState([]); // para la cinta: los de toda la cartelera, sin filtros
+  const [artistas, setArtistas] = useState(memoria.artistas); // para la cinta: los de toda la cartelera, sin filtros
   const [cintaPausada, setCintaPausada] = useState(false);
   // Foco de escenario: al pasar el mouse (o llegar con Tab) a un evento, el resto baja la luz y un haz lo ilumina
   const foco = useReflector();
@@ -105,7 +110,7 @@ function Cartelera() {
   useTitulo("Cartelera");
 
   useEffect(() => {
-    obtenerCiudades().then(({ data }) => setCiudades(data)).catch(() => {});
+    obtenerCiudades().then(({ data }) => setCiudades((memoria.ciudades = data))).catch(() => {});
   }, []);
 
   // La búsqueda la hace la API (nombre, artistas, géneros, lugar, productora). Solo si hay texto se espera
@@ -119,7 +124,9 @@ function Cartelera() {
           setEventos(data);
           setError("");
           if (!busqueda.trim() && !tipo && !ciudad) {
-            setArtistas([...new Set(data.flatMap((e) => (e.headliners ?? "").split(",").map((a) => a.trim()).filter(Boolean)))]);
+            memoria.eventos = data;
+            memoria.artistas = [...new Set(data.flatMap((e) => (e.headliners ?? "").split(",").map((a) => a.trim()).filter(Boolean)))];
+            setArtistas(memoria.artistas);
           }
         })
         .catch((e) => vigente && setError(mensajeDeError(e, "No se pudo cargar la cartelera")));

@@ -31,22 +31,18 @@ export const obtenerCiudades = async (req, res) => {
 
 // Detalle: jornadas, line-up y tarifas activas con su disponibilidad.
 // disponibles: para una tarifa de un día, lo libre del sector ese día; para un abono, el mínimo de todos los días (RN-23).
+// Las cuatro consultas van juntas (una sola ida y vuelta a la base); si el evento no está en la cartelera, el resto se descarta.
 export const obtenerEventoPublico = async (req, res) => {
-  const { rows } = await pool.query(
-    `SELECT c.*, e.cargo_servicio_pct, l.direccion
-     FROM v_cartelera c
-     JOIN empresas e ON e.id_empresa = c.id_empresa
-     JOIN lugares l  ON l.id_lugar = c.id_lugar
-     WHERE c.id_evento = $1`,
-    [req.params.id]
-  );
-  const evento = rows[0];
-  if (!evento) {
-    throw new ErrorHttp(404, "El evento no existe o no está publicado");
-  }
-
-  const id = evento.id_evento;
-  const [jornadas, presentaciones, tarifas] = await Promise.all([
+  const id = req.params.id;
+  const [{ rows }, jornadas, presentaciones, tarifas] = await Promise.all([
+    pool.query(
+      `SELECT c.*, e.cargo_servicio_pct, l.direccion
+       FROM v_cartelera c
+       JOIN empresas e ON e.id_empresa = c.id_empresa
+       JOIN lugares l  ON l.id_lugar = c.id_lugar
+       WHERE c.id_evento = $1`,
+      [id]
+    ),
     pool.query(
       `SELECT id_jornada, fecha, to_char(hora_apertura, 'HH24:MI') AS hora_apertura, nombre
        FROM jornadas WHERE id_evento = $1 ORDER BY fecha`,
@@ -79,6 +75,10 @@ export const obtenerEventoPublico = async (req, res) => {
       [id]
     )
   ]);
+  const evento = rows[0];
+  if (!evento) {
+    throw new ErrorHttp(404, "El evento no existe o no está publicado");
+  }
 
   res.json({ ...evento, jornadas: jornadas.rows, presentaciones: presentaciones.rows, tarifas: tarifas.rows });
 };
