@@ -6,7 +6,8 @@ import { itemsDelCarrito, leerCarrito, vaciarCarrito } from "../../utils/carrito
 import { pesos } from "../../utils/formato.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
 import { conTransicion } from "../../utils/transicion.js";
-import { Aviso, botonPrimario, botonSecundario, Campo, campoClase } from "../../components/afiche.jsx";
+import { Aviso, botonPrimario, botonSecundario, Campo, campoClase, TituloLetras } from "../../components/afiche.jsx";
+import { lluviaDeEntradas } from "../../utils/movimiento.js";
 
 const MEDIOS = [
   { valor: "credito", texto: "Crédito" },
@@ -55,8 +56,13 @@ function Resumen({ cotizacion }) {
 
 function Resultado({ compra, idEvento, onReintentar }) {
   const aprobada = compra.estado === "pagada";
+  // Pago aprobado: lluvia de entraditas y sello; rechazado: la caja se sacude
+  useEffect(() => {
+    if (aprobada) lluviaDeEntradas();
+  }, [aprobada]);
   return (
-    <section className={`grid justify-items-start gap-4 border-2 p-6 sm:p-8 ${aprobada ? "border-verde" : "border-fucsia"}`}>
+    <section className={`relative grid justify-items-start gap-4 border-2 p-6 sm:p-8 ${aprobada ? "border-verde" : "sacude border-fucsia"}`}>
+      {aprobada && <span className="sello text-verde" aria-hidden="true">Pagado</span>}
       <span className={`px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-tinta ${aprobada ? "bg-verde" : "bg-fucsia"}`}>
         {aprobada ? "Pago aprobado" : "Pago rechazado"}
       </span>
@@ -149,7 +155,7 @@ function Checkout() {
       <Link viewTransition to={`/eventos/${id}`} className="justify-self-start text-xs font-bold uppercase tracking-widest text-gris hover:text-papel">
         ← Cambiar entradas
       </Link>
-      <h1 className="entra font-afiche text-6xl uppercase leading-[0.9]">Pagar</h1>
+      <TituloLetras texto="Pagar" className="font-afiche text-6xl uppercase leading-[0.9]" />
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <Resumen cotizacion={cotizacion} />

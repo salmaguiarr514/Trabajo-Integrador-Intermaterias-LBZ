@@ -60,6 +60,8 @@ function PublicLayout() {
             </div>
           )}
         </div>
+        {/* Barra de progreso del scroll (index.css, solo donde el navegador anima con el scroll) */}
+        <div className="progreso-scroll" aria-hidden="true" />
       </header>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16">

@@ -8,7 +8,7 @@ import { diaMes, pesos, rangoLargo } from "../../utils/formato.js";
 import { AFICHE } from "../../tema.js";
 import { ESTADOS } from "../../utils/estados.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
-import { ErrorCarga, Hueco } from "../../components/afiche.jsx";
+import { ErrorCarga, Hueco, TituloLetras } from "../../components/afiche.jsx";
 
 const etiquetaDia = (iso) => {
   const { dia, mes, semana } = diaMes(iso);
@@ -51,7 +51,10 @@ function Entrada({ entrada, numero, total }) {
         <div className="mx-auto grid h-full max-w-md content-center justify-items-center gap-4 p-6 text-center">
           <p className="font-afiche text-3xl uppercase leading-tight text-balance">{entrada.evento}</p>
           <p className="text-base font-semibold">{dia} · {entrada.espacio} · {entrada.tarifa}</p>
-          <QRCodeSVG value={entrada.codigo} size={512} aria-label={`Código QR de la entrada ${entrada.codigo}`} style={{ width: "100%", height: "auto" }} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
+          <div className="relative w-full">
+            <QRCodeSVG value={entrada.codigo} size={512} aria-label={`Código QR de la entrada ${entrada.codigo}`} style={{ display: "block", width: "100%", height: "auto" }} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
+            <span className="escaneo" aria-hidden="true" />
+          </div>
           <p className="font-mono text-sm break-all">{entrada.codigo}</p>
           <button
             type="button"
@@ -79,7 +82,7 @@ function Entrada({ entrada, numero, total }) {
 
 const encabezado = (
   <section className="entra grid gap-3">
-    <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-7xl">Mis entradas</h1>
+    <TituloLetras texto="Mis entradas" className="font-afiche text-6xl uppercase leading-[0.9] sm:text-7xl" />
     <p className="max-w-prose text-gris">Mostrá el QR en la puerta. Tocalo para verlo en pantalla completa.</p>
   </section>
 );
@@ -168,7 +171,7 @@ function MisEntradas() {
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {g.entradas.map((e, i) => (
-                <div key={e.id_entrada} className="entra grid grid-cols-1" style={{ "--i": i + 2 }}>
+                <div key={e.id_entrada} className="voltea grid grid-cols-1" style={{ "--i": i }}>
                   <Entrada entrada={e} numero={i + 1} total={g.entradas.length} />
                 </div>
               ))}

@@ -1,4 +1,6 @@
-import { cloneElement, useId } from "react";
+import { cloneElement, useEffect, useId, useRef } from "react";
+import { pesos } from "../utils/formato.js";
+import { contar, saltito } from "../utils/movimiento.js";
 
 // Piezas del sitio público (Tailwind, estética de afiche) que se repiten entre pantallas.
 
@@ -64,4 +66,39 @@ export function ErrorCarga({ titulo, mensaje, onReintentar }) {
 // Sobre el fondo tinta va en noche; dentro de una caja noche, fondo="bg-linea".
 export function Hueco({ className = "", fondo = "bg-noche" }) {
   return <span aria-hidden="true" className={`block ${fondo} motion-safe:animate-pulse ${className}`} />;
+}
+
+// Título de afiche que cae letra por letra al aparecer (ver "Movimiento" en index.css).
+// El lector de pantalla lee el texto entero (aria-label), no letra por letra.
+const ESPACIO_DURO = String.fromCharCode(160);
+export function TituloLetras({ texto, className = "" }) {
+  return (
+    <h1 className={className} aria-label={texto}>
+      <span aria-hidden="true">
+        {[...texto].map((letra, i) => (
+          <span key={i} className="letra" style={{ "--n": i }}>
+            {letra === " " ? ESPACIO_DURO : letra}
+          </span>
+        ))}
+      </span>
+    </h1>
+  );
+}
+
+// Importe que, cuando cambia, cuenta hasta el valor nuevo y da un saltito
+export function ImporteAnimado({ valor, className = "" }) {
+  const ref = useRef(null);
+  const anterior = useRef(valor);
+  useEffect(() => {
+    if (anterior.current === valor) return;
+    const cortar = contar(ref.current, anterior.current, valor, pesos);
+    saltito(ref.current, { desde: 1.22 });
+    anterior.current = valor;
+    return cortar;
+  }, [valor]);
+  return (
+    <span ref={ref} className={`inline-block tabular-nums ${className}`}>
+      {pesos(valor)}
+    </span>
+  );
 }

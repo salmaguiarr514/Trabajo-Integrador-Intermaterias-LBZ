@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { obtenerEventoPublico } from "../../services/publicService.js";
@@ -7,7 +7,8 @@ import { useCarga } from "../../hooks/useCarga.js";
 import { diaMes, hora, numero, pesos, rangoLargo } from "../../utils/formato.js";
 import { guardarCarrito, leerCarrito } from "../../utils/carrito.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
-import { botonPrimario, botonSecundario, Hueco } from "../../components/afiche.jsx";
+import { botonPrimario, botonSecundario, Hueco, ImporteAnimado } from "../../components/afiche.jsx";
+import { saltito } from "../../utils/movimiento.js";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { conTransicion } from "../../utils/transicion.js";
 
@@ -35,10 +36,10 @@ function Grilla({ evento, jornada }) {
   if (jornada === ABONO) {
     return (
       <ul>
-        {evento.jornadas.map((j) => {
+        {evento.jornadas.map((j, i) => {
           const cierre = evento.presentaciones.find((p) => p.id_jornada === j.id_jornada && p.headliner);
           return (
-            <li key={j.id_jornada} className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-4 border-b-2 border-dashed border-linea px-4 py-3 last:border-b-0">
+            <li key={j.id_jornada} style={{ "--i": i }} className="fila-show grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-4 border-b-2 border-dashed border-linea px-4 py-3 last:border-b-0">
               <span className="text-sm uppercase text-gris">{etiquetaDia(j.fecha)}</span>
               <span className="font-afiche text-xl uppercase leading-tight">
                 {cierre?.artista ?? "—"}
@@ -57,8 +58,8 @@ function Grilla({ evento, jornada }) {
   }
   return (
     <ul>
-      {shows.map((p) => (
-        <li key={p.id_presentacion} className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-4 border-b-2 border-dashed border-linea px-4 py-3 last:border-b-0">
+      {shows.map((p, i) => (
+        <li key={p.id_presentacion} style={{ "--i": i }} className="fila-show grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-4 border-b-2 border-dashed border-linea px-4 py-3 last:border-b-0">
           <span className="text-sm tabular-nums text-gris">{hora(p.inicio)}</span>
           <span className="min-w-0 font-afiche text-xl uppercase leading-tight">
             {p.artista}
@@ -68,7 +69,7 @@ function Grilla({ evento, jornada }) {
             </span>
           </span>
           {p.headliner ? (
-            <span className="border-2 border-amarillo px-2 text-xs font-extrabold uppercase tracking-widest text-amarillo">Cierre</span>
+            <span className="cierre-late border-2 border-amarillo px-2 text-xs font-extrabold uppercase tracking-widest text-amarillo">Cierre</span>
           ) : (
             <span />
           )}
@@ -79,12 +80,18 @@ function Grilla({ evento, jornada }) {
 }
 
 function Contador({ valor, maximo, onCambio, nombre }) {
+  const numero = useRef(null);
+  const anterior = useRef(valor);
+  useEffect(() => {
+    if (valor !== anterior.current) saltito(numero.current, { desde: 1.6, y: valor > anterior.current ? -8 : 8 });
+    anterior.current = valor;
+  }, [valor]);
   return (
     <div className="flex items-center border-2 border-papel">
       <button type="button" aria-label={`Una entrada menos de ${nombre}`} disabled={valor <= 0} onClick={() => onCambio(valor - 1)} className="size-9 font-bold disabled:text-borde">
         −
       </button>
-      <span className="w-8 text-center font-bold tabular-nums" aria-live="polite">{valor}</span>
+      <span ref={numero} className="inline-block w-8 text-center font-bold tabular-nums" aria-live="polite">{valor}</span>
       <button type="button" aria-label={`Una entrada más de ${nombre}`} disabled={valor >= maximo} onClick={() => onCambio(valor + 1)} className="size-9 font-bold disabled:text-borde">
         +
       </button>
@@ -241,7 +248,6 @@ function EventoDetalle() {
   };
 
   const conPestañas = pestañas.length > 1;
-  const total = pesos(subtotal + cargo);
 
   return (
     // En el celular deja lugar abajo para la barra de compra fija
@@ -315,7 +321,7 @@ function EventoDetalle() {
                   </div>
                   <div className="flex items-baseline justify-between gap-3 pt-2">
                     <span className="font-bold uppercase tracking-widest">Total</span>
-                    <span className="font-afiche text-3xl tabular-nums">{pesos(subtotal + cargo)}</span>
+                    <ImporteAnimado valor={subtotal + cargo} className="font-afiche text-3xl" />
                   </div>
                 </>
               )}
@@ -337,7 +343,7 @@ function EventoDetalle() {
           {cantidadTotal > 0 ? (
             <>
               <p className="leading-tight">
-                <span className="block font-afiche text-2xl tabular-nums">{total}</span>
+                <ImporteAnimado valor={subtotal + cargo} className="block font-afiche text-2xl" />
                 <span className="text-sm text-gris">
                   {cantidadTotal} {cantidadTotal === 1 ? "entrada" : "entradas"}, con el cargo por servicio
                 </span>
