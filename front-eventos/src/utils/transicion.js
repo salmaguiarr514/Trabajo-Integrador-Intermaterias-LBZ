@@ -13,5 +13,7 @@ export function conTransicion(cambio) {
   const raiz = document.documentElement;
   raiz.dataset.transicion = "local";
   const t = document.startViewTransition(() => flushSync(cambio));
-  t.finished.finally(() => delete raiz.dataset.transicion);
+  // Si se toca otra opción antes de que termine, el navegador saltea esta: no es un error
+  t.ready.catch(() => {});
+  t.finished.finally(() => delete raiz.dataset.transicion).catch(() => {});
 }
