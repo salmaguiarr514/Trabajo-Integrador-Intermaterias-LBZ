@@ -65,7 +65,7 @@ function Inicio() {
               prefix={<DollarOutlined />}
               styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }}
             />
-            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Sin el service charge</Typography.Text>
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Sin el cargo por servicio</Typography.Text>
           </Card>
         </Col>
       </Row>

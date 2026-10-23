@@ -29,7 +29,7 @@ function Dashboard() {
         <Col xs={24} md={12}>
           <Card>
             <Statistic
-              title="Recaudación de Backstage (service charge)"
+              title="Recaudación de Backstage (cargo por servicio)"
               value={m.service_charge_total}
               {...formatoPesos}
               prefix={<DollarOutlined />}
@@ -79,7 +79,7 @@ function Dashboard() {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title={<><ShopOutlined /> Service charge por productora</>}>
+          <Card title={<><ShopOutlined /> Cargo por servicio de cada productora</>}>
             {m.recaudacion_por_productora.length === 0 ? (
               <Empty description="Todavía no hay ventas" />
             ) : (
@@ -118,7 +118,7 @@ function Dashboard() {
                 { title: "Mes", dataIndex: "mes", render: (mes) => mesAnio(mes) },
                 { title: "Compras", dataIndex: "compras", align: "right" },
                 { title: "Vendido", dataIndex: "total", align: "right", render: pesos },
-                { title: "Service charge", dataIndex: "service_charge", align: "right", render: (v) => <b>{pesos(v)}</b> }
+                { title: "Cargo por servicio", dataIndex: "service_charge", align: "right", render: (v) => <b>{pesos(v)}</b> }
               ]}
             />
           </Card>

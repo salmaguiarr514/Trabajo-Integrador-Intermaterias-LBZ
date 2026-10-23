@@ -86,14 +86,14 @@ function VentasEvento() {
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Service charge" value={v.service_charge} formatter={pesos} />
+            <Statistic title="Cargo por servicio" value={v.service_charge} formatter={pesos} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Para Backstage</Typography.Text>
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
             <Statistic title="Cobrado al público" value={v.total} formatter={pesos} />
-            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal + service charge</Typography.Text>
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal + cargo por servicio</Typography.Text>
           </Card>
         </Col>
       </Row>

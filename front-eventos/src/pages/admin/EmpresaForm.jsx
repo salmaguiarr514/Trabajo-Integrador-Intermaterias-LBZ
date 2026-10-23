@@ -155,7 +155,7 @@ function EmpresaForm() {
               </Form.Item>
             </Col>
             <Col xs={24} md={8}>
-              <Form.Item label="Service charge" required tooltip="Porcentaje que cobra Backstage sobre cada venta" {...estado("cargo_servicio_pct")}>
+              <Form.Item label="Cargo por servicio" required tooltip="Porcentaje que cobra Backstage sobre cada venta" {...estado("cargo_servicio_pct")}>
                 <InputNumber
                   min={0}
                   max={100}

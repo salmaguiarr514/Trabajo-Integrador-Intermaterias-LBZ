@@ -88,9 +88,9 @@ function Artistas() {
             </Tooltip>
           ) : (
             <Popconfirm
-              title="Eliminar artista"
-              description={`¿Seguro que querés eliminar a "${a.nombre}"?`}
-              okText="Eliminar"
+              title={`¿Eliminar a "${a.nombre}"?`}
+              description="Se borra de tus artistas y no se puede deshacer."
+              okText="Eliminar artista"
               cancelText="Cancelar"
               okButtonProps={{ danger: true }}
               onConfirm={() => eliminar(a)}

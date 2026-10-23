@@ -306,7 +306,7 @@ function EventoDetalle() {
                     </div>
                   ))}
                   <div className="flex justify-between gap-3">
-                    <span className="text-gris">Service charge ({e.cargo_servicio_pct}%)</span>
+                    <span className="text-gris">Cargo por servicio ({e.cargo_servicio_pct}%)</span>
                     <span className="tabular-nums">{pesos(cargo)}</span>
                   </div>
                   <div className="flex items-baseline justify-between gap-3 pt-2">

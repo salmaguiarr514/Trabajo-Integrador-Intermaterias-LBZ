@@ -40,7 +40,7 @@ function Resumen({ cotizacion }) {
           <span className="tabular-nums">{pesos(cotizacion.subtotal)}</span>
         </div>
         <div className="flex justify-between gap-3">
-          <span className="text-gris">Service charge ({cotizacion.cargo_servicio_pct}%)</span>
+          <span className="text-gris">Cargo por servicio ({cotizacion.cargo_servicio_pct}%)</span>
           <span className="tabular-nums">{pesos(cotizacion.cargo_servicio)}</span>
         </div>
         <div className="flex items-baseline justify-between gap-3 pt-1">

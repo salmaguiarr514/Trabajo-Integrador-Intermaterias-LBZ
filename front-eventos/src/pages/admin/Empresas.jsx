@@ -79,7 +79,7 @@ function Empresas() {
     },
     { title: "CUIT", dataIndex: "cuit", render: (cuit) => <span style={{ whiteSpace: "nowrap" }}>{cuit}</span> },
     {
-      title: "Service charge",
+      title: "Cargo por servicio",
       dataIndex: "cargo_servicio_pct",
       responsive: ["md"],
       sorter: (a, b) => a.cargo_servicio_pct - b.cargo_servicio_pct,
@@ -129,9 +129,9 @@ function Empresas() {
             />
           </Tooltip>
           <Popconfirm
-            title="Eliminar productora"
-            description={`¿Seguro que querés eliminar "${empresa.nombre}"?`}
-            okText="Eliminar"
+            title={`¿Eliminar "${empresa.nombre}"?`}
+            description="Se borra la productora y no se puede deshacer."
+            okText="Eliminar productora"
             cancelText="Cancelar"
             okButtonProps={{ danger: true }}
             onConfirm={() => handleEliminar(empresa.id_empresa)}

@@ -68,13 +68,13 @@ function DatosLugar({ ambito, lugar, editable, onGuardado }) {
               Guardar cambios
             </Button>
             <Popconfirm
-              title="Eliminar lugar"
+              title={`¿Eliminar "${lugar.nombre}"?`}
               description={
                 lugar.cantidad_eventos > 0
                   ? "Tiene eventos: no se va a poder eliminar. Dalo de baja."
-                  : `Se borran también sus sectores y escenarios. ¿Seguro?`
+                  : "Se borran también sus sectores y escenarios, y no se puede deshacer."
               }
-              okText="Eliminar"
+              okText="Eliminar lugar"
               cancelText="Cancelar"
               okButtonProps={{ danger: true, disabled: lugar.cantidad_eventos > 0 }}
               onConfirm={eliminar}
@@ -162,9 +162,9 @@ function PartesLugar({ ambito, tipo, lugar, editable, onCambio }) {
                   </Tooltip>
                 ) : (
                   <Popconfirm
-                    title={esSector ? "Eliminar sector" : "Eliminar escenario"}
-                    description={`¿Seguro que querés eliminar "${p.nombre}"?`}
-                    okText="Eliminar"
+                    title={`¿Eliminar ${esSector ? "el sector" : "el escenario"} "${p.nombre}"?`}
+                    description="No se puede deshacer."
+                    okText={esSector ? "Eliminar sector" : "Eliminar escenario"}
                     cancelText="Cancelar"
                     okButtonProps={{ danger: true }}
                     onConfirm={() => eliminar(p)}

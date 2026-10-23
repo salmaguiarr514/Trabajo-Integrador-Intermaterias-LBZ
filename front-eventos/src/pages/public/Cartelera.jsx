@@ -20,7 +20,7 @@ function TarjetaEvento({ evento }) {
     <Link
       to={`/eventos/${evento.id_evento}`}
       state={{ previa: evento }} // el detalle muestra esto al instante, mientras llega el resto
-      className="group flex flex-col border-2 border-papel bg-noche text-papel shadow-[6px_6px_0_var(--color-fucsia)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_var(--color-fucsia)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amarillo"
+      className="group flex flex-col border-2 border-papel bg-noche text-papel shadow-[6px_6px_0_var(--color-fucsia)] transition-[translate,box-shadow] duration-150 ease-out motion-safe:hover:-translate-x-0.5 motion-safe:hover:-translate-y-0.5 hover:shadow-[9px_9px_0_var(--color-fucsia)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amarillo"
     >
       <div className="flex items-stretch border-b-2 border-papel">
         <div className="grid w-20 shrink-0 place-items-center border-r-2 border-papel bg-amarillo py-2 text-tinta">
@@ -116,7 +116,6 @@ function Cartelera() {
   return (
     <div className="grid grid-cols-1 gap-8">
       <section className="grid gap-3">
-        <span className="justify-self-start bg-fucsia px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-tinta">Próximos shows</span>
         <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-8xl">Cartelera</h1>
         <p className="max-w-prose text-gris">Recitales y festivales de todas las productoras. Elegí un evento para ver la grilla y comprar tus entradas.</p>
       </section>

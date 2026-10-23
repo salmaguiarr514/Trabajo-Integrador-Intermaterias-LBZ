@@ -6,6 +6,7 @@ import { obtenerCompras, obtenerEntradas } from "../../services/clienteService.j
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaMes, pesos, rangoLargo } from "../../utils/formato.js";
 import { AFICHE } from "../../tema.js";
+import { ESTADOS } from "../../utils/estados.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
 import { ErrorCarga, Hueco } from "../../components/afiche.jsx";
 
@@ -77,7 +78,6 @@ function Entrada({ entrada }) {
 
 const encabezado = (
   <section className="grid gap-3">
-    <span className="justify-self-start bg-fucsia px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-tinta">Tu acceso</span>
     <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-7xl">Mis entradas</h1>
     <p className="max-w-prose text-gris">Mostrá el QR en la puerta. Tocalo para verlo en pantalla completa.</p>
   </section>
@@ -195,7 +195,7 @@ function MisEntradas() {
                     <td className="px-3 py-2">{c.evento}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{c.cantidad}</td>
                     <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{pesos(c.total)}</td>
-                    <td className={`px-3 py-2 text-xs font-bold uppercase tracking-widest ${ESTADO_COMPRA[c.estado]}`}>{c.estado}</td>
+                    <td className={`px-3 py-2 text-xs font-bold uppercase tracking-widest ${ESTADO_COMPRA[c.estado]}`}>{ESTADOS.compra[c.estado]?.texto ?? c.estado}</td>
                   </tr>
                 ))}
               </tbody>
