@@ -1,5 +1,5 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Alert, Button, Card, Result, Steps } from "antd";
+import { Alert, Button, Card, Grid, Result, Steps } from "antd";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { obtenerEvento } from "../../../services/panelService.js";
 import { useCarga } from "../../../hooks/useCarga.js";
@@ -27,12 +27,19 @@ const PASOS = [
 
 const VOLVER = { a: LISTADO, texto: "Eventos" };
 
+// Los 6 pasos entran en una fila solo en pantallas anchas; si no, van uno debajo del otro
+// (en una fila angosta los títulos se partían por la mitad)
+function Pasos(props) {
+  const anchas = Grid.useBreakpoint().xl;
+  return <Steps {...props} orientation={anchas ? "horizontal" : "vertical"} size={anchas ? "default" : "small"} />;
+}
+
 // Evento nuevo: solo el paso de datos. Al guardarlo, se pasa al asistente completo.
 function NuevoEvento() {
   return (
     <div className="pila">
       <Encabezado volver={VOLVER} titulo="Nuevo evento" />
-      <Steps current={0} items={PASOS.map((p, i) => ({ title: p.titulo, disabled: i > 0 }))} responsive />
+      <Pasos current={0} items={PASOS.map((p, i) => ({ title: p.titulo, disabled: i > 0 }))} />
       <Card>
         <PasoDatos evento={null} />
       </Card>
@@ -70,10 +77,9 @@ function EventoExistente({ id }) {
     <div className="pila">
       <Encabezado volver={VOLVER} titulo={e.nombre} estado={e.estado} />
       {cerrado && <Alert type="warning" showIcon title={`El evento está ${e.estado}: se puede ver, pero ya no se modifica`} />}
-      <Steps
+      <Pasos
         current={paso}
         onChange={irA}
-        responsive
         items={PASOS.map((p, i) => ({ title: p.titulo, status: i === paso ? "process" : p.hecho(e) ? "finish" : "wait" }))}
       />
       <Card>

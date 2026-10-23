@@ -63,7 +63,8 @@ function Estructura({ inicio, subtitulo, items }) {
             ...(esMovil && { position: "absolute", insetBlock: 0, left: 0, zIndex: 20 })
           }}
         >
-          <nav aria-label="Secciones del panel">
+          {/* inert: con el menú cerrado en el celular, sus links no reciben foco (están fuera de la vista) */}
+          <nav aria-label="Secciones del panel" inert={esMovil && !menuAbierto}>
             <Menu
               mode="inline"
               selectedKeys={seleccionado ? [seleccionado] : []}

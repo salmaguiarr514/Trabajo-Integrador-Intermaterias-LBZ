@@ -15,7 +15,7 @@ const VERDE = PANEL.ok;
 const MEDIO = { credito: "Crédito", debito: "Débito", transferencia: "Transferencia" };
 
 // Barra con "vendidas de capacidad" (o "ingresaron de entradas") y el número al lado
-function Medidor({ valor, total, color, detalle }) {
+function Medidor({ valor, total, color, detalle, nombre }) {
   const pct = total > 0 ? (valor / total) * 100 : 0;
   return (
     <div>
@@ -25,7 +25,7 @@ function Medidor({ valor, total, color, detalle }) {
         </Typography.Text>
         <Typography.Text type="secondary" style={{ fontVariantNumeric: "tabular-nums" }}>{detalle ?? `${Math.round(pct)} %`}</Typography.Text>
       </div>
-      <Progress percent={pct} showInfo={false} strokeColor={color} size="small" />
+      <Progress aria-label={nombre} percent={pct} showInfo={false} strokeColor={color} size="small" />
     </div>
   );
 }
@@ -114,7 +114,7 @@ function VentasEvento() {
                         .map((o) => (
                           <div key={o.id_espacio}>
                             <Typography.Text type="secondary" style={{ fontSize: 12 }}>{o.espacio}</Typography.Text>
-                            <Medidor valor={o.vendidas} total={o.capacidad} color={VIOLETA} detalle={o.disponibles === 0 ? "Agotado" : `Quedan ${numero(o.disponibles)}`} />
+                            <Medidor nombre={`Ocupación de ${o.espacio}, ${diaCorto(d)}`} valor={o.vendidas} total={o.capacidad} color={VIOLETA} detalle={o.disponibles === 0 ? "Agotado" : `Quedan ${numero(o.disponibles)}`} />
                           </div>
                         ))}
                     </Space>
@@ -137,7 +137,7 @@ function VentasEvento() {
               {v.asistencia.map((a) => (
                 <div key={a.id_jornada}>
                   <Typography.Text strong style={{ textTransform: "capitalize" }}>{diaCorto(a.fecha)}</Typography.Text>
-                  <Medidor valor={a.ingresos} total={a.entradas} color={VERDE} detalle={`${numero(a.entradas - a.ingresos)} por entrar`} />
+                  <Medidor nombre={`Asistencia del ${diaCorto(a.fecha)}`} valor={a.ingresos} total={a.entradas} color={VERDE} detalle={`${numero(a.entradas - a.ingresos)} por entrar`} />
                 </div>
               ))}
             </Space>

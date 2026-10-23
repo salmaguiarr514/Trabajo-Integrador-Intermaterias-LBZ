@@ -149,7 +149,7 @@ function Empresas() {
     <div className="pila">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
         <div>
-          <Typography.Title level={2} style={{ marginBottom: 4 }}>Productoras</Typography.Title>
+          <Typography.Title level={1} style={{ marginBottom: 4, fontSize: 30 }}>Productoras</Typography.Title>
           <Typography.Text type="secondary">
             Empresas que organizan recitales y festivales en la plataforma.
           </Typography.Text>

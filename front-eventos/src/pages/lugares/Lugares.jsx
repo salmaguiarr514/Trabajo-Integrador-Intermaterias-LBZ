@@ -148,7 +148,9 @@ function Lugares({ ambito: nombreAmbito }) {
 
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-          <Segmented options={ambito.filtros} value={origen} onChange={setOrigen} />
+          <div className="desliza">
+            <Segmented options={ambito.filtros} value={origen} onChange={setOrigen} />
+          </div>
           <Input
             allowClear
             prefix={<SearchOutlined />}

@@ -24,7 +24,8 @@ const ESTADO_COMPRA = {
 
 // Una entrada: el QR lleva el código (UUID, RN-29) que se escanea en la puerta.
 // Tocándolo se abre a pantalla completa, en blanco, para que el lector lo tome fácil (Escape o "Cerrar" vuelve).
-function Entrada({ entrada }) {
+// numero/total: cuál es entre las del evento, para que cada QR tenga un nombre distinto al leerlo
+function Entrada({ entrada, numero, total }) {
   const pantalla = useRef(null);
   const anulada = entrada.estado !== "valida";
   const usada = entrada.ingresos > 0;
@@ -36,10 +37,10 @@ function Entrada({ entrada }) {
         type="button"
         disabled={anulada}
         onClick={() => pantalla.current?.showModal()}
-        aria-label={`Mostrar en pantalla completa el QR de ${entrada.espacio}, ${dia}`}
+        aria-label={`Mostrar en pantalla completa el QR de la entrada ${numero} de ${total}: ${entrada.espacio}, ${dia}`}
         className={`grid shrink-0 place-items-center border-b-2 border-papel bg-papel p-3 sm:border-r-2 sm:border-b-0 ${anulada ? "opacity-40" : ""}`}
       >
-        <QRCodeSVG value={entrada.codigo} size={112} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
+        <QRCodeSVG value={entrada.codigo} size={112} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" aria-hidden="true" />
       </button>
       <dialog
         ref={pantalla}
@@ -50,7 +51,7 @@ function Entrada({ entrada }) {
         <div className="mx-auto grid h-full max-w-md content-center justify-items-center gap-4 p-6 text-center">
           <p className="font-afiche text-3xl uppercase leading-tight text-balance">{entrada.evento}</p>
           <p className="text-base font-semibold">{dia} · {entrada.espacio} · {entrada.tarifa}</p>
-          <QRCodeSVG value={entrada.codigo} size={512} style={{ width: "100%", height: "auto" }} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
+          <QRCodeSVG value={entrada.codigo} size={512} aria-label={`Código QR de la entrada ${entrada.codigo}`} style={{ width: "100%", height: "auto" }} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
           <p className="font-mono text-sm break-all">{entrada.codigo}</p>
           <button
             type="button"
@@ -166,8 +167,8 @@ function MisEntradas() {
               </span>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {g.entradas.map((e) => (
-                <Entrada key={e.id_entrada} entrada={e} />
+              {g.entradas.map((e, i) => (
+                <Entrada key={e.id_entrada} entrada={e} numero={i + 1} total={g.entradas.length} />
               ))}
             </div>
           </section>

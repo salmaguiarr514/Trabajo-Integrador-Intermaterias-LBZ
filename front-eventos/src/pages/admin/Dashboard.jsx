@@ -91,6 +91,7 @@ function Dashboard() {
                       <Typography.Text style={{ fontVariantNumeric: "tabular-nums" }}>{pesos(p.service_charge)}</Typography.Text>
                     </div>
                     <Progress
+                      aria-label={`Cargo por servicio de ${p.productora}, comparado con la que más recaudó`}
                       percent={(p.service_charge / maxProductora) * 100}
                       showInfo={false}
                       strokeColor={PANEL.violeta}

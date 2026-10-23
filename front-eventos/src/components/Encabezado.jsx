@@ -17,7 +17,7 @@ function Encabezado({ titulo, descripcion, acciones, volver, estado }) {
       <div className="encabezado">
         <div style={{ minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "4px 12px" }}>
-            <Typography.Title level={2} style={{ margin: 0 }}>{titulo}</Typography.Title>
+            <Typography.Title level={1} style={{ margin: 0, fontSize: 30 }}>{titulo}</Typography.Title>
             {estado && <TagEstado estado={estado} />}
           </div>
           {descripcion && (

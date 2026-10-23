@@ -202,7 +202,7 @@ function PasoTarifas({ evento, soloLectura, onCambio }) {
       title: "Activa",
       dataIndex: "activa",
       render: (activa, t) => (
-        <Switch size="small" checked={activa} disabled={soloLectura} loading={cambiando === t.id_tarifa} onChange={(v) => cambiarActiva(t, v)} />
+        <Switch size="small" aria-label={`Tarifa ${t.nombre} a la venta`} checked={activa} disabled={soloLectura} loading={cambiando === t.id_tarifa} onChange={(v) => cambiarActiva(t, v)} />
       )
     },
     ...(soloLectura

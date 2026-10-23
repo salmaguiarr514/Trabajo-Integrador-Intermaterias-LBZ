@@ -148,6 +148,7 @@ function Eventos() {
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
           <Select
+            aria-label="Filtrar por estado"
             allowClear
             placeholder="Todos los estados"
             value={filtros.estado}
@@ -156,6 +157,7 @@ function Eventos() {
             style={{ minWidth: 170 }}
           />
           <Select
+            aria-label="Filtrar por productora"
             allowClear
             showSearch
             optionFilterProp="label"

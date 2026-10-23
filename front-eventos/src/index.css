@@ -101,6 +101,31 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  /* Tablas de los paneles: las palabras no se parten por la mitad (antd las corta en la celda y en
+     Typography); si no entran, la tabla se desplaza de costado (todas tienen scroll x) */
+  .ant-table-cell,
+  .ant-table-cell .ant-typography {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  /* Encabezados de columna que ordenan: antd los hace enfocables pero sin marca de foco */
+  .ant-table-thead > tr > th:focus-visible {
+    outline: 2px solid #c084fc;
+    outline-offset: -2px;
+  }
+
+  /* Fila de filtros (Segmented) que en el celular no entra: se desplaza de costado en vez de salirse */
+  .desliza {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* Etiqueta violeta de antd (Plataforma, Abono, Superadmin): su texto quedaba en 3,4:1 */
+  .ant-tag.ant-tag-purple {
+    color: #d3adf7;
+  }
+
   .barra-interior {
     display: flex;
     align-items: center;

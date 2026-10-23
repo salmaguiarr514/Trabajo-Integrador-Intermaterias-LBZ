@@ -42,6 +42,12 @@ function VerificarEmail() {
     }
   };
 
+  // Con un error, el foco vuelve al código para escribirlo de nuevo. Va en un efecto: mientras se verifica
+  // el campo está deshabilitado, y recién después de este render vuelve a aceptar el foco.
+  useEffect(() => {
+    if (error && !enviando) campoCodigo.current?.focus();
+  }, [error, enviando]);
+
   // Viene del login: el código que tenía pudo haber vencido, se manda uno nuevo
   useEffect(() => {
     if (state?.reenviar && state?.email && !reenvioInicial.current) {
@@ -66,7 +72,6 @@ function VerificarEmail() {
       setError(mensajeDeError(err, "No se pudo verificar el código"));
       setCodigo("");
       setEnviando(false);
-      campoCodigo.current?.focus();
     }
   };
 

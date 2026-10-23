@@ -117,6 +117,7 @@ function Usuarios() {
       render: (activo, u) => (
         <Tooltip title={u.id_usuario === yo.id_usuario ? "No podés darte de baja a vos mismo" : undefined}>
           <Switch
+            aria-label={`Cuenta activa de ${u.nombre} ${u.apellido ?? ""}`.trim()}
             checked={activo}
             loading={cambiando === u.id_usuario}
             disabled={u.id_usuario === yo.id_usuario}
@@ -156,7 +157,9 @@ function Usuarios() {
 
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-          <Segmented options={FILTROS} value={rol} onChange={setRol} />
+          <div className="desliza">
+            <Segmented options={FILTROS} value={rol} onChange={setRol} />
+          </div>
           <Input
             allowClear
             prefix={<SearchOutlined />}

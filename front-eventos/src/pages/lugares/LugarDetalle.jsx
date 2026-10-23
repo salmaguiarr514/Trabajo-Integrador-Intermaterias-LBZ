@@ -249,7 +249,7 @@ function LugarDetalle({ ambito: nombreAmbito }) {
         <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(ambito.ruta)} style={{ paddingInline: 0 }}>
           Lugares
         </Button>
-        <Typography.Title level={2} style={{ margin: "8px 0 8px" }}>{l.nombre}</Typography.Title>
+        <Typography.Title level={1} style={{ margin: "8px 0 8px", fontSize: 30 }}>{l.nombre}</Typography.Title>
         <Space wrap>
           <TagOrigen lugar={l} />
           <Tag>{etiquetaTipoLugar(l.tipo)}</Tag>

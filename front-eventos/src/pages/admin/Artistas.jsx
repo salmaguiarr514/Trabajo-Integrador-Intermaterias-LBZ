@@ -63,6 +63,7 @@ function Artistas() {
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
           <Select
+            aria-label="Filtrar por productora"
             allowClear
             showSearch
             optionFilterProp="label"
