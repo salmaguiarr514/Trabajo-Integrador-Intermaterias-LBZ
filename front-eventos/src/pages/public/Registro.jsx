@@ -49,7 +49,7 @@ function Registro() {
     try {
       await registro({ ...enviar, nombre: enviar.nombre.trim(), email: enviar.email.trim() });
       // La cuenta queda creada pero hay que verificar el email con el código que llega por mail
-      navigate("/verificar", { replace: true, state: { email: enviar.email.trim() } });
+      navigate("/verificar", { replace: true, state: { email: enviar.email.trim() }, viewTransition: true });
     } catch (err) {
       // Los errores de validación de la API se muestran debajo de cada campo
       const campos = erroresPorCampo(err);
@@ -66,7 +66,7 @@ function Registro() {
 
   return (
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-12">
-      <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
+      <section className="entra grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
         <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-7xl">Creá tu cuenta</h1>
         <p className="max-w-prose text-base font-medium">
           Con tu cuenta comprás entradas y las tenés en el celular, con el QR para la puerta.
@@ -74,7 +74,7 @@ function Registro() {
         <p className="max-w-prose text-base font-medium">Después te mandamos un código por mail para confirmar que es tuyo.</p>
       </section>
 
-      <form ref={formulario} onSubmit={handleSubmit} noValidate className="grid gap-5 border-2 border-papel bg-noche p-5 sm:p-6">
+      <form ref={formulario} onSubmit={handleSubmit} noValidate style={{ "--i": 1 }} className="entra grid gap-5 border-2 border-papel bg-noche p-5 sm:p-6">
         {error && <Aviso>{error}</Aviso>}
         <div className="grid gap-5 sm:grid-cols-2">
           <Campo etiqueta="Nombre" error={errores.nombre}>
@@ -108,7 +108,7 @@ function Registro() {
 
         <p className="text-sm text-gris">
           ¿Ya tenés cuenta?{" "}
-          <Link to="/login" className="font-semibold text-papel underline underline-offset-4 hover:text-amarillo">
+          <Link viewTransition to="/login" className="font-semibold text-papel underline underline-offset-4 hover:text-amarillo">
             Ingresá
           </Link>
         </p>

@@ -71,14 +71,14 @@ function Login() {
   // En pantallas grandes: el afiche (título + destinos, un solo bloque fucsia) a la izquierda y el formulario a la derecha.
   return (
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-0">
-      <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8 lg:col-start-1 lg:row-start-1 lg:border-b-0 lg:pb-6">
+      <section className="entra grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8 lg:col-start-1 lg:row-start-1 lg:border-b-0 lg:pb-6">
         <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-7xl">Entrá a Backstage</h1>
         <p className="max-w-prose text-base font-medium">
           Una sola entrada para todos. Ingresá con tu mail y tu contraseña, y te llevamos a lo tuyo.
         </p>
       </section>
 
-      <div className="grid gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+      <div className="entra grid gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1" style={{ "--i": 1 }}>
         <form onSubmit={handleSubmit} noValidate className="grid gap-5 border-2 border-papel bg-noche p-5 sm:p-6">
           <h2 className="font-afiche text-3xl uppercase leading-none">Ingresar</h2>
           {error && <Aviso>{error}</Aviso>}
@@ -117,7 +117,7 @@ function Login() {
 
           <p className="text-sm text-gris">
             ¿No tenés cuenta?{" "}
-            <Link to="/registro" className="font-semibold text-papel underline underline-offset-4 hover:text-amarillo">
+            <Link viewTransition to="/registro" className="font-semibold text-papel underline underline-offset-4 hover:text-amarillo">
               Creá una para comprar entradas
             </Link>
           </p>
@@ -148,7 +148,7 @@ function Login() {
         )}
       </div>
 
-      <section aria-label="A dónde te lleva el ingreso" className="border-2 border-papel bg-fucsia px-6 pb-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:px-8 sm:pb-8 max-lg:pt-6 lg:col-start-1 lg:row-start-2 lg:self-start lg:border-t-0">
+      <section aria-label="A dónde te lleva el ingreso" className="entra border-2 border-papel bg-fucsia px-6 pb-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:px-8 sm:pb-8 max-lg:pt-6 lg:col-start-1 lg:row-start-2 lg:self-start lg:border-t-0">
         <dl className="grid gap-3 lg:border-t-2 lg:border-tinta lg:pt-5">
           {DESTINOS.map((d) => (
             <div key={d.quien} className="grid gap-0.5 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useViewTransitionState } from "react-router-dom";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { obtenerCartelera, obtenerCiudades } from "../../services/publicService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { diaMes, pesos } from "../../utils/formato.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
 import { ErrorCarga, Hueco } from "../../components/afiche.jsx";
+import { conTransicion } from "../../utils/transicion.js";
 
 const TIPOS = [
   { valor: "", texto: "Todos" },
@@ -15,10 +17,13 @@ const TIPOS = [
 function TarjetaEvento({ evento }) {
   const { dia, mes, semana } = diaMes(evento.fecha_inicio);
   const varios = evento.fecha_inicio !== evento.fecha_fin;
+  // Al abrir este evento, la tarjeta se transforma en la portada del detalle (mismo view-transition-name)
+  const viaja = useViewTransitionState(`/eventos/${evento.id_evento}`);
 
   return (
-    <Link
+    <Link viewTransition
       to={`/eventos/${evento.id_evento}`}
+      style={viaja ? { viewTransitionName: "portada-evento" } : undefined}
       state={{ previa: evento }} // el detalle muestra esto al instante, mientras llega el resto
       className="group flex flex-col border-2 border-papel bg-noche text-papel shadow-[6px_6px_0_var(--color-fucsia)] transition-[translate,box-shadow] duration-150 ease-out motion-safe:hover:-translate-x-0.5 motion-safe:hover:-translate-y-0.5 hover:shadow-[9px_9px_0_var(--color-fucsia)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amarillo"
     >
@@ -85,6 +90,8 @@ function Cartelera() {
   const [tipo, setTipo] = useState("");
   const [ciudad, setCiudad] = useState("");
   const [intento, setIntento] = useState(0); // "Reintentar" lo suma y vuelve a pedir
+  // Al filtrar o buscar, las tarjetas que quedan se acomodan y las que salen se desvanecen
+  const [grillaAnimada] = useAutoAnimate({ duration: 300, easing: "cubic-bezier(0.2, 0, 0, 1)" });
   useTitulo("Cartelera");
 
   useEffect(() => {
@@ -115,12 +122,12 @@ function Cartelera() {
 
   return (
     <div className="grid grid-cols-1 gap-8">
-      <section className="grid gap-3">
+      <section className="entra grid gap-3">
         <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-8xl">Cartelera</h1>
         <p className="max-w-prose text-gris">Recitales y festivales de todas las productoras. Elegí un evento para ver la grilla y comprar tus entradas.</p>
       </section>
 
-      <section className="flex flex-wrap items-center gap-3">
+      <section className="entra flex flex-wrap items-center gap-3" style={{ "--i": 1 }}>
         <label className="flex min-w-0 flex-1 basis-64 items-center gap-2 border-2 border-papel bg-noche px-3 focus-within:border-amarillo">
           <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-gris" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
@@ -153,10 +160,11 @@ function Cartelera() {
             <button
               key={t.valor}
               type="button"
-              onClick={() => setTipo(t.valor)}
+              onClick={() => conTransicion(() => setTipo(t.valor))}
               aria-pressed={tipo === t.valor}
-              className={`border-2 px-4 py-2 text-xs font-bold uppercase tracking-widest ${
-                tipo === t.valor ? "border-papel bg-papel text-tinta" : "border-borde text-gris hover:border-papel hover:text-papel"
+              className={`border-2 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-[background-color,border-color,color,scale] duration-150 motion-safe:active:scale-96 ${
+                // vt-filtro-activo: el resaltado del filtro elegido se desliza hasta el nuevo
+                tipo === t.valor ? "vt-filtro-activo border-papel bg-papel text-tinta" : "border-borde text-gris hover:border-papel hover:text-papel"
               }`}
             >
               {t.texto}
@@ -180,9 +188,12 @@ function Cartelera() {
           <p className="mt-1 text-sm text-gris">{filtrando ? "Probá con otro artista o ciudad." : "Volvé pronto."}</p>
         </div>
       ) : (
-        <section className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {eventos.map((e) => (
-            <TarjetaEvento key={e.id_evento} evento={e} />
+        <section ref={grillaAnimada} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {eventos.map((e, i) => (
+            // al aparecer, entran en cascada
+            <div key={e.id_evento} className="entra grid grid-cols-1" style={{ "--i": i + 2 }}>
+              <TarjetaEvento evento={e} />
+            </div>
           ))}
         </section>
       )}

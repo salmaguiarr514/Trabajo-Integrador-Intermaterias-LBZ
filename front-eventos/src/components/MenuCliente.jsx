@@ -31,7 +31,7 @@ function MenuCliente() {
     // React Router navega dentro de una transition: si el logout va aparte, se aplica
     // antes y RutaProtegida manda al login. Juntos, se renderizan a la vez.
     startTransition(() => {
-      navigate("/");
+      navigate("/", { viewTransition: true });
       logout();
     });
   };
@@ -64,9 +64,9 @@ function MenuCliente() {
           <ul className="py-1">
             <li>
               {usuario.rol === "cliente" ? (
-                <Link to="/mis-entradas" onClick={() => setAbierto(false)} className={opcion}>Mis entradas</Link>
+                <Link viewTransition to="/mis-entradas" onClick={() => setAbierto(false)} className={opcion}>Mis entradas</Link>
               ) : (
-                <Link to={inicioDeRol(usuario.rol)} onClick={() => setAbierto(false)} className={opcion}>Ir a mi panel</Link>
+                <Link viewTransition to={inicioDeRol(usuario.rol)} onClick={() => setAbierto(false)} className={opcion}>Ir a mi panel</Link>
               )}
             </li>
             <li>

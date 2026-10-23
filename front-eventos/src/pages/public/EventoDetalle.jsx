@@ -8,6 +8,8 @@ import { diaMes, hora, numero, pesos, rangoLargo } from "../../utils/formato.js"
 import { guardarCarrito, leerCarrito } from "../../utils/carrito.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
 import { botonPrimario, botonSecundario, Hueco } from "../../components/afiche.jsx";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { conTransicion } from "../../utils/transicion.js";
 
 const ABONO = "abono";
 const MAX_ENTRADAS = 10; // RN-30
@@ -95,7 +97,7 @@ function Contador({ valor, maximo, onCambio, nombre }) {
 function Portada({ e }) {
   const jornadas = e.jornadas?.length;
   return (
-    <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
+    <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8" style={{ viewTransitionName: "portada-evento" }}>
       <span className="justify-self-start bg-tinta px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amarillo">
         {e.tipo}
         {jornadas ? ` · ${jornadas} ${jornadas === 1 ? "jornada" : "jornadas"}` : ""}
@@ -113,7 +115,7 @@ function Portada({ e }) {
 }
 
 const volver = (
-  <Link to="/" className="justify-self-start text-xs font-bold uppercase tracking-widest text-gris hover:text-papel">
+  <Link viewTransition to="/" className="justify-self-start text-xs font-bold uppercase tracking-widest text-gris hover:text-papel">
     ← Cartelera
   </Link>
 );
@@ -132,7 +134,7 @@ function Pestañas({ pestañas, actual, onElegir }) {
     lista.current?.querySelector(`#tab-${nueva.valor}`)?.focus();
   };
   return (
-    <div ref={lista} className="flex flex-wrap gap-2" role="tablist" aria-label="Jornadas" onKeyDown={tecla}>
+    <div ref={lista} className="entra flex flex-wrap gap-2" style={{ "--i": 1 }} role="tablist" aria-label="Jornadas" onKeyDown={tecla}>
       {pestañas.map((p) => (
         <button
           key={p.valor}
@@ -144,7 +146,7 @@ function Pestañas({ pestañas, actual, onElegir }) {
           tabIndex={actual === p.valor ? 0 : -1}
           onClick={() => onElegir(p.valor)}
           className={`border-2 px-4 py-2 text-sm font-extrabold uppercase tracking-wider ${
-            actual === p.valor ? "border-papel bg-papel text-tinta" : "border-papel text-papel hover:bg-noche"
+            actual === p.valor ? "vt-pestana-activa border-papel bg-papel text-tinta" : "border-papel text-papel hover:bg-noche"
           }`}
         >
           {p.texto}
@@ -163,6 +165,7 @@ function EventoDetalle() {
   const [carrito, setCarrito] = useState(() => leerCarrito(id)); // { id_tarifa: cantidad }
   const [aviso, setAviso] = useState("");
   const previa = useLocation().state?.previa; // lo que ya traía la tarjeta de la cartelera
+  const [resumenAnimado] = useAutoAnimate({ duration: 240 });
   useTitulo(evento.datos?.nombre ?? previa?.nombre ?? "Evento");
 
   // Mientras carga: la portada con lo que ya se sabe y el lugar reservado para la grilla y las entradas
@@ -196,7 +199,7 @@ function EventoDetalle() {
           <button type="button" onClick={evento.recargar} className={botonPrimario}>
             Reintentar
           </button>
-          <Link to="/" className={botonSecundario}>
+          <Link viewTransition to="/" className={botonSecundario}>
             Volver a la cartelera
           </Link>
         </div>
@@ -229,11 +232,11 @@ function EventoDetalle() {
   const comprar = () => {
     guardarCarrito(id, carrito);
     if (!usuario) {
-      navigate("/login", { state: { desde: `/checkout/${id}` } });
+      navigate("/login", { state: { desde: `/checkout/${id}` }, viewTransition: true });
     } else if (usuario.rol !== "cliente") {
       setAviso("Para comprar entradas, ingresá con una cuenta de cliente.");
     } else {
-      navigate(`/checkout/${id}`);
+      navigate(`/checkout/${id}`, { viewTransition: true });
     }
   };
 
@@ -247,10 +250,11 @@ function EventoDetalle() {
 
       <Portada e={e} />
 
-      {conPestañas && <Pestañas pestañas={pestañas} actual={actual} onElegir={setPestaña} />}
+      {conPestañas && <Pestañas pestañas={pestañas} actual={actual} onElegir={(v) => conTransicion(() => setPestaña(v))} />}
 
       <div
-        className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
+        className={`entra grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] ${conPestañas ? "vt-panel-jornada" : ""}`}
+        style={{ "--i": 2 }}
         {...(conPestañas && { id: "panel-jornada", role: "tabpanel", "aria-labelledby": `tab-${actual}` })}
       >
         <section className="border-2 border-papel bg-noche">
@@ -292,7 +296,7 @@ function EventoDetalle() {
               );
             })}
 
-            <div className="mt-2 grid gap-1 border-t-2 border-dashed border-linea pt-3 text-sm">
+            <div ref={resumenAnimado} className="mt-2 grid gap-1 border-t-2 border-dashed border-linea pt-3 text-sm">
               {elegidas.length === 0 ? (
                 <p className="text-gris">Elegí tus entradas. Podés combinar días, sectores y abonos (hasta {MAX_ENTRADAS} por compra).</p>
               ) : (

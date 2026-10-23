@@ -163,3 +163,127 @@
     }
   }
 }
+
+/* ─── Movimiento ───
+   Todo corre solo si el sistema no pide menos movimiento; si lo pide, las pantallas cambian al instante.
+   - Cambio de pantalla (View Transitions, viewTransition en los links): la barra de arriba queda quieta,
+     el contenido viejo se apaga subiendo y el nuevo entra desde abajo.
+   - Cambio dentro de una pantalla (utils/transicion.js: pestañas, filtros, opciones): la página no se mueve;
+     solo lo que tiene view-transition-name (la opción elegida, el panel que cambia) se desliza o funde.
+   - .entra: lo que aparece en pantalla entra subiendo, en cascada según --i (0, 1, 2…). */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: salir-pantalla 160ms ease-in both;
+  }
+
+  ::view-transition-new(root) {
+    animation: entrar-pantalla 360ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  html[data-transicion="local"]::view-transition-old(root),
+  html[data-transicion="local"]::view-transition-new(root) {
+    animation: none;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 340ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  /* La barra de arriba y el menú de los paneles no viajan con el contenido */
+  .sitio > header {
+    view-transition-name: barra-sitio;
+  }
+
+  .barra {
+    view-transition-name: barra-panel;
+  }
+
+  .ant-layout-sider {
+    view-transition-name: menu-panel;
+  }
+
+  @keyframes salir-pantalla {
+    to {
+      opacity: 0;
+      translate: 0 -12px;
+    }
+  }
+
+  @keyframes entrar-pantalla {
+    from {
+      opacity: 0;
+      translate: 0 18px;
+    }
+  }
+
+  .entra {
+    transition:
+      opacity 480ms cubic-bezier(0.2, 0, 0, 1),
+      translate 480ms cubic-bezier(0.2, 0, 0, 1);
+    transition-delay: calc(min(var(--i, 0), 8) * 70ms);
+  }
+
+  @starting-style {
+    .entra {
+      opacity: 0;
+      translate: 0 20px;
+    }
+  }
+
+  /* Pase con QR a pantalla completa: sube al abrirse y baja al cerrarse */
+  .dialogo-qr {
+    transition:
+      opacity 220ms cubic-bezier(0.2, 0, 0, 1),
+      translate 300ms cubic-bezier(0.2, 0, 0, 1),
+      overlay 300ms allow-discrete,
+      display 300ms allow-discrete;
+    opacity: 0;
+    translate: 0 48px;
+  }
+
+  .dialogo-qr[open] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @starting-style {
+    .dialogo-qr[open] {
+      opacity: 0;
+      translate: 0 48px;
+    }
+  }
+}
+
+/* Con movimiento reducido, el cambio de pantalla es inmediato (sin el fundido que el navegador pone por defecto) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Transiciones locales (utils/transicion.js): lo que se desliza (la opción elegida) o se funde (el panel que
+   cambia). Los nombres solo existen mientras corre una, así al cambiar de pantalla no se animan aparte. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-transicion="local"] .vt-filtro-activo {
+    view-transition-name: filtro-activo;
+  }
+
+  html[data-transicion="local"] .vt-pestana-activa {
+    view-transition-name: pestana-activa;
+  }
+
+  html[data-transicion="local"] .vt-panel-jornada {
+    view-transition-name: panel-jornada;
+  }
+
+  html[data-transicion="local"] .vt-medio-activo {
+    view-transition-name: medio-activo;
+  }
+
+  html[data-transicion="local"] .vt-panel-medio {
+    view-transition-name: panel-medio;
+  }
+}

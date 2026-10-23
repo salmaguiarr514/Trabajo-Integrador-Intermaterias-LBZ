@@ -28,7 +28,7 @@ function Estructura({ inicio, subtitulo, items }) {
   useTitulo(`${items.find((i) => i.key === seleccionado)?.label ?? "Panel"} · ${subtitulo}`);
 
   const irA = ({ key }) => {
-    navigate(key);
+    navigate(key, { viewTransition: true });
     setMenuAbierto(false);
   };
 

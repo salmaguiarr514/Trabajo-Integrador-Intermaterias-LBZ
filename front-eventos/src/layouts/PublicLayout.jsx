@@ -11,6 +11,10 @@ const linkClase = ({ isActive }) =>
     isActive ? "bg-papel text-tinta" : "text-gris hover:text-papel"
   }`;
 
+// El resaltado de la sección actual tiene nombre de transición: al cambiar de pantalla se desliza
+// de un link al otro (Cartelera → Mis entradas, Cartelera → Ingresar…)
+const activo = ({ isActive }) => (isActive ? { viewTransitionName: "nav-activo" } : undefined);
+
 function PublicLayout() {
   const { usuario } = useAuth();
 
@@ -18,17 +22,17 @@ function PublicLayout() {
     <div className="sitio flex min-h-dvh flex-col bg-tinta font-sans text-papel antialiased">
       <header className="sticky top-0 z-10 border-b-2 border-papel bg-tinta">
         <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:gap-4">
-          <Link to="/" className="flex shrink-0 items-center gap-2.5 text-papel" aria-label="Backstage, ir a la cartelera">
+          <Link viewTransition to="/" className="flex shrink-0 items-center gap-2.5 text-papel" aria-label="Backstage, ir a la cartelera">
             <Marca alto={30} />
             {/* En pantallas muy angostas queda solo el logo, para que entren Cartelera y Mis entradas */}
             <span aria-hidden="true" className="hidden font-afiche text-2xl uppercase tracking-wide min-[440px]:inline">Backstage</span>
           </Link>
           <nav aria-label="Principal" className="flex min-w-0 flex-1 gap-1">
-            <NavLink to="/" end className={linkClase}>
+            <NavLink viewTransition to="/" end className={linkClase} style={activo}>
               Cartelera
             </NavLink>
             {usuario?.rol === "cliente" && (
-              <NavLink to="/mis-entradas" className={linkClase}>
+              <NavLink viewTransition to="/mis-entradas" className={linkClase} style={activo}>
                 Mis entradas
               </NavLink>
             )}
@@ -37,15 +41,22 @@ function PublicLayout() {
             <MenuCliente />
           ) : (
             <div className="flex shrink-0 items-center gap-2">
-              <Link to="/registro" className="hidden px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-gris hover:text-papel sm:block">
+              <NavLink
+                viewTransition
+                to="/registro"
+                style={activo}
+                className={({ isActive }) => `hidden px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors sm:block ${isActive ? "bg-papel text-tinta" : "text-gris hover:text-papel"}`}
+              >
                 Crear cuenta
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
+                viewTransition
                 to="/login"
-                className="border-2 border-papel px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-papel hover:bg-papel hover:text-tinta"
+                style={activo}
+                className={({ isActive }) => `border-2 border-papel px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors ${isActive ? "bg-papel text-tinta" : "text-papel hover:bg-papel hover:text-tinta"}`}
               >
                 Ingresar
-              </Link>
+              </NavLink>
             </div>
           )}
         </div>

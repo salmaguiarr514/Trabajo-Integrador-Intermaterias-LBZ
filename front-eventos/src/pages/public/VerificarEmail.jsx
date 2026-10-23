@@ -77,7 +77,7 @@ function VerificarEmail() {
 
   return (
     <div className="mx-auto grid w-full max-w-xl gap-8">
-      <section className="grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
+      <section className="entra grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
         <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-6xl">Verificá tu email</h1>
         <p className="text-base font-medium">Ingresá el código que te llegó por mail. Si no lo ves, fijate en spam.</p>
       </section>
@@ -88,7 +88,8 @@ function VerificarEmail() {
           enviarCodigo();
         }}
         noValidate
-        className="grid gap-5 border-2 border-papel bg-noche p-5 sm:p-6"
+        style={{ "--i": 1 }}
+        className="entra grid gap-5 border-2 border-papel bg-noche p-5 sm:p-6"
       >
         {aviso && !error && <Aviso tipo="info">{aviso}</Aviso>}
         {error && <Aviso>{error}</Aviso>}
@@ -132,7 +133,7 @@ function VerificarEmail() {
           >
             {espera > 0 ? `Pedir otro código en ${espera} s` : "Mandarme otro código"}
           </button>
-          <Link to="/login" className="text-gris underline underline-offset-4 hover:text-papel">
+          <Link viewTransition to="/login" className="text-gris underline underline-offset-4 hover:text-papel">
             Volver al ingreso
           </Link>
         </div>

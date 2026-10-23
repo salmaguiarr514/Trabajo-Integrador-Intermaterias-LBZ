@@ -25,8 +25,8 @@ function MenuUsuario() {
     },
     { type: "divider" },
     usuario.rol === "cliente"
-      ? { key: "entradas", icon: <TagsOutlined />, label: "Mis entradas", onClick: () => navigate("/mis-entradas") }
-      : { key: "panel", icon: <AppstoreOutlined />, label: "Mi panel", onClick: () => navigate(inicioDeRol(usuario.rol)) },
+      ? { key: "entradas", icon: <TagsOutlined />, label: "Mis entradas", onClick: () => navigate("/mis-entradas", { viewTransition: true }) }
+      : { key: "panel", icon: <AppstoreOutlined />, label: "Mi panel", onClick: () => navigate(inicioDeRol(usuario.rol), { viewTransition: true }) },
     {
       key: "salir",
       icon: <LogoutOutlined />,

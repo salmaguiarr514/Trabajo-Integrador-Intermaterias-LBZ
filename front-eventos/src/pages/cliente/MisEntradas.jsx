@@ -46,7 +46,7 @@ function Entrada({ entrada, numero, total }) {
         ref={pantalla}
         aria-label={`QR de la entrada: ${entrada.espacio}, ${dia}`}
         onClick={(ev) => ev.target === pantalla.current && pantalla.current.close()}
-        className="fixed inset-0 m-0 size-full max-h-none max-w-none bg-papel p-0 text-tinta backdrop:bg-tinta"
+        className="dialogo-qr fixed inset-0 m-0 size-full max-h-none max-w-none bg-papel p-0 text-tinta backdrop:bg-tinta"
       >
         <div className="mx-auto grid h-full max-w-md content-center justify-items-center gap-4 p-6 text-center">
           <p className="font-afiche text-3xl uppercase leading-tight text-balance">{entrada.evento}</p>
@@ -78,7 +78,7 @@ function Entrada({ entrada, numero, total }) {
 }
 
 const encabezado = (
-  <section className="grid gap-3">
+  <section className="entra grid gap-3">
     <h1 className="font-afiche text-6xl uppercase leading-[0.9] sm:text-7xl">Mis entradas</h1>
     <p className="max-w-prose text-gris">Mostrá el QR en la puerta. Tocalo para verlo en pantalla completa.</p>
   </section>
@@ -145,16 +145,16 @@ function MisEntradas() {
       {porEvento.length === 0 ? (
         <div className="border-2 border-dashed border-linea px-6 py-12 text-center">
           <p className="font-afiche text-2xl uppercase">Todavía no tenés entradas</p>
-          <Link to="/" className="mt-4 inline-block border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
+          <Link viewTransition to="/" className="mt-4 inline-block border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
             Ver la cartelera
           </Link>
         </div>
       ) : (
         porEvento.map((g) => (
-          <section key={g.id_evento} className="grid gap-4">
+          <section key={g.id_evento} className="entra grid gap-4" style={{ "--i": 1 }}>
             <div className="flex flex-wrap items-end justify-between gap-3 border-b-2 border-papel pb-3">
               <div>
-                <Link to={`/eventos/${g.id_evento}`} className="font-afiche text-3xl uppercase leading-tight text-papel hover:text-amarillo">
+                <Link viewTransition to={`/eventos/${g.id_evento}`} className="font-afiche text-3xl uppercase leading-tight text-papel hover:text-amarillo">
                   {g.evento}
                 </Link>
                 <p className="text-sm text-gris">
@@ -168,7 +168,9 @@ function MisEntradas() {
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {g.entradas.map((e, i) => (
-                <Entrada key={e.id_entrada} entrada={e} numero={i + 1} total={g.entradas.length} />
+                <div key={e.id_entrada} className="entra grid grid-cols-1" style={{ "--i": i + 2 }}>
+                  <Entrada entrada={e} numero={i + 1} total={g.entradas.length} />
+                </div>
               ))}
             </div>
           </section>

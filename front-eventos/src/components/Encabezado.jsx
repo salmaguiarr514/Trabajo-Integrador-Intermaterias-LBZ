@@ -10,7 +10,7 @@ function Encabezado({ titulo, descripcion, acciones, volver, estado }) {
   return (
     <div>
       {volver && (
-        <Link to={volver.a} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+        <Link viewTransition to={volver.a} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
           <ArrowLeftOutlined aria-hidden="true" /> {volver.texto}
         </Link>
       )}
