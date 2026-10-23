@@ -1,20 +1,22 @@
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { Alert, Button, Card, Col, Empty, Progress, Result, Row, Space, Statistic, Table, Tag, Typography } from "antd";
-import { ArrowLeftOutlined, EditOutlined, ScanOutlined } from "@ant-design/icons";
+import { Alert, Button, Card, Col, Empty, Progress, Result, Row, Space, Table, Tag, Typography } from "antd";
+import { EditOutlined, ScanOutlined } from "@ant-design/icons";
 import { obtenerVentasEvento } from "../../services/panelService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaCorto, numero, pesos } from "../../utils/formato.js";
-import { COLOR_ESTADO } from "../../utils/estados.js";
+import Encabezado from "../../components/Encabezado.jsx";
+import Indicador from "../../components/Indicador.jsx";
+import TagEstado from "../../components/TagEstado.jsx";
 import Cargando from "../../components/Cargando.jsx";
+import { PANEL } from "../../tema.js";
 
-const VIOLETA = "#a855f7";
-const VERDE = "#52c41a";
+const VIOLETA = PANEL.violeta;
+const VERDE = PANEL.ok;
 const MEDIO = { credito: "Crédito", debito: "Débito", transferencia: "Transferencia" };
-const COLOR_COMPRA = { pagada: "green", rechazada: "red", pendiente: "gold", cancelada: "default" };
 
 // Barra con "vendidas de capacidad" (o "ingresaron de entradas") y el número al lado
-function Medidor({ valor, total, color, detalle }) {
+function Medidor({ valor, total, color, detalle, nombre }) {
   const pct = total > 0 ? (valor / total) * 100 : 0;
   return (
     <div>
@@ -24,7 +26,7 @@ function Medidor({ valor, total, color, detalle }) {
         </Typography.Text>
         <Typography.Text type="secondary" style={{ fontVariantNumeric: "tabular-nums" }}>{detalle ?? `${Math.round(pct)} %`}</Typography.Text>
       </div>
-      <Progress percent={pct} showInfo={false} strokeColor={color} size="small" />
+      <Progress aria-label={nombre} percent={pct} showInfo={false} strokeColor={color} size="small" />
     </div>
   );
 }
@@ -35,9 +37,19 @@ function VentasEvento() {
   const navigate = useNavigate();
   const ventas = useCarga(() => obtenerVentasEvento(id), id, "No se pudieron cargar las ventas");
 
-  if (ventas.cargando) return <Cargando texto="Cargando ventas..." />;
+  if (ventas.cargando) return <Cargando texto="Cargando ventas…" />;
   if (ventas.error) {
-    return <Result status="404" title="Evento no encontrado" subTitle={ventas.error} extra={<Button type="primary" onClick={() => navigate("/panel/eventos")}>Volver a eventos</Button>} />;
+    return (
+      <Result
+        status="404"
+        title="Evento no encontrado"
+        subTitle={ventas.error}
+        extra={[
+          <Button key="reintentar" onClick={ventas.recargar}>Reintentar</Button>,
+          <Button key="volver" type="primary" onClick={() => navigate("/panel/eventos")}>Volver a eventos</Button>
+        ]}
+      />
+    );
   }
 
   const v = ventas.datos;
@@ -45,26 +57,22 @@ function VentasEvento() {
 
   return (
     <div className="pila">
-      <div>
-        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate("/panel/eventos")} style={{ paddingInline: 0 }}>
-          Eventos
-        </Button>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 12, flexWrap: "wrap", marginTop: 8 }}>
-          <Space align="center" wrap>
-            <Typography.Title level={2} style={{ margin: 0 }}>Ventas · {v.evento.nombre}</Typography.Title>
-            <Tag color={COLOR_ESTADO[v.evento.estado]}>{v.evento.estado}</Tag>
-          </Space>
+      <Encabezado
+        volver={{ a: "/panel/eventos", texto: "Eventos" }}
+        titulo={`Ventas · ${v.evento.nombre}`}
+        estado={v.evento.estado}
+        acciones={
           <Space wrap>
             <Button icon={<EditOutlined />} onClick={() => navigate(`/panel/eventos/${id}`)}>Armado del evento</Button>
             <Button icon={<ScanOutlined />} onClick={() => navigate(`/panel/acceso?evento=${id}`)}>Control de acceso</Button>
           </Space>
-        </div>
-      </div>
+        }
+      />
 
       <Row gutter={[16, 16]}>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Entradas vendidas" value={v.entradas} groupSeparator="." />
+            <Indicador title="Entradas vendidas" value={v.entradas} groupSeparator="." />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>
               En {v.compras} {v.compras === 1 ? "compra" : "compras"}
               {v.rechazadas > 0 && ` · ${v.rechazadas} rechazadas`}
@@ -73,20 +81,20 @@ function VentasEvento() {
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Para la productora" value={v.subtotal} precision={0} groupSeparator="." prefix="$" styles={{ content: { color: VIOLETA, fontWeight: 700 } }} />
+            <Indicador title="Para la productora" value={v.subtotal} formatter={pesos} styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal de las entradas</Typography.Text>
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Service charge" value={v.service_charge} precision={0} groupSeparator="." prefix="$" />
+            <Indicador title="Cargo por servicio" value={v.service_charge} formatter={pesos} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Para Backstage</Typography.Text>
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Cobrado al público" value={v.total} precision={0} groupSeparator="." prefix="$" />
-            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal + service charge</Typography.Text>
+            <Indicador title="Cobrado al público" value={v.total} formatter={pesos} />
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal + cargo por servicio</Typography.Text>
           </Card>
         </Col>
       </Row>
@@ -107,7 +115,7 @@ function VentasEvento() {
                         .map((o) => (
                           <div key={o.id_espacio}>
                             <Typography.Text type="secondary" style={{ fontSize: 12 }}>{o.espacio}</Typography.Text>
-                            <Medidor valor={o.vendidas} total={o.capacidad} color={VIOLETA} detalle={o.disponibles === 0 ? "Agotado" : `Quedan ${numero(o.disponibles)}`} />
+                            <Medidor nombre={`Ocupación de ${o.espacio}, ${diaCorto(d)}`} valor={o.vendidas} total={o.capacidad} color={VIOLETA} detalle={o.disponibles === 0 ? "Agotado" : `Quedan ${numero(o.disponibles)}`} />
                           </div>
                         ))}
                     </Space>
@@ -130,7 +138,7 @@ function VentasEvento() {
               {v.asistencia.map((a) => (
                 <div key={a.id_jornada}>
                   <Typography.Text strong style={{ textTransform: "capitalize" }}>{diaCorto(a.fecha)}</Typography.Text>
-                  <Medidor valor={a.ingresos} total={a.entradas} color={VERDE} detalle={`${numero(a.entradas - a.ingresos)} por entrar`} />
+                  <Medidor nombre={`Asistencia del ${diaCorto(a.fecha)}`} valor={a.ingresos} total={a.entradas} color={VERDE} detalle={`${numero(a.entradas - a.ingresos)} por entrar`} />
                 </div>
               ))}
             </Space>
@@ -143,7 +151,7 @@ function VentasEvento() {
           rowKey="id_tarifa"
           size="small"
           pagination={false}
-          scroll={{ x: true }}
+          scroll={{ x: "max-content" }}
           dataSource={v.por_tarifa}
           locale={{ emptyText: <Empty description="Sin tarifas" /> }}
           columns={[
@@ -176,6 +184,7 @@ function VentasEvento() {
               rowKey="dia"
               size="small"
               pagination={false}
+              scroll={{ x: "max-content" }}
               dataSource={v.por_dia}
               locale={{ emptyText: <Empty description="Todavía no hay ventas" /> }}
               columns={[
@@ -196,7 +205,7 @@ function VentasEvento() {
               rowKey="id_compra"
               size="small"
               pagination={false}
-              scroll={{ x: true }}
+              scroll={{ x: "max-content" }}
               dataSource={v.ultimas_compras}
               locale={{ emptyText: <Empty description="Todavía no hay compras" /> }}
               columns={[
@@ -204,7 +213,7 @@ function VentasEvento() {
                 { title: "Entradas", dataIndex: "cantidad", align: "right" },
                 { title: "Medio", dataIndex: "medio_pago", render: (m) => MEDIO[m] ?? m },
                 { title: "Importe", dataIndex: "subtotal", align: "right", render: (p) => <span style={{ whiteSpace: "nowrap" }}>{pesos(p)}</span> },
-                { title: "Estado", dataIndex: "estado", render: (e) => <Tag color={COLOR_COMPRA[e]}>{e}</Tag> }
+                { title: "Estado", dataIndex: "estado", render: (e) => <TagEstado tipo="compra" estado={e} /> }
               ]}
             />
           </Card>

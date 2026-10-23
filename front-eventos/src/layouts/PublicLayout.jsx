@@ -1,58 +1,76 @@
+import { Suspense } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/auth.js";
-import MenuUsuario from "../components/MenuUsuario.jsx";
+import MenuCliente from "../components/MenuCliente.jsx";
+import Cargando from "../components/Cargando.jsx";
+import Marca from "../components/Marca.jsx";
 
-// Sitio público (cartelera, evento, compra, mis entradas): Tailwind con estética de afiche.
-// Los links llevan su color explícito: antd pinta todos los <a> de azul.
+// Sitio público (cartelera, evento, ingreso, compra, mis entradas): Tailwind con estética de afiche.
 const linkClase = ({ isActive }) =>
-  `px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors ${
+  `px-2.5 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors sm:px-3 ${
     isActive ? "bg-papel text-tinta" : "text-gris hover:text-papel"
   }`;
+
+// El resaltado de la sección actual tiene nombre de transición: al cambiar de pantalla se desliza
+// de un link al otro (Cartelera → Mis entradas, Cartelera → Ingresar…)
+const activo = ({ isActive }) => (isActive ? { viewTransitionName: "nav-activo" } : undefined);
 
 function PublicLayout() {
   const { usuario } = useAuth();
 
   return (
-    <div className="flex min-h-screen flex-col bg-tinta font-sans text-papel antialiased">
-      <header className="sticky top-0 z-10 border-b-2 border-papel bg-tinta/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-4">
-          <Link to="/" className="flex shrink-0 items-center gap-2 text-papel">
-            <span className="grid size-8 place-items-center bg-amarillo font-afiche text-lg text-tinta">B</span>
-            <span className="font-afiche text-2xl uppercase tracking-wide">Backstage</span>
+    <div className="sitio flex min-h-dvh flex-col bg-tinta font-sans text-papel antialiased">
+      <header className="sticky top-0 z-10 border-b-2 border-papel bg-tinta">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:gap-4">
+          <Link viewTransition to="/" className="flex shrink-0 items-center gap-2.5 text-papel" aria-label="Backstage, ir a la cartelera">
+            <Marca alto={30} />
+            {/* En pantallas muy angostas queda solo el logo, para que entren Cartelera y Mis entradas */}
+            <span aria-hidden="true" className="hidden font-afiche text-2xl uppercase tracking-wide min-[440px]:inline">Backstage</span>
           </Link>
-          <nav className="flex min-w-0 flex-1 gap-1">
-            <NavLink to="/" end className={(e) => `hidden sm:block ${linkClase(e)}`}>
+          <nav aria-label="Principal" className="flex min-w-0 flex-1 gap-1">
+            <NavLink viewTransition to="/" end className={linkClase} style={activo}>
               Cartelera
             </NavLink>
             {usuario?.rol === "cliente" && (
-              <NavLink to="/mis-entradas" className={(e) => `hidden sm:block ${linkClase(e)}`}>
+              <NavLink viewTransition to="/mis-entradas" className={linkClase} style={activo}>
                 Mis entradas
               </NavLink>
             )}
           </nav>
           {usuario ? (
-            <MenuUsuario />
+            <MenuCliente />
           ) : (
             <div className="flex shrink-0 items-center gap-2">
-              <Link to="/registro" className="hidden px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-gris hover:text-papel sm:block">
+              <NavLink
+                viewTransition
+                to="/registro"
+                style={activo}
+                className={({ isActive }) => `hidden px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors sm:block ${isActive ? "bg-papel text-tinta" : "text-gris hover:text-papel"}`}
+              >
                 Crear cuenta
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
+                viewTransition
                 to="/login"
-                className="border-2 border-papel px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-papel hover:bg-papel hover:text-tinta"
+                style={activo}
+                className={({ isActive }) => `border-2 border-papel px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors ${isActive ? "bg-papel text-tinta" : "text-papel hover:bg-papel hover:text-tinta"}`}
               >
                 Ingresar
-              </Link>
+              </NavLink>
             </div>
           )}
         </div>
+        {/* Barra de progreso del scroll (index.css, solo donde el navegador anima con el scroll) */}
+        <div className="progreso-scroll" aria-hidden="true" />
       </header>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16">
-        <Outlet />
+        <Suspense fallback={<Cargando />}>
+          <Outlet />
+        </Suspense>
       </main>
 
-      <footer className="border-t-2 border-dashed border-borde">
+      <footer className="border-t-2 border-dashed border-linea">
         <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-gris">
           Backstage · entradas para recitales y festivales. El pago es simulado: todo es ficticio.
         </div>

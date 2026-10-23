@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, App, Button, Card, Empty, Input, Segmented, Space, Switch, Table, Tag, Tooltip, Typography } from "antd";
+import { App, Button, Card, Empty, Input, Segmented, Space, Switch, Table, Tag, Tooltip, Typography } from "antd";
 import { CrownOutlined, EditOutlined, PlusOutlined, SearchOutlined, ShopOutlined, UserOutlined } from "@ant-design/icons";
 import { actualizarUsuario, obtenerUsuarios } from "../../services/adminService.js";
 import { obtenerEmpresas } from "../../services/empresasService.js";
@@ -10,6 +10,7 @@ import { fechaHora } from "../../utils/formato.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 import UsuarioModal from "./UsuarioModal.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 const ROL = {
   superadmin: { texto: "Superadmin", color: "purple", icono: <CrownOutlined /> },
@@ -35,8 +36,8 @@ function Usuarios() {
   const usuarios = useCarga(() => obtenerUsuarios({ rol: rol || undefined }), rol, "No se pudieron cargar los usuarios");
   const empresas = useCarga(obtenerEmpresas, "empresas", "No se pudieron cargar las productoras");
 
-  if (usuarios.cargando) return <Cargando texto="Cargando usuarios..." />;
-  if (usuarios.error) return <Alert type="error" showIcon title={usuarios.error} />;
+  if (usuarios.cargando) return <Cargando texto="Cargando usuarios…" />;
+  if (usuarios.error) return <ErrorPanel mensaje={usuarios.error} onReintentar={usuarios.recargar} />;
 
   const reemplazar = (u) =>
     usuarios.setDatos((lista) => {
@@ -116,6 +117,7 @@ function Usuarios() {
       render: (activo, u) => (
         <Tooltip title={u.id_usuario === yo.id_usuario ? "No podés darte de baja a vos mismo" : undefined}>
           <Switch
+            aria-label={`Cuenta activa de ${u.nombre} ${u.apellido ?? ""}`.trim()}
             checked={activo}
             loading={cambiando === u.id_usuario}
             disabled={u.id_usuario === yo.id_usuario}
@@ -155,7 +157,9 @@ function Usuarios() {
 
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-          <Segmented options={FILTROS} value={rol} onChange={setRol} />
+          <div className="desliza">
+            <Segmented options={FILTROS} value={rol} onChange={setRol} />
+          </div>
           <Input
             allowClear
             prefix={<SearchOutlined />}

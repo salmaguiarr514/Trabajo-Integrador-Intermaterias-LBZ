@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { Alert, Button, Card, Col, Empty, Input, Row, Select, Space, Tag, Typography } from "antd";
+import { Button, Card, Col, Empty, Input, Row, Select, Space, Tag, Typography } from "antd";
 import { CheckCircleFilled, CloseCircleFilled, ScanOutlined } from "@ant-design/icons";
 import { obtenerEvento, obtenerEventos, obtenerVentasEvento, validarEntrada } from "../../services/panelService.js";
 import { mensajeDeError } from "../../services/api.js";
@@ -9,9 +9,11 @@ import { useCarga } from "../../hooks/useCarga.js";
 import { diaCorto, numero } from "../../utils/formato.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import { PANEL } from "../../tema.js";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
-const VERDE = "#52c41a";
-const ROJO = "#ff4d4f";
+const VERDE = PANEL.ok;
+const ROJO = PANEL.error;
 
 // La jornada que conviene controlar: la de hoy, o la próxima, o la última
 const jornadaSugerida = (jornadas) => {
@@ -39,7 +41,7 @@ function Veredicto({ resultado }) {
       style={{ textAlign: "center", padding: "28px 16px", borderRadius: 12, background: `${color}22`, border: `2px solid ${color}` }}
     >
       {ok ? <CheckCircleFilled style={{ fontSize: 64, color }} /> : <CloseCircleFilled style={{ fontSize: 64, color }} />}
-      <Typography.Title level={1} style={{ color, margin: "8px 0 4px", letterSpacing: 2 }}>{ok ? "ADELANTE" : "NO PASA"}</Typography.Title>
+      <Typography.Title level={2} style={{ color, margin: "8px 0 4px", letterSpacing: 2, fontSize: 38 }}>{ok ? "ADELANTE" : "NO PASA"}</Typography.Title>
       {ok ? (
         <Space orientation="vertical" size={2}>
           <Typography.Text style={{ fontSize: 20 }} strong>{resultado.espacio}</Typography.Text>
@@ -88,7 +90,7 @@ function ControlAcceso() {
   }, [idEvento, jornada?.id_jornada]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (eventos.cargando) return <Cargando />;
-  if (eventos.error) return <Alert type="error" showIcon title={eventos.error} />;
+  if (eventos.error) return <ErrorPanel mensaje={eventos.error} onReintentar={eventos.recargar} />;
 
   // Solo tiene sentido controlar eventos que se venden
   const opcionesEventos = eventos.datos
@@ -129,8 +131,9 @@ function ControlAcceso() {
       <Card>
         <Row gutter={[16, 16]}>
           <Col xs={24} md={14}>
-            <Typography.Text type="secondary">Evento</Typography.Text>
+            <label htmlFor="acceso-evento" style={{ color: "rgba(255, 255, 255, 0.65)" }}>Evento</label>
             <Select
+              id="acceso-evento"
               style={{ width: "100%", marginTop: 4 }}
               placeholder="Elegí el evento"
               value={idEvento ?? undefined}
@@ -140,8 +143,9 @@ function ControlAcceso() {
             />
           </Col>
           <Col xs={24} md={10}>
-            <Typography.Text type="secondary">Día que se controla</Typography.Text>
+            <label htmlFor="acceso-dia" style={{ color: "rgba(255, 255, 255, 0.65)" }}>Día que se controla</label>
             <Select
+              id="acceso-dia"
               style={{ width: "100%", marginTop: 4 }}
               placeholder="Elegí el día"
               disabled={!jornada}

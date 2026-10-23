@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Dropdown, Space, Typography } from "antd";
 import { AppstoreOutlined, LogoutOutlined, TagsOutlined, UserOutlined } from "@ant-design/icons";
 import { inicioDeRol, useAuth } from "../context/auth.js";
+import { PANEL } from "../tema.js";
 
 const NOMBRE_ROL = { superadmin: "Equipo Backstage", empresa: "Productora", cliente: "Cliente" };
 
@@ -24,8 +25,8 @@ function MenuUsuario() {
     },
     { type: "divider" },
     usuario.rol === "cliente"
-      ? { key: "entradas", icon: <TagsOutlined />, label: "Mis entradas", onClick: () => navigate("/mis-entradas") }
-      : { key: "panel", icon: <AppstoreOutlined />, label: "Mi panel", onClick: () => navigate(inicioDeRol(usuario.rol)) },
+      ? { key: "entradas", icon: <TagsOutlined />, label: "Mis entradas", onClick: () => navigate("/mis-entradas", { viewTransition: true }) }
+      : { key: "panel", icon: <AppstoreOutlined />, label: "Mi panel", onClick: () => navigate(inicioDeRol(usuario.rol), { viewTransition: true }) },
     {
       key: "salir",
       icon: <LogoutOutlined />,
@@ -44,9 +45,9 @@ function MenuUsuario() {
 
   return (
     <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
-      <Button type="text" style={{ height: "auto", paddingBlock: 4 }}>
+      <Button type="text" style={{ height: "auto", paddingBlock: 4 }} aria-label={`Cuenta de ${usuario.nombre}`}>
         <Space>
-          <Avatar style={{ background: "#a855f7" }} icon={<UserOutlined />} />
+          <Avatar style={{ background: PANEL.violeta }} icon={<UserOutlined />} />
           <span className="ocultar-mobile">{usuario.nombre}</span>
         </Space>
       </Button>

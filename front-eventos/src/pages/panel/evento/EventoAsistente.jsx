@@ -1,9 +1,9 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Alert, Button, Card, Result, Space, Steps, Tag, Typography } from "antd";
+import { Alert, Button, Card, Grid, Result, Steps } from "antd";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { obtenerEvento } from "../../../services/panelService.js";
 import { useCarga } from "../../../hooks/useCarga.js";
-import { COLOR_ESTADO } from "../../../utils/estados.js";
+import Encabezado from "../../../components/Encabezado.jsx";
 import Cargando from "../../../components/Cargando.jsx";
 import PasoDatos from "./PasoDatos.jsx";
 import PasoJornadas from "./PasoJornadas.jsx";
@@ -25,29 +25,21 @@ const PASOS = [
   { titulo: "Revisar y publicar", componente: PasoRevisar, hecho: (e) => e.estado !== "borrador" }
 ];
 
-function Encabezado({ titulo, estado }) {
-  const navigate = useNavigate();
-  return (
-    <div>
-      <div>
-        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(LISTADO)} style={{ paddingInline: 0 }}>
-          Eventos
-        </Button>
-      </div>
-      <Space align="center" wrap style={{ marginTop: 8 }}>
-        <Typography.Title level={2} style={{ margin: 0 }}>{titulo}</Typography.Title>
-        {estado && <Tag color={COLOR_ESTADO[estado]}>{estado}</Tag>}
-      </Space>
-    </div>
-  );
+const VOLVER = { a: LISTADO, texto: "Eventos" };
+
+// Los 6 pasos entran en una fila solo en pantallas anchas; si no, van uno debajo del otro
+// (en una fila angosta los títulos se partían por la mitad)
+function Pasos(props) {
+  const anchas = Grid.useBreakpoint().xl;
+  return <Steps {...props} orientation={anchas ? "horizontal" : "vertical"} size={anchas ? "default" : "small"} />;
 }
 
 // Evento nuevo: solo el paso de datos. Al guardarlo, se pasa al asistente completo.
 function NuevoEvento() {
   return (
     <div className="pila">
-      <Encabezado titulo="Nuevo evento" />
-      <Steps current={0} items={PASOS.map((p, i) => ({ title: p.titulo, disabled: i > 0 }))} responsive />
+      <Encabezado volver={VOLVER} titulo="Nuevo evento" />
+      <Pasos current={0} items={PASOS.map((p, i) => ({ title: p.titulo, disabled: i > 0 }))} />
       <Card>
         <PasoDatos evento={null} />
       </Card>
@@ -62,14 +54,17 @@ function EventoExistente({ id }) {
   const paso = Math.min(Math.max(Number(params.get("paso")) || 0, 0), PASOS.length - 1);
   const irA = (n) => setParams({ paso: String(n) }, { replace: true });
 
-  if (evento.cargando) return <Cargando texto="Cargando evento..." />;
+  if (evento.cargando) return <Cargando texto="Cargando evento…" />;
   if (evento.error) {
     return (
       <Result
         status="404"
         title="Evento no encontrado"
         subTitle={evento.error}
-        extra={<Button type="primary" onClick={() => navigate(LISTADO)}>Volver a eventos</Button>}
+        extra={[
+          <Button key="reintentar" onClick={evento.recargar}>Reintentar</Button>,
+          <Button key="volver" type="primary" onClick={() => navigate(LISTADO)}>Volver a eventos</Button>
+        ]}
       />
     );
   }
@@ -80,12 +75,11 @@ function EventoExistente({ id }) {
 
   return (
     <div className="pila">
-      <Encabezado titulo={e.nombre} estado={e.estado} />
+      <Encabezado volver={VOLVER} titulo={e.nombre} estado={e.estado} />
       {cerrado && <Alert type="warning" showIcon title={`El evento está ${e.estado}: se puede ver, pero ya no se modifica`} />}
-      <Steps
+      <Pasos
         current={paso}
         onChange={irA}
-        responsive
         items={PASOS.map((p, i) => ({ title: p.titulo, status: i === paso ? "process" : p.hecho(e) ? "finish" : "wait" }))}
       />
       <Card>

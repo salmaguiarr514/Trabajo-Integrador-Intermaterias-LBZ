@@ -1,6 +1,7 @@
 // Formatos en español de Argentina
 
-export const pesos = (n) => `$ ${Math.round(n ?? 0).toLocaleString("es-AR")}`;
+// Espacio que no se corta (\u00a0): el signo nunca queda en una línea y el número en otra
+export const pesos = (n) => `$\u00a0${Math.round(n ?? 0).toLocaleString("es-AR")}`;
 
 export const numero = (n) => (n ?? 0).toLocaleString("es-AR");
 
@@ -10,7 +11,8 @@ const deFecha = (iso) => new Date(`${iso.slice(0, 10)}T12:00:00`);
 
 export const fecha = (iso) => (iso ? deFecha(iso).toLocaleDateString("es-AR") : "—");
 
-export const mesAnio = (iso) => deFecha(iso).toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+// "Agosto de 2026" (solo la primera letra en mayúscula)
+export const mesAnio = (iso) => deFecha(iso).toLocaleDateString("es-AR", { month: "long", year: "numeric" }).replace(/^./, (l) => l.toUpperCase());
 
 export const rangoFechas = (inicio, fin) => (inicio === fin ? fecha(inicio) : `${fecha(inicio)} al ${fecha(fin)}`);
 

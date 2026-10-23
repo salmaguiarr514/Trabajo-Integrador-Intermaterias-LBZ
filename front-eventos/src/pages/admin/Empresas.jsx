@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert, App, Button, Card, Col, Empty, Input, Popconfirm, Row,
-  Space, Statistic, Table, Tag, Tooltip, Typography
+  Space, Table, Tag, Tooltip, Typography
 } from "antd";
 import {
   CheckCircleOutlined, DeleteOutlined, EditOutlined,
@@ -11,6 +11,7 @@ import {
 import { obtenerEmpresas, eliminarEmpresa } from "../../services/empresasService.js";
 import { mensajeDeError } from "../../services/api.js";
 import Cargando from "../../components/Cargando.jsx";
+import Indicador from "../../components/Indicador.jsx";
 
 function Empresas() {
   const [empresas, setEmpresas] = useState([]);
@@ -52,7 +53,7 @@ function Empresas() {
   };
 
   if (loading) {
-    return <Cargando texto="Cargando productoras..." />;
+    return <Cargando texto="Cargando productoras…" />;
   }
 
   if (error) {
@@ -79,7 +80,7 @@ function Empresas() {
     },
     { title: "CUIT", dataIndex: "cuit", render: (cuit) => <span style={{ whiteSpace: "nowrap" }}>{cuit}</span> },
     {
-      title: "Service charge",
+      title: "Cargo por servicio",
       dataIndex: "cargo_servicio_pct",
       responsive: ["md"],
       sorter: (a, b) => a.cargo_servicio_pct - b.cargo_servicio_pct,
@@ -129,9 +130,9 @@ function Empresas() {
             />
           </Tooltip>
           <Popconfirm
-            title="Eliminar productora"
-            description={`¿Seguro que querés eliminar "${empresa.nombre}"?`}
-            okText="Eliminar"
+            title={`¿Eliminar "${empresa.nombre}"?`}
+            description="Se borra la productora y no se puede deshacer."
+            okText="Eliminar productora"
             cancelText="Cancelar"
             okButtonProps={{ danger: true }}
             onConfirm={() => handleEliminar(empresa.id_empresa)}
@@ -149,7 +150,7 @@ function Empresas() {
     <div className="pila">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
         <div>
-          <Typography.Title level={2} style={{ marginBottom: 4 }}>Productoras</Typography.Title>
+          <Typography.Title level={1} style={{ marginBottom: 4, fontSize: 30 }}>Productoras</Typography.Title>
           <Typography.Text type="secondary">
             Empresas que organizan recitales y festivales en la plataforma.
           </Typography.Text>
@@ -161,14 +162,14 @@ function Empresas() {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={8}>
-          <Card><Statistic title="Total" value={empresas.length} prefix={<TeamOutlined />} /></Card>
+          <Card><Indicador title="Total" value={empresas.length} prefix={<TeamOutlined />} /></Card>
         </Col>
         <Col xs={12} sm={8}>
-          <Card><Statistic title="Activas" value={activas} prefix={<CheckCircleOutlined />} /></Card>
+          <Card><Indicador title="Activas" value={activas} prefix={<CheckCircleOutlined />} /></Card>
         </Col>
         <Col xs={12} sm={8}>
           <Card>
-            <Statistic title="Inactivas" value={empresas.length - activas} prefix={<PauseCircleOutlined />} />
+            <Indicador title="Inactivas" value={empresas.length - activas} prefix={<PauseCircleOutlined />} />
           </Card>
         </Col>
       </Row>

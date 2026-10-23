@@ -1,21 +1,24 @@
-import { Alert, Card, Col, Empty, Progress, Row, Space, Statistic, Table, Tag, Typography } from "antd";
+import { Card, Col, Empty, Progress, Row, Space, Table, Typography } from "antd";
 import {
   DollarOutlined, FireOutlined, ShopOutlined, TagsOutlined, TeamOutlined, UserOutlined
 } from "@ant-design/icons";
 import { obtenerMetricas } from "../../services/adminService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { mesAnio, numero, pesos } from "../../utils/formato.js";
-import { COLOR_ESTADO } from "../../utils/estados.js";
+import TagEstado from "../../components/TagEstado.jsx";
+import { PANEL } from "../../tema.js";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import Indicador from "../../components/Indicador.jsx";
 
 const formatoPesos = { prefix: "$", groupSeparator: ".", decimalSeparator: ",", precision: 0 };
 
 function Dashboard() {
-  const { datos: m, cargando, error } = useCarga(obtenerMetricas, "metricas", "No se pudieron cargar las métricas");
+  const { datos: m, cargando, error, recargar } = useCarga(obtenerMetricas, "metricas", "No se pudieron cargar las métricas");
 
-  if (cargando) return <Cargando texto="Cargando métricas..." />;
-  if (error) return <Alert type="error" showIcon title={error} />;
+  if (cargando) return <Cargando texto="Cargando métricas…" />;
+  if (error) return <ErrorPanel mensaje={error} onReintentar={recargar} />;
 
   const maxProductora = Math.max(1, ...m.recaudacion_por_productora.map((p) => p.service_charge));
 
@@ -26,12 +29,12 @@ function Dashboard() {
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Card>
-            <Statistic
-              title="Recaudación de Backstage (service charge)"
+            <Indicador
+              title="Recaudación de Backstage (cargo por servicio)"
               value={m.service_charge_total}
               {...formatoPesos}
               prefix={<DollarOutlined />}
-              styles={{ content: { color: "#a855f7", fontWeight: 700 } }}
+              styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }}
             />
             <Typography.Text type="secondary">
               Sobre {pesos(m.ventas_total)} vendidos en total (lo demás es de las productoras)
@@ -40,17 +43,17 @@ function Dashboard() {
         </Col>
         <Col xs={12} md={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Entradas vendidas" value={m.entradas_vendidas} groupSeparator="." prefix={<TagsOutlined />} />
+            <Indicador title="Entradas vendidas" value={m.entradas_vendidas} groupSeparator="." prefix={<TagsOutlined />} />
           </Card>
         </Col>
         <Col xs={12} md={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Clientes registrados" value={m.clientes} groupSeparator="." prefix={<UserOutlined />} />
+            <Indicador title="Clientes registrados" value={m.clientes} groupSeparator="." prefix={<UserOutlined />} />
           </Card>
         </Col>
         <Col xs={12} md={6}>
           <Card>
-            <Statistic
+            <Indicador
               title="Productoras activas"
               value={m.productoras_activas}
               suffix={`/ ${m.productoras_total}`}
@@ -65,9 +68,9 @@ function Dashboard() {
             ) : (
               <Space wrap>
                 {m.eventos_por_estado.map((e) => (
-                  <Tag key={e.estado} color={COLOR_ESTADO[e.estado]} style={{ fontSize: 14, padding: "4px 10px" }}>
-                    {e.estado}: <b>{e.cantidad}</b>
-                  </Tag>
+                  <TagEstado key={e.estado} estado={e.estado} style={{ fontSize: 14, padding: "4px 10px" }}>
+                    : <b>{e.cantidad}</b>
+                  </TagEstado>
                 ))}
               </Space>
             )}
@@ -77,7 +80,7 @@ function Dashboard() {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title={<><ShopOutlined /> Service charge por productora</>}>
+          <Card title={<><ShopOutlined /> Cargo por servicio de cada productora</>}>
             {m.recaudacion_por_productora.length === 0 ? (
               <Empty description="Todavía no hay ventas" />
             ) : (
@@ -89,9 +92,10 @@ function Dashboard() {
                       <Typography.Text style={{ fontVariantNumeric: "tabular-nums" }}>{pesos(p.service_charge)}</Typography.Text>
                     </div>
                     <Progress
+                      aria-label={`Cargo por servicio de ${p.productora}, comparado con la que más recaudó`}
                       percent={(p.service_charge / maxProductora) * 100}
                       showInfo={false}
-                      strokeColor="#a855f7"
+                      strokeColor={PANEL.violeta}
                       size="small"
                     />
                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>
@@ -113,10 +117,10 @@ function Dashboard() {
               scroll={{ x: true }}
               locale={{ emptyText: <Empty description="Todavía no hay ventas" /> }}
               columns={[
-                { title: "Mes", dataIndex: "mes", render: (mes) => <span style={{ textTransform: "capitalize" }}>{mesAnio(mes)}</span> },
+                { title: "Mes", dataIndex: "mes", render: (mes) => mesAnio(mes) },
                 { title: "Compras", dataIndex: "compras", align: "right" },
                 { title: "Vendido", dataIndex: "total", align: "right", render: pesos },
-                { title: "Service charge", dataIndex: "service_charge", align: "right", render: (v) => <b>{pesos(v)}</b> }
+                { title: "Cargo por servicio", dataIndex: "service_charge", align: "right", render: (v) => <b>{pesos(v)}</b> }
               ]}
             />
           </Card>

@@ -8,10 +8,15 @@ pg.types.setTypeParser(pg.types.builtins.DATE, (valor) => valor);
 
 // En local se usan las variables DB_*. Si existe DATABASE_URL (ej. deploy en Vercel
 // con una base en la nube como Neon o Supabase), se usa esa con SSL.
+// Abrir una conexión con la base en la nube tarda ~2 s (TLS + pooler): las conexiones quedan abiertas
+// 5 minutos sin uso (por defecto pg las cierra a los 10 s y cada pausa costaba esos 2 s).
 const pool = process.env.DATABASE_URL
   ? new pg.Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: false },
+      max: 5,
+      idleTimeoutMillis: 5 * 60_000,
+      keepAlive: true
     })
   : new pg.Pool({
       host: process.env.DB_HOST,
@@ -20,6 +25,12 @@ const pool = process.env.DATABASE_URL
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME
     });
+
+// Si la base corta una conexión ociosa, se descarta y la próxima consulta abre otra (sin tirar el servidor)
+pool.on("error", (error) => console.error("Conexión con la base cerrada:", error.message));
+
+// Deja una conexión lista al arrancar, así el primer pedido no espera el saludo con la base
+if (!process.env.VERCEL) pool.query("SELECT 1").catch(() => {});
 
 export default pool;
 

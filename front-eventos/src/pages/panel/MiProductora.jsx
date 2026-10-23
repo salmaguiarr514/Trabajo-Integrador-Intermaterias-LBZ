@@ -7,8 +7,9 @@ import { useAuth } from "../../context/auth.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
-// Datos de la propia productora. El CUIT y el % de service charge (RN-05) los maneja el superadmin.
+// Datos de la propia productora. El CUIT y el % de cargo por servicio (RN-05) los maneja el superadmin.
 function MiProductora() {
   const [form] = Form.useForm();
   const { message } = App.useApp();
@@ -18,7 +19,7 @@ function MiProductora() {
   const empresa = useCarga(obtenerMiEmpresa, "mi-empresa", "No se pudieron cargar los datos de la productora");
 
   if (empresa.cargando) return <Cargando />;
-  if (empresa.error) return <Alert type="error" showIcon title={empresa.error} />;
+  if (empresa.error) return <ErrorPanel mensaje={empresa.error} onReintentar={empresa.recargar} />;
 
   const guardar = async (valores) => {
     setGuardando(true);
@@ -52,11 +53,11 @@ function MiProductora() {
           column={{ xs: 1, sm: 2 }}
           items={[
             { label: "CUIT", children: e.cuit },
-            { label: "Service charge", children: `${e.cargo_servicio_pct} % sobre cada venta` }
+            { label: "Cargo por servicio", children: `${e.cargo_servicio_pct} % sobre cada venta` }
           ]}
         />
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-          Para cambiar el CUIT o el service charge, escribile al equipo de Backstage.
+          Para cambiar el CUIT o el cargo por servicio, escribile al equipo de Backstage.
         </Typography.Text>
       </Card>
 

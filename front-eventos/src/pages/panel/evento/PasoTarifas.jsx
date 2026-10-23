@@ -113,7 +113,7 @@ function TarifaModal({ evento, tarifa, onCerrar, onGuardado }) {
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            <Form.Item name="precio" label="Precio" rules={[{ required: true, message: "Poné el precio" }]} extra="Sin el service charge: ese se suma al comprar">
+            <Form.Item name="precio" label="Precio" rules={[{ required: true, message: "Poné el precio" }]} extra="Sin el cargo por servicio: ese se suma al comprar">
               <InputNumber min={0} step={1000} prefix="$" formatter={separarMiles} parser={sacarMiles} style={{ width: "100%" }} />
             </Form.Item>
           </Col>
@@ -202,7 +202,7 @@ function PasoTarifas({ evento, soloLectura, onCambio }) {
       title: "Activa",
       dataIndex: "activa",
       render: (activa, t) => (
-        <Switch size="small" checked={activa} disabled={soloLectura} loading={cambiando === t.id_tarifa} onChange={(v) => cambiarActiva(t, v)} />
+        <Switch size="small" aria-label={`Tarifa ${t.nombre} a la venta`} checked={activa} disabled={soloLectura} loading={cambiando === t.id_tarifa} onChange={(v) => cambiarActiva(t, v)} />
       )
     },
     ...(soloLectura
