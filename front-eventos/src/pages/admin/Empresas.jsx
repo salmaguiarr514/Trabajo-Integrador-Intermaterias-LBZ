@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert, App, Button, Card, Col, Empty, Input, Popconfirm, Row,
-  Space, Statistic, Table, Tag, Tooltip, Typography
+  Space, Table, Tag, Tooltip, Typography
 } from "antd";
 import {
   CheckCircleOutlined, DeleteOutlined, EditOutlined,
@@ -11,6 +11,7 @@ import {
 import { obtenerEmpresas, eliminarEmpresa } from "../../services/empresasService.js";
 import { mensajeDeError } from "../../services/api.js";
 import Cargando from "../../components/Cargando.jsx";
+import Indicador from "../../components/Indicador.jsx";
 
 function Empresas() {
   const [empresas, setEmpresas] = useState([]);
@@ -161,14 +162,14 @@ function Empresas() {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={8}>
-          <Card><Statistic title="Total" value={empresas.length} prefix={<TeamOutlined />} /></Card>
+          <Card><Indicador title="Total" value={empresas.length} prefix={<TeamOutlined />} /></Card>
         </Col>
         <Col xs={12} sm={8}>
-          <Card><Statistic title="Activas" value={activas} prefix={<CheckCircleOutlined />} /></Card>
+          <Card><Indicador title="Activas" value={activas} prefix={<CheckCircleOutlined />} /></Card>
         </Col>
         <Col xs={12} sm={8}>
           <Card>
-            <Statistic title="Inactivas" value={empresas.length - activas} prefix={<PauseCircleOutlined />} />
+            <Indicador title="Inactivas" value={empresas.length - activas} prefix={<PauseCircleOutlined />} />
           </Card>
         </Col>
       </Row>

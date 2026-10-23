@@ -1,4 +1,4 @@
-import { Card, Col, Empty, Progress, Row, Space, Statistic, Table, Typography } from "antd";
+import { Card, Col, Empty, Progress, Row, Space, Table, Typography } from "antd";
 import {
   DollarOutlined, FireOutlined, ShopOutlined, TagsOutlined, TeamOutlined, UserOutlined
 } from "@ant-design/icons";
@@ -10,6 +10,7 @@ import { PANEL } from "../../tema.js";
 import ErrorPanel from "../../components/ErrorPanel.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import Indicador from "../../components/Indicador.jsx";
 
 const formatoPesos = { prefix: "$", groupSeparator: ".", decimalSeparator: ",", precision: 0 };
 
@@ -28,7 +29,7 @@ function Dashboard() {
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Card>
-            <Statistic
+            <Indicador
               title="Recaudación de Backstage (cargo por servicio)"
               value={m.service_charge_total}
               {...formatoPesos}
@@ -42,17 +43,17 @@ function Dashboard() {
         </Col>
         <Col xs={12} md={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Entradas vendidas" value={m.entradas_vendidas} groupSeparator="." prefix={<TagsOutlined />} />
+            <Indicador title="Entradas vendidas" value={m.entradas_vendidas} groupSeparator="." prefix={<TagsOutlined />} />
           </Card>
         </Col>
         <Col xs={12} md={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Clientes registrados" value={m.clientes} groupSeparator="." prefix={<UserOutlined />} />
+            <Indicador title="Clientes registrados" value={m.clientes} groupSeparator="." prefix={<UserOutlined />} />
           </Card>
         </Col>
         <Col xs={12} md={6}>
           <Card>
-            <Statistic
+            <Indicador
               title="Productoras activas"
               value={m.productoras_activas}
               suffix={`/ ${m.productoras_total}`}

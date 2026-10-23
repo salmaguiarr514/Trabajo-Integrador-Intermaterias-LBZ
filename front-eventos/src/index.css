@@ -671,3 +671,64 @@
     }
   }
 }
+
+/* ─── Paneles en movimiento ───
+   Versión sobria de los efectos para las pantallas de trabajo (admin y productora): el contenido entra
+   en cascada, las filas de las tablas se escalonan y las barras de progreso se llenan. Los números de
+   los tableros cuentan con components/Indicador.jsx. Solo sin "menos movimiento". */
+@media (prefers-reduced-motion: no-preference) {
+  .contenido .encabezado,
+  .contenido .ant-card,
+  .contenido .ant-alert,
+  .contenido .ant-steps,
+  .contenido .ant-result {
+    animation: entra-panel 360ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  /* En las grillas de tarjetas, cada columna entra un poco después que la anterior */
+  .contenido .ant-col:nth-child(2) > .ant-card { animation-delay: 50ms; }
+  .contenido .ant-col:nth-child(3) > .ant-card { animation-delay: 100ms; }
+  .contenido .ant-col:nth-child(4) > .ant-card { animation-delay: 150ms; }
+  .contenido .ant-col:nth-child(5) > .ant-card { animation-delay: 200ms; }
+  .contenido .ant-col:nth-child(n + 6) > .ant-card { animation-delay: 250ms; }
+
+  /* Filas de las tablas: entran escalonadas (al cargar, filtrar o cambiar de página) */
+  .contenido .ant-table-tbody > tr.ant-table-row {
+    animation: entra-fila 300ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(2) { animation-delay: 25ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(3) { animation-delay: 50ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(4) { animation-delay: 75ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(5) { animation-delay: 100ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(6) { animation-delay: 125ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(7) { animation-delay: 150ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(8) { animation-delay: 175ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(n + 9) { animation-delay: 200ms; }
+
+  @keyframes entra-panel {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+    }
+  }
+
+  @keyframes entra-fila {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
+  /* Barras de progreso (ocupación, cargo por servicio): se llenan desde cero al aparecer */
+  .contenido .ant-progress-track {
+    transform-origin: 0 50%;
+    transition: scale 800ms cubic-bezier(0.2, 0, 0, 1) 150ms;
+  }
+
+  @starting-style {
+    .contenido .ant-progress-track {
+      scale: 0 1;
+    }
+  }
+}

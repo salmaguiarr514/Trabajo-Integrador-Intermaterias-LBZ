@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Button, Card, Col, Empty, Row, Space, Statistic, Table, Typography } from "antd";
+import { Button, Card, Col, Empty, Row, Space, Table, Typography } from "antd";
 import { CalendarOutlined, DollarOutlined, EditOutlined, PlusOutlined, RocketOutlined, TagsOutlined } from "@ant-design/icons";
 import { useAuth } from "../../context/auth.js";
 import { obtenerResumen } from "../../services/panelService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { numero, pesos, rangoFechas } from "../../utils/formato.js";
 import Encabezado from "../../components/Encabezado.jsx";
+import Indicador from "../../components/Indicador.jsx";
 import TagEstado from "../../components/TagEstado.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import { PANEL } from "../../tema.js";
@@ -42,22 +43,22 @@ function Inicio() {
       <Row gutter={[16, 16]}>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Publicados" value={r.publicados} prefix={<RocketOutlined />} />
+            <Indicador title="Publicados" value={r.publicados} prefix={<RocketOutlined />} />
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="En borrador" value={r.borradores} prefix={<EditOutlined />} />
+            <Indicador title="En borrador" value={r.borradores} prefix={<EditOutlined />} />
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Entradas vendidas" value={r.entradas_vendidas} groupSeparator="." prefix={<TagsOutlined />} />
+            <Indicador title="Entradas vendidas" value={r.entradas_vendidas} groupSeparator="." prefix={<TagsOutlined />} />
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic
+            <Indicador
               title="Recaudado"
               value={r.recaudado}
               precision={0}

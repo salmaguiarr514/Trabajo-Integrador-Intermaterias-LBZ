@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { Alert, Button, Card, Col, Empty, Progress, Result, Row, Space, Statistic, Table, Tag, Typography } from "antd";
+import { Alert, Button, Card, Col, Empty, Progress, Result, Row, Space, Table, Tag, Typography } from "antd";
 import { EditOutlined, ScanOutlined } from "@ant-design/icons";
 import { obtenerVentasEvento } from "../../services/panelService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaCorto, numero, pesos } from "../../utils/formato.js";
 import Encabezado from "../../components/Encabezado.jsx";
+import Indicador from "../../components/Indicador.jsx";
 import TagEstado from "../../components/TagEstado.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import { PANEL } from "../../tema.js";
@@ -71,7 +72,7 @@ function VentasEvento() {
       <Row gutter={[16, 16]}>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Entradas vendidas" value={v.entradas} groupSeparator="." />
+            <Indicador title="Entradas vendidas" value={v.entradas} groupSeparator="." />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>
               En {v.compras} {v.compras === 1 ? "compra" : "compras"}
               {v.rechazadas > 0 && ` · ${v.rechazadas} rechazadas`}
@@ -80,19 +81,19 @@ function VentasEvento() {
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Para la productora" value={v.subtotal} formatter={pesos} styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }} />
+            <Indicador title="Para la productora" value={v.subtotal} formatter={pesos} styles={{ content: { color: PANEL.violetaTexto, fontWeight: 700 } }} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal de las entradas</Typography.Text>
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Cargo por servicio" value={v.service_charge} formatter={pesos} />
+            <Indicador title="Cargo por servicio" value={v.service_charge} formatter={pesos} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Para Backstage</Typography.Text>
           </Card>
         </Col>
         <Col xs={12} lg={6}>
           <Card style={{ height: "100%" }}>
-            <Statistic title="Cobrado al público" value={v.total} formatter={pesos} />
+            <Indicador title="Cobrado al público" value={v.total} formatter={pesos} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>Subtotal + cargo por servicio</Typography.Text>
           </Card>
         </Col>
