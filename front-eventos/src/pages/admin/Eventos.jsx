@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  App, Button, Card, Empty, Input, Popconfirm, Select, Space, Table, Tag, Tooltip, Typography
+  App, Button, Card, Empty, Input, Popconfirm, Select, Space, Table, Tooltip, Typography
 } from "antd";
 import { EnvironmentOutlined, EyeInvisibleOutlined, SearchOutlined, StopOutlined } from "@ant-design/icons";
 import { cambiarEstadoEvento, obtenerEventos } from "../../services/adminService.js";
@@ -8,7 +8,8 @@ import { obtenerEmpresas } from "../../services/empresasService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { numero, pesos, rangoFechas } from "../../utils/formato.js";
-import { COLOR_ESTADO, ESTADOS_EVENTO } from "../../utils/estados.js";
+import { OPCIONES_ESTADO_EVENTO } from "../../utils/estados.js";
+import TagEstado from "../../components/TagEstado.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 import ErrorPanel from "../../components/ErrorPanel.jsx";
@@ -80,7 +81,7 @@ function Eventos() {
     {
       title: "Estado",
       dataIndex: "estado",
-      render: (estado) => <Tag color={COLOR_ESTADO[estado]}>{estado}</Tag>
+      render: (estado) => <TagEstado estado={estado} />
     },
     {
       title: "Entradas",
@@ -151,7 +152,7 @@ function Eventos() {
             placeholder="Todos los estados"
             value={filtros.estado}
             onChange={(estado) => setFiltros({ ...filtros, estado })}
-            options={ESTADOS_EVENTO.map((e) => ({ value: e, label: e }))}
+            options={OPCIONES_ESTADO_EVENTO}
             style={{ minWidth: 170 }}
           />
           <Select

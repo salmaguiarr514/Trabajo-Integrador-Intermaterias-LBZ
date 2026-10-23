@@ -1,11 +1,11 @@
-import { Card, Col, Empty, Progress, Row, Space, Statistic, Table, Tag, Typography } from "antd";
+import { Card, Col, Empty, Progress, Row, Space, Statistic, Table, Typography } from "antd";
 import {
   DollarOutlined, FireOutlined, ShopOutlined, TagsOutlined, TeamOutlined, UserOutlined
 } from "@ant-design/icons";
 import { obtenerMetricas } from "../../services/adminService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { mesAnio, numero, pesos } from "../../utils/formato.js";
-import { COLOR_ESTADO } from "../../utils/estados.js";
+import TagEstado from "../../components/TagEstado.jsx";
 import { PANEL } from "../../tema.js";
 import ErrorPanel from "../../components/ErrorPanel.jsx";
 import Cargando from "../../components/Cargando.jsx";
@@ -67,9 +67,9 @@ function Dashboard() {
             ) : (
               <Space wrap>
                 {m.eventos_por_estado.map((e) => (
-                  <Tag key={e.estado} color={COLOR_ESTADO[e.estado]} style={{ fontSize: 14, padding: "4px 10px" }}>
-                    {e.estado}: <b>{e.cantidad}</b>
-                  </Tag>
+                  <TagEstado key={e.estado} estado={e.estado} style={{ fontSize: 14, padding: "4px 10px" }}>
+                    : <b>{e.cantidad}</b>
+                  </TagEstado>
                 ))}
               </Space>
             )}
@@ -115,7 +115,7 @@ function Dashboard() {
               scroll={{ x: true }}
               locale={{ emptyText: <Empty description="Todavía no hay ventas" /> }}
               columns={[
-                { title: "Mes", dataIndex: "mes", render: (mes) => <span style={{ textTransform: "capitalize" }}>{mesAnio(mes)}</span> },
+                { title: "Mes", dataIndex: "mes", render: (mes) => mesAnio(mes) },
                 { title: "Compras", dataIndex: "compras", align: "right" },
                 { title: "Vendido", dataIndex: "total", align: "right", render: pesos },
                 { title: "Service charge", dataIndex: "service_charge", align: "right", render: (v) => <b>{pesos(v)}</b> }

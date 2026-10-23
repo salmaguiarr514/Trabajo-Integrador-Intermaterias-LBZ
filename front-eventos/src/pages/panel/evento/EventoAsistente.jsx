@@ -1,9 +1,9 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Alert, Button, Card, Result, Space, Steps, Tag, Typography } from "antd";
+import { Alert, Button, Card, Result, Steps } from "antd";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { obtenerEvento } from "../../../services/panelService.js";
 import { useCarga } from "../../../hooks/useCarga.js";
-import { COLOR_ESTADO } from "../../../utils/estados.js";
+import Encabezado from "../../../components/Encabezado.jsx";
 import Cargando from "../../../components/Cargando.jsx";
 import PasoDatos from "./PasoDatos.jsx";
 import PasoJornadas from "./PasoJornadas.jsx";
@@ -25,28 +25,13 @@ const PASOS = [
   { titulo: "Revisar y publicar", componente: PasoRevisar, hecho: (e) => e.estado !== "borrador" }
 ];
 
-function Encabezado({ titulo, estado }) {
-  const navigate = useNavigate();
-  return (
-    <div>
-      <div>
-        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(LISTADO)} style={{ paddingInline: 0 }}>
-          Eventos
-        </Button>
-      </div>
-      <Space align="center" wrap style={{ marginTop: 8 }}>
-        <Typography.Title level={2} style={{ margin: 0 }}>{titulo}</Typography.Title>
-        {estado && <Tag color={COLOR_ESTADO[estado]}>{estado}</Tag>}
-      </Space>
-    </div>
-  );
-}
+const VOLVER = { a: LISTADO, texto: "Eventos" };
 
 // Evento nuevo: solo el paso de datos. Al guardarlo, se pasa al asistente completo.
 function NuevoEvento() {
   return (
     <div className="pila">
-      <Encabezado titulo="Nuevo evento" />
+      <Encabezado volver={VOLVER} titulo="Nuevo evento" />
       <Steps current={0} items={PASOS.map((p, i) => ({ title: p.titulo, disabled: i > 0 }))} responsive />
       <Card>
         <PasoDatos evento={null} />
@@ -83,7 +68,7 @@ function EventoExistente({ id }) {
 
   return (
     <div className="pila">
-      <Encabezado titulo={e.nombre} estado={e.estado} />
+      <Encabezado volver={VOLVER} titulo={e.nombre} estado={e.estado} />
       {cerrado && <Alert type="warning" showIcon title={`El evento está ${e.estado}: se puede ver, pero ya no se modifica`} />}
       <Steps
         current={paso}

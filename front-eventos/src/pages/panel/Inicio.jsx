@@ -1,12 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Button, Card, Col, Empty, Row, Space, Statistic, Table, Tag, Typography } from "antd";
+import { Button, Card, Col, Empty, Row, Space, Statistic, Table, Typography } from "antd";
 import { CalendarOutlined, DollarOutlined, EditOutlined, PlusOutlined, RocketOutlined, TagsOutlined } from "@ant-design/icons";
 import { useAuth } from "../../context/auth.js";
 import { obtenerResumen } from "../../services/panelService.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { numero, pesos, rangoFechas } from "../../utils/formato.js";
-import { COLOR_ESTADO } from "../../utils/estados.js";
+import Encabezado from "../../components/Encabezado.jsx";
+import TagEstado from "../../components/TagEstado.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import { PANEL } from "../../tema.js";
 import ErrorPanel from "../../components/ErrorPanel.jsx";
@@ -18,22 +19,21 @@ function Inicio() {
   const resumen = useCarga(obtenerResumen, "resumen", "No se pudo cargar el resumen");
 
   const encabezado = (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
-      <div>
-        <Typography.Title level={2} style={{ marginBottom: 4 }}>Hola, {usuario.nombre}</Typography.Title>
-        <Typography.Text type="secondary">Panel de {usuario.empresa}</Typography.Text>
-      </div>
-      <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/panel/eventos/nuevo")}>
-        Nuevo evento
-      </Button>
-    </div>
+    <Encabezado
+      titulo={`Hola, ${usuario.nombre}`}
+      descripcion={`Panel de ${usuario.empresa}`}
+      acciones={
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/panel/eventos/nuevo")}>
+          Nuevo evento
+        </Button>
+      }
+    />
   );
 
   if (resumen.cargando) return <Cargando texto="Cargando tu panel…" />;
   if (resumen.error) return <div className="pila">{encabezado}<ErrorPanel mensaje={resumen.error} onReintentar={resumen.recargar} /></div>;
 
   const r = resumen.datos;
-  const abrir = (id) => navigate(`/panel/eventos/${id}`);
 
   return (
     <div className="pila">
@@ -78,27 +78,13 @@ function Inicio() {
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/panel/eventos/nuevo")}>Armar uno</Button>
               </Empty>
             ) : (
-              <Space orientation="vertical" size={0} style={{ width: "100%" }}>
-                {r.proximos.map((e, i) => (
-                  <div
-                    key={e.id_evento}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => abrir(e.id_evento)}
-                    onKeyDown={(ev) => ev.key === "Enter" && abrir(e.id_evento)}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: 12,
-                      padding: "12px 0",
-                      borderTop: i ? "1px solid rgba(255,255,255,0.08)" : "none",
-                      cursor: "pointer"
-                    }}
-                  >
+              <div>
+                {r.proximos.map((e) => (
+                  <Link key={e.id_evento} to={`/panel/eventos/${e.id_evento}`} className="fila-enlace">
                     <Space orientation="vertical" size={2} style={{ minWidth: 0 }}>
                       <Space wrap size={8}>
                         <Typography.Text strong>{e.nombre}</Typography.Text>
-                        <Tag color={COLOR_ESTADO[e.estado]}>{e.estado}</Tag>
+                        <TagEstado estado={e.estado} />
                       </Space>
                       <Typography.Text type="secondary">
                         {rangoFechas(e.fecha_inicio, e.fecha_fin)} · {e.lugar}, {e.ciudad}
@@ -109,9 +95,9 @@ function Inicio() {
                       <br />
                       <Typography.Text type="secondary" style={{ fontVariantNumeric: "tabular-nums" }}>{pesos(e.recaudado)}</Typography.Text>
                     </div>
-                  </div>
+                  </Link>
                 ))}
-              </Space>
+              </div>
             )}
           </Card>
         </Col>

@@ -11,7 +11,8 @@ const deFecha = (iso) => new Date(`${iso.slice(0, 10)}T12:00:00`);
 
 export const fecha = (iso) => (iso ? deFecha(iso).toLocaleDateString("es-AR") : "—");
 
-export const mesAnio = (iso) => deFecha(iso).toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+// "Agosto de 2026" (solo la primera letra en mayúscula)
+export const mesAnio = (iso) => deFecha(iso).toLocaleDateString("es-AR", { month: "long", year: "numeric" }).replace(/^./, (l) => l.toUpperCase());
 
 export const rangoFechas = (inicio, fin) => (inicio === fin ? fecha(inicio) : `${fecha(inicio)} al ${fecha(fin)}`);
 

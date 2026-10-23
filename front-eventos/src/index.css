@@ -71,6 +71,36 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  /* Encabezado de una pantalla del panel: título a la izquierda, acciones a la derecha */
+  .encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* Fila de una lista que lleva a otra pantalla (un link de verdad, con hover y foco) */
+  .fila-enlace {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 8px;
+    margin-inline: -8px;
+    border-radius: 8px;
+    color: inherit;
+    transition: background-color 150ms ease-out;
+  }
+
+  .fila-enlace:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: inherit;
+  }
+
+  .fila-enlace + .fila-enlace {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
   .barra-interior {
     display: flex;
     align-items: center;
