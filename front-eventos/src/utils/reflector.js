@@ -94,23 +94,31 @@ export function crearReflector() {
     const k = luz * parpadeo(ahora - encendidoEn);
 
     // Haz: cono exterior en capas (bordes suaves) y núcleo más brillante, de la lente al elemento;
-    // charco de luz donde pega. Va al canvas chico.
+    // charco de luz donde pega. El cono sigue un poco más allá del elemento y ahí se apaga de a poco
+    // (sin un borde cortado al final). Va al canvas chico.
+    const largo = dist + ancho * 1.1;
+    const f = dist / largo; // dónde cae el elemento a lo largo del cono (0 = lente, 1 = punta)
+    const F = { x: L.x + dx * largo, y: L.y + dy * largo };
+    const hasta = (w0, w1) => w0 + (w1 - w0) / f; // el ancho del cono, prolongado hasta la punta
     ctxHaz.save();
-    const g = ctxHaz.createLinearGradient(L.x, L.y, E.x, E.y);
+    const g = ctxHaz.createLinearGradient(L.x, L.y, F.x, F.y);
     g.addColorStop(0, "rgba(255,244,214,0.6)");
-    g.addColorStop(0.45, "rgba(255,236,190,0.22)");
-    g.addColorStop(1, "rgba(255,228,170,0.14)");
+    g.addColorStop(0.45 * f, "rgba(255,236,190,0.22)");
+    g.addColorStop(f, "rgba(255,228,170,0.14)");
+    g.addColorStop(f + (1 - f) * 0.45, "rgba(255,228,170,0.05)");
+    g.addColorStop(1, "rgba(255,228,170,0)");
     ctxHaz.fillStyle = g;
     for (const [w0, w1, a] of [[26, ancho + 50, 0.18], [20, ancho + 32, 0.25], [14, ancho + 14, 0.32], [10, ancho * 0.85, 0.38], [7, ancho * 0.6, 0.4]]) {
       ctxHaz.globalAlpha = k * a;
-      poligono(L, E, nx, ny, w0, w1);
+      poligono(L, F, nx, ny, w0, hasta(w0, w1));
     }
-    const g2 = ctxHaz.createLinearGradient(L.x, L.y, E.x, E.y);
+    const g2 = ctxHaz.createLinearGradient(L.x, L.y, F.x, F.y);
     g2.addColorStop(0, "rgba(255,252,240,0.55)");
-    g2.addColorStop(1, "rgba(255,240,205,0.04)");
+    g2.addColorStop(f, "rgba(255,240,205,0.04)");
+    g2.addColorStop(1, "rgba(255,240,205,0)");
     ctxHaz.fillStyle = g2;
     ctxHaz.globalAlpha = k;
-    poligono(L, E, nx, ny, 6, ancho * 0.42);
+    poligono(L, F, nx, ny, 6, hasta(6, ancho * 0.42));
     ctxHaz.translate(E.x, E.y);
     ctxHaz.scale(1, 0.55);
     const charco = ctxHaz.createRadialGradient(0, 0, 0, 0, 0, ancho * 1.15);
