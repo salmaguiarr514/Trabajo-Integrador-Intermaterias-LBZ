@@ -59,7 +59,7 @@ Antes de empezar, en la PC de cada uno:
 | F0 | Preparar el entorno | — | Herramientas de la sección 2 instaladas en cada PC | ⬜ |
 | F1 | Postgres en Docker | F0 | `docker-compose.yml` solo con la base, scripts `01`–`12` cargados | ⬜ |
 | F2 | App local contra la base local | F1 | API y front funcionando en la PC contra el Postgres del contenedor | ⬜ |
-| F3 | Preparar el código para Vercel | F2 | Commits con los cambios de la sección 5 | ⬜ |
+| F3 | Preparar el código para Vercel | F2 | Commits con los cambios de la sección 5 | ✅ 2026-10-26 (probado en local simulando la función; F2 no hizo falta porque el sitio público usa Supabase) |
 | F4 | Desplegar la API en Vercel | F3 | `/api/salud` responde desde internet, contra Supabase | ⬜ |
 | F5 | Desplegar el front en Vercel | F4 | Front público que habla con la API pública | ⬜ |
 | F6 | Verificación en producción | F5 | Lista de humo completa en el sitio público | ⬜ |
@@ -174,14 +174,20 @@ Son cuatro cambios chicos. Cada uno es un commit separado, en este orden. Despu�
 ### F3.1. Entrada serverless de la API
 
 Vercel no ejecuta `app.listen`. `src/index.js` ya está preparado: no escucha cuando existe `process.env.VERCEL` (que Vercel define solo) y exporta `app`.
-Falta un archivo que Vercel reconozca como función. Se crea `api-eventos/api/[...ruta].js`:
+Falta un archivo que Vercel reconozca como función: `api-eventos/api/index.js`, que reexporta la app.
 
 ```js
-// Entrada para Vercel: todas las rutas /api/* llegan a la app de Express de src/index.js
 export { default } from "../src/index.js";
 ```
 
-La carpeta `[...ruta]` es una ruta "catch-all": recibe cualquier path sin que Vercel lo reescriba, así que Express ve la URL original (`/api/salud`, `/api/admin/usuarios`…).
+Y en `api-eventos/vercel.json`, una regla que manda todas las rutas `/api/*` a esa función.
+Con un *rewrite*, la función recibe la URL original, así que Express ve `/api/salud`, `/api/admin/usuarios`…:
+
+```json
+{ "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }] }
+```
+
+> Se eligió esto en lugar de un archivo `api/[...ruta].js` (la idea original) porque las rutas *catch-all* con corchetes son propias de Next.js; con la regla de `vercel.json` no hay dudas.
 
 **Verificación:** con `npx vercel dev` dentro de `api-eventos` (detener antes `npm run dev`, porque ambos usan el puerto 3000), `curl http://localhost:3000/api/salud` debe responder `{"ok":true,...}`.
 Si `/api/salud` responde 404, la URL llega cambiada a la función: revisar la documentación de Vercel para Express antes de seguir. No se pasa a F4 con un 404.
@@ -220,7 +226,8 @@ Solo después de la migración (F8), cuando la base esté en la PC de Argentina,
 }
 ```
 
-Antes de F8, Supabase está en EE. UU. (según `.env.example`, `aws-1-us-west-2`; confirmar la región real en el panel de Supabase). Ahí conviene una región de EE. UU. como `sfo1`, para que la función esté cerca de la base. Cambiar la región no rompe nada, pero sí hay que medir la latencia después.
+Antes de F8, Supabase está en EE. UU. (`aws-1-us-west-2`, Oregón). Por eso `api-eventos/vercel.json` ya trae `"regions": ["pdx1"]` (Portland, Oregón): la función queda al lado de la base.
+En F8 se cambia a `gru1`. Cambiar la región no rompe nada, pero sí hay que medir la latencia después.
 
 **Listo cuando:** los cuatro commits están en `main`, `npm run build` del front pasa, y la lista de humo pasa en local.
 

@@ -10,11 +10,13 @@ pg.types.setTypeParser(pg.types.builtins.DATE, (valor) => valor);
 // con una base en la nube como Neon o Supabase), se usa esa con SSL.
 // Abrir una conexión con la base en la nube tarda ~2 s (TLS + pooler): las conexiones quedan abiertas
 // 5 minutos sin uso (por defecto pg las cierra a los 10 s y cada pausa costaba esos 2 s).
+// DB_POOL_MAX: conexiones por instancia. En Vercel cada instancia abre su propio pool, así que va baja (3)
+// para no agotar el límite de la base (docs/comun/plan-despliegue.md, F3.2).
 const pool = process.env.DATABASE_URL
   ? new pg.Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
-      max: 5,
+      max: Number(process.env.DB_POOL_MAX) || 5,
       idleTimeoutMillis: 5 * 60_000,
       keepAlive: true
     })
@@ -23,7 +25,8 @@ const pool = process.env.DATABASE_URL
       port: process.env.DB_PORT,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
+      database: process.env.DB_NAME,
+      max: Number(process.env.DB_POOL_MAX) || 10
     });
 
 // Si la base corta una conexión ociosa, se descarta y la próxima consulta abre otra (sin tirar el servidor)
