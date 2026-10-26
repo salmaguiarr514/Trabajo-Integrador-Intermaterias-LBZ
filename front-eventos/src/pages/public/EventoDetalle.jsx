@@ -11,6 +11,8 @@ import { botonPrimario, botonSecundario, Hueco, ImporteAnimado } from "../../com
 import { saltito } from "../../utils/movimiento.js";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { conTransicion } from "../../utils/transicion.js";
+import { sinMovimiento } from "../../utils/movimiento.js";
+import VisorPlano from "../../components/plano/VisorPlano.jsx";
 
 const ABONO = "abono";
 const MAX_ENTRADAS = 10; // RN-30
@@ -78,6 +80,24 @@ function Grilla({ evento, jornada }) {
     </ul>
   );
 }
+
+// Estado de cada sector del plano para las entradas de la pestaña elegida (día o abono):
+// disponible "desde $ X", últimas, agotado o sin venta. Lo usa VisorPlano.
+const estadoDeSectores = (espacios, tarifas) =>
+  Object.fromEntries(
+    espacios.map((s) => {
+      const suyas = tarifas.filter((t) => t.id_espacio === s.id_espacio);
+      const aLaVenta = suyas.filter((t) => !motivoNoDisponible(t));
+      if (suyas.length === 0) return [s.id_espacio, { estado: "sin_venta", detalle: "Sin venta este día" }];
+      if (aLaVenta.length === 0) {
+        const motivo = motivoNoDisponible(suyas[0]);
+        return [s.id_espacio, { estado: motivo === "Agotado" ? "agotado" : "sin_venta", detalle: motivo }];
+      }
+      const desde = `Desde ${pesos(Math.min(...aLaVenta.map((t) => t.precio)))}`;
+      const quedan = Math.max(...aLaVenta.map((t) => t.disponibles));
+      return [s.id_espacio, quedan < 100 ? { estado: "pocas", detalle: `Últimas · ${desde.toLowerCase()}` } : { estado: "disponible", detalle: desde }];
+    })
+  );
 
 function Contador({ valor, maximo, onCambio, nombre }) {
   const numero = useRef(null);
@@ -171,6 +191,7 @@ function EventoDetalle() {
   const [pestaña, setPestaña] = useState(null);
   const [carrito, setCarrito] = useState(() => leerCarrito(id)); // { id_tarifa: cantidad }
   const [aviso, setAviso] = useState("");
+  const [sector, setSector] = useState(null); // id_espacio elegido en el plano (filtra las entradas)
   const previa = useLocation().state?.previa; // lo que ya traía la tarjeta de la cartelera
   const [resumenAnimado] = useAutoAnimate({ duration: 240 });
   useTitulo(evento.datos?.nombre ?? previa?.nombre ?? "Evento");
@@ -217,7 +238,15 @@ function EventoDetalle() {
   const e = evento.datos;
   const hayAbono = e.tarifas.some((t) => t.id_jornada === null);
   const actual = pestaña ?? e.jornadas[0]?.id_jornada ?? ABONO;
-  const tarifas = e.tarifas.filter((t) => (actual === ABONO ? t.id_jornada === null : t.id_jornada === actual));
+  const delDia = e.tarifas.filter((t) => (actual === ABONO ? t.id_jornada === null : t.id_jornada === actual));
+  const tarifas = sector ? delDia.filter((t) => t.id_espacio === sector) : delDia;
+  const nombreSector = e.plano?.espacios.find((s) => s.id_espacio === sector)?.nombre;
+
+  // Elegir un sector en el plano: la lista de entradas muestra solo ese sector (y queda a la vista)
+  const elegirSector = (id) => {
+    conTransicion(() => setSector((s) => (s === id ? null : id)));
+    requestAnimationFrame(() => document.getElementById("entradas")?.scrollIntoView({ block: "nearest", behavior: sinMovimiento() ? "auto" : "smooth" }));
+  };
   const pestañas = [
     ...e.jornadas.map((j) => ({ valor: j.id_jornada, texto: etiquetaDia(j.fecha) })),
     ...(hayAbono ? [{ valor: ABONO, texto: e.jornadas.length > 1 ? `Abono ${e.jornadas.length} días` : "Abono" }] : [])
@@ -263,6 +292,23 @@ function EventoDetalle() {
         style={{ "--i": 2 }}
         {...(conPestañas && { id: "panel-jornada", role: "tabpanel", "aria-labelledby": `tab-${actual}` })}
       >
+        {e.plano && (
+          <section className="border-2 border-papel bg-noche lg:col-span-2">
+            <h2 className="border-b-2 border-papel px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em]">Elegí tu sector</h2>
+            <div className="grid gap-3 p-4">
+              <p className="text-sm text-gris">Tocá un sector del mapa para ver sus entradas. Los precios son de {actual === ABONO ? "los abonos" : "este día"}.</p>
+              <VisorPlano
+                plano={e.plano}
+                tema="afiche"
+                sectores={estadoDeSectores(e.plano.espacios, delDia)}
+                elegido={sector}
+                onElegir={elegirSector}
+                titulo={`Plano de ${e.lugar}`}
+              />
+            </div>
+          </section>
+        )}
+
         <section className="border-2 border-papel bg-noche">
           <h2 className="border-b-2 border-papel px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em]">
             {actual === ABONO ? "Cierres incluidos en el abono" : "Grilla del día"}
@@ -273,7 +319,19 @@ function EventoDetalle() {
         <section id="entradas" className="scroll-mt-24 border-2 border-papel bg-noche lg:sticky lg:top-24">
           <h2 className="border-b-2 border-papel px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em]">Entradas</h2>
           <div className="grid gap-3 p-4">
-            {tarifas.length === 0 && <p className="py-4 text-center text-sm text-gris">No hay entradas a la venta para este día.</p>}
+            {sector && (
+              <div className="vt-filtro-sector flex flex-wrap items-center justify-between gap-2 border-2 border-amarillo px-3 py-2 text-sm">
+                <span>
+                  Sector <strong className="font-afiche text-base uppercase tracking-wide">{nombreSector}</strong>
+                </span>
+                <button type="button" onClick={() => conTransicion(() => setSector(null))} className="text-xs font-bold uppercase tracking-widest text-amarillo underline underline-offset-4 hover:text-papel">
+                  Ver todos los sectores
+                </button>
+              </div>
+            )}
+            {tarifas.length === 0 && (
+              <p className="py-4 text-center text-sm text-gris">{sector ? `No hay entradas de ${nombreSector} para ${actual === ABONO ? "el abono" : "este día"}.` : "No hay entradas a la venta para este día."}</p>
+            )}
             {tarifas.map((t) => {
               const motivo = motivoNoDisponible(t);
               const cantidad = carrito[t.id_tarifa] ?? 0;

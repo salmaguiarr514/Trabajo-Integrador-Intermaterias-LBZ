@@ -279,6 +279,10 @@
     view-transition-name: panel-jornada;
   }
 
+  html[data-transicion="local"] .vt-filtro-sector {
+    view-transition-name: filtro-sector;
+  }
+
   html[data-transicion="local"] .vt-medio-activo {
     view-transition-name: medio-activo;
   }
@@ -729,6 +733,306 @@
   @starting-style {
     .contenido .ant-progress-track {
       scale: 0 1;
+    }
+  }
+}
+
+/* ─── Plano del lugar ───
+   components/plano: VisorPlano (panel y sitio) y EditorPlano (panel). Cada tema define sus colores;
+   el color propio de cada sector llega en --c. El estado de un sector nunca es solo un color:
+   lleva su texto en el mapa, un rayado si está agotado y un borde punteado si no tiene venta. */
+.plano {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.plano svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 64vh;
+}
+
+.plano--panel {
+  --p-lienzo: #101019;
+  --p-borde-lienzo: rgb(255 255 255 / 0.12);
+  --p-grilla: rgb(255 255 255 / 0.05);
+  --p-texto: #ffffff;
+  --p-texto-suave: rgb(255 255 255 / 0.7);
+  --p-contorno: #0b0b12;
+  --p-elemento: rgb(255 255 255 / 0.06);
+  --p-elemento-borde: rgb(255 255 255 / 0.32);
+  --p-escenario: #2a1f3d;
+  --p-escenario-borde: #c084fc;
+  --p-escenario-texto: #ffffff;
+  --p-foco: #c084fc;
+  --p-elegido: #fadb14;
+  --p-aviso: #fadb14;
+}
+
+.plano--afiche {
+  --p-lienzo: var(--color-noche);
+  --p-borde-lienzo: var(--color-papel);
+  --p-grilla: rgb(255 246 236 / 0.05);
+  --p-texto: var(--color-papel);
+  --p-texto-suave: var(--color-gris);
+  --p-contorno: var(--color-tinta);
+  --p-elemento: rgb(255 246 236 / 0.05);
+  --p-elemento-borde: var(--color-borde);
+  --p-escenario: var(--color-papel);
+  --p-escenario-borde: var(--color-papel);
+  --p-escenario-texto: var(--color-tinta);
+  --p-foco: var(--color-amarillo);
+  --p-elegido: var(--color-amarillo);
+  --p-aviso: var(--color-amarillo);
+}
+
+.plano-lienzo {
+  fill: var(--p-lienzo);
+  stroke: var(--p-borde-lienzo);
+  stroke-width: 4;
+}
+
+.plano-grilla {
+  stroke: var(--p-grilla);
+  stroke-width: 2;
+}
+
+.plano-rotulo {
+  fill: var(--p-texto);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  paint-order: stroke;
+  stroke: var(--p-contorno);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  user-select: none;
+}
+
+.plano--afiche .plano-rotulo {
+  font-family: var(--font-afiche);
+  font-weight: 400;
+}
+
+.plano-detalle {
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.plano-elemento path {
+  fill: var(--p-elemento);
+  stroke: var(--p-elemento-borde);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+
+.plano-elemento .plano-rotulo {
+  fill: var(--p-texto-suave);
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.plano-escenario path {
+  fill: var(--p-escenario);
+  stroke: var(--p-escenario-borde);
+  stroke-width: 3;
+}
+
+.plano-escenario .plano-rotulo {
+  fill: var(--p-escenario-texto);
+  stroke: none;
+}
+
+.plano-sector .plano-forma {
+  fill: color-mix(in srgb, var(--c) 40%, transparent);
+  stroke: var(--c);
+  stroke-width: 3;
+  transition: fill 150ms ease-out; /* el borde (foco y elegido) cambia al instante */
+}
+
+.plano-sector--pocas .plano-forma {
+  stroke: var(--p-aviso);
+  stroke-dasharray: 14 6;
+}
+
+.plano-sector--agotado .plano-forma {
+  fill: color-mix(in srgb, var(--c) 14%, transparent);
+  stroke-dasharray: 10 6;
+}
+
+.plano-sector--sin_venta {
+  opacity: 0.5;
+}
+
+.plano-sector--sin_venta .plano-forma {
+  fill: color-mix(in srgb, var(--c) 10%, transparent);
+  stroke-dasharray: 4 6;
+}
+
+.plano-rayado {
+  stroke: var(--p-texto);
+  stroke-opacity: 0.28;
+  stroke-width: 3;
+}
+
+.plano-sector.elegible,
+.plano .editable {
+  cursor: pointer;
+  outline: none;
+}
+
+.plano-sector.elegible:focus-visible .plano-forma,
+.plano .editable:focus-visible path {
+  stroke: var(--p-foco);
+  stroke-width: 7;
+}
+
+@media (hover: hover) {
+  .plano-sector.elegible:hover .plano-forma {
+    fill: color-mix(in srgb, var(--c) 62%, transparent);
+  }
+}
+
+.plano-sector.elegido .plano-forma,
+.plano .editable.elegido path {
+  stroke: var(--p-elegido);
+  stroke-width: 7;
+  stroke-dasharray: none;
+}
+
+.plano-sector.elegido .plano-forma {
+  fill: color-mix(in srgb, var(--c) 72%, transparent);
+}
+
+.plano-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 0.8125rem;
+  color: var(--p-texto-suave);
+}
+
+.plano-clave::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  border: 2px solid var(--p-texto);
+  background: color-mix(in srgb, var(--p-texto) 30%, transparent);
+}
+
+.plano-clave--pocas::before {
+  border-color: var(--p-aviso);
+  border-style: dashed;
+}
+
+.plano-clave--agotado::before {
+  border-style: dashed;
+  background: repeating-linear-gradient(45deg, transparent 0 3px, color-mix(in srgb, var(--p-texto) 45%, transparent) 3px 5px);
+}
+
+.plano-clave--sin_venta::before {
+  border-style: dotted;
+  background: none;
+  opacity: 0.6;
+}
+
+/* Editor (panel) */
+.editor-plano {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .editor-plano {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+}
+
+.editor-plano svg {
+  touch-action: none; /* arrastrar formas con el dedo sin mover la página */
+}
+
+.plano .editable.fuera path {
+  stroke: #ff7875;
+  stroke-dasharray: 8 5;
+}
+
+.plano-manija {
+  fill: #ffffff;
+  stroke: #9333ea;
+  stroke-width: 3;
+  cursor: grab;
+}
+
+.plano-manija.esquina-0,
+.plano-manija.esquina-2 {
+  cursor: nwse-resize;
+}
+
+.plano-manija.esquina-1,
+.plano-manija.esquina-3 {
+  cursor: nesw-resize;
+}
+
+.plano-manija.activa {
+  fill: #fadb14;
+}
+
+.editor-plano-medidas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.editor-plano-campo {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: rgb(255 255 255 / 0.7);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Los sectores entran uno tras otro desde su centro; escenarios y elementos aparecen antes */
+  .plano-sector:not(.editable) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: entra-sector 460ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(min(var(--i, 0), 8) * 70ms + 150ms);
+  }
+
+  .plano-escenario:not(.editable),
+  .plano-elemento:not(.editable) {
+    animation: aparece-plano 320ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  @keyframes entra-sector {
+    from {
+      opacity: 0;
+      scale: 0.86;
+    }
+  }
+
+  @keyframes aparece-plano {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* El sector elegido late tres veces (y queda marcado con su borde) */
+  .plano-sector.elegido .plano-forma {
+    animation: late-sector 700ms ease-in-out 3;
+  }
+
+  @keyframes late-sector {
+    50% {
+      stroke-width: 13;
     }
   }
 }

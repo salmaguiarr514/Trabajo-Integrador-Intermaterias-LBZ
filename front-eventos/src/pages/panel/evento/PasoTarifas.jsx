@@ -9,6 +9,7 @@ import { actualizarParteEvento, crearParteEvento, eliminarParteEvento } from "..
 import { mensajeDeError } from "../../../services/api.js";
 import { mostrarErrores } from "../../../utils/erroresForm.js";
 import { diaCorto, numero, pesos } from "../../../utils/formato.js";
+import VisorPlano from "../../../components/plano/VisorPlano.jsx";
 
 const ABONO = "abono"; // en el Select; en la API el abono es id_jornada = null
 const FORMATO = "YYYY-MM-DDTHH:mm";
@@ -17,7 +18,7 @@ const NOMBRES = ["General", "Preventa", "Preventa 1", "Preventa 2", "Venta gener
 const separarMiles = (v) => `${v ?? ""}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 const sacarMiles = (v) => (v ?? "").replace(/\./g, "");
 
-function TarifaModal({ evento, tarifa, onCerrar, onGuardado }) {
+function TarifaModal({ evento, tarifa, espacioInicial, onCerrar, onGuardado }) {
   const [form] = Form.useForm();
   const { message } = App.useApp();
   const [guardando, setGuardando] = useState(false);
@@ -82,7 +83,7 @@ function TarifaModal({ evento, tarifa, onCerrar, onGuardado }) {
                 id_jornada: tarifa.id_jornada ?? ABONO,
                 venta: tarifa.venta_desde || tarifa.venta_hasta ? [tarifa.venta_desde && dayjs(tarifa.venta_desde), tarifa.venta_hasta && dayjs(tarifa.venta_hasta)] : null
               }
-            : { activa: true, id_jornada: evento.jornadas.length === 1 ? evento.jornadas[0].id_jornada : undefined }
+            : { activa: true, id_espacio: espacioInicial, id_jornada: evento.jornadas.length === 1 ? evento.jornadas[0].id_jornada : undefined }
         }
       >
         <Row gutter={16}>
@@ -135,7 +136,7 @@ function TarifaModal({ evento, tarifa, onCerrar, onGuardado }) {
 
 function PasoTarifas({ evento, soloLectura, onCambio }) {
   const { message } = App.useApp();
-  const [modal, setModal] = useState(null); // { tarifa }
+  const [modal, setModal] = useState(null); // { tarifa, espacio }
   const [cambiando, setCambiando] = useState(null);
 
   const eliminar = async (t) => {
@@ -232,8 +233,34 @@ function PasoTarifas({ evento, soloLectura, onCambio }) {
         ])
   ];
 
+  // En el plano, cada sector muestra cuántas tarifas tiene; al tocarlo se carga una nueva para ese sector
+  const puedeCargar = !soloLectura && evento.jornadas.length > 0;
+  const porSector = evento.plano
+    ? Object.fromEntries(
+        evento.espacios.map((e) => {
+          const n = evento.tarifas.filter((t) => t.id_espacio === e.id_espacio).length;
+          return [e.id_espacio, { estado: n > 0 ? "disponible" : "sin_venta", detalle: n === 0 ? "Sin tarifas" : n === 1 ? "1 tarifa" : `${n} tarifas` }];
+        })
+      )
+    : null;
+
   return (
     <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+      {evento.plano && (
+        <div>
+          <Typography.Title level={2} style={{ fontSize: 16, marginTop: 0 }}>Plano de {evento.lugar}</Typography.Title>
+          <Typography.Text type="secondary" style={{ display: "block", marginBottom: 12 }}>
+            {puedeCargar ? "Tocá un sector para cargarle una tarifa." : "Cada sector muestra cuántas tarifas tiene."}
+          </Typography.Text>
+          <VisorPlano
+            plano={evento.plano}
+            sectores={porSector}
+            titulo={`Plano de ${evento.lugar}`}
+            onElegir={puedeCargar ? (id) => setModal({ tarifa: null, espacio: id }) : undefined}
+            leyenda={false}
+          />
+        </div>
+      )}
       <Descriptions
         size="small"
         title="Cupos por sector"
@@ -263,6 +290,7 @@ function PasoTarifas({ evento, soloLectura, onCambio }) {
         <TarifaModal
           evento={evento}
           tarifa={modal.tarifa}
+          espacioInicial={modal.espacio}
           onCerrar={() => setModal(null)}
           onGuardado={() => {
             setModal(null);

@@ -10,7 +10,8 @@ import {
   eliminarEscenario,
   crearEspacio,
   editarEspacio,
-  eliminarEspacio
+  eliminarEspacio,
+  guardarPlano
 } from "../controllers/lugares.controller.js";
 import { validar } from "../middlewares/validar.js";
 import { idHijoParams, idParams } from "../schemas/comunes.js";
@@ -20,7 +21,8 @@ import {
   crearEscenarioSchema,
   editarEscenarioSchema,
   crearEspacioSchema,
-  editarEspacioSchema
+  editarEspacioSchema,
+  planoSchema
 } from "../schemas/lugares.schema.js";
 
 // Mismas rutas para el superadmin (/api/admin/lugares) y la productora (/api/panel/lugares):
@@ -42,5 +44,8 @@ router.delete("/:id/escenarios/:idHijo", idHijo, eliminarEscenario);
 router.post("/:id/espacios", id, validar(crearEspacioSchema), crearEspacio);
 router.put("/:id/espacios/:idHijo", idHijo, validar(editarEspacioSchema), editarEspacio);
 router.delete("/:id/espacios/:idHijo", idHijo, eliminarEspacio);
+
+// El plano completo de un lugar (tamaño del lienzo y formas): reemplaza lo que había
+router.put("/:id/plano", id, validar(planoSchema), guardarPlano);
 
 export default router;

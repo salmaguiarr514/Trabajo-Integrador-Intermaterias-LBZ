@@ -175,7 +175,7 @@ src/
 - `empresas` CRUD (lo que ya existe, se mueve acá).
 - `usuarios` CRUD (crear usuarios de rol empresa con su productora).
 - `lugares` CRUD del catálogo de la plataforma, con anidados `lugares/:id/escenarios` y `lugares/:id/espacios`,
-  y `GET/PUT lugares/:id/plano` (guarda de una vez el lienzo, las formas de espacios y escenarios y los elementos, en una transacción).
+  y `PUT lugares/:id/plano` (guarda de una vez el lienzo, las formas de espacios y escenarios y los elementos, en una transacción; el `GET lugares/:id` ya trae todo lo dibujado).
 - `artistas` GET de todos (solo lectura).
 - `eventos` GET de todos y `PATCH /:id/estado` (despublicar o cancelar).
 - `metricas` GET (productoras activas, eventos por estado, entradas vendidas, **recaudación por service charge** por productora y por mes).
@@ -266,7 +266,7 @@ src/
 | **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | Hecha: inicio (próximos eventos y ventas), lugares propios, artistas, datos de la productora y asistente de eventos completo con publicar |
 | **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Hecha: cartelera, detalle con grilla, registro (con verificación del email), compra con service charge y pago simulado, mis entradas con QR. El checkout elige sectores de una lista: el plano queda para 7b |
 | **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | Hecha: ventas por evento (con ocupación y asistencia), control de acceso en la puerta y métricas del superadmin |
-| **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |
+| **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | Hecha: editor en el detalle del lugar (mover, estirar, polígonos, teclado y medidas exactas), plano en el paso de tarifas (tocar un sector carga su tarifa) y en la compra (el sector se elige en el mapa, pintado según la disponibilidad del día). El seed ya trae tres lugares dibujados (Aeródromo de Punilla, Movistar Arena y Niceto Club) |
 | **8. Deploy en Vercel** | Front y API publicados en Vercel (dos proyectos), todavía **contra Supabase**: `vercel.json` del front, variables de entorno, región `gru1`, CORS | 7 | |
 | **9. Postgres dockerizado** | Compose con Postgres solo (volumen, `restart`, backup diario), scripts `01`–`12` probados en una base vacía, usuario `backstage_app` sin superusuario | 1 | |
 | **10. Exponer la base** | Prueba de CGNAT en la PC servidor; port forwarding + DuckDNS o túnel TCP; SSL obligatorio; la API local conectada a la base por la dirección pública | 9 | |

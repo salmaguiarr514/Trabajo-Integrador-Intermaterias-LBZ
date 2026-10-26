@@ -13,6 +13,9 @@ import TagOrigen from "../../components/TagOrigen.jsx";
 import LugarCampos from "./LugarCampos.jsx";
 import ParteLugarModal from "./ParteLugarModal.jsx";
 import { AMBITOS } from "./ambitos.js";
+import EditorPlano from "../../components/plano/EditorPlano.jsx";
+import VisorPlano from "../../components/plano/VisorPlano.jsx";
+import { planoDeLugar } from "../../components/plano/geometria.js";
 
 function DatosLugar({ ambito, lugar, editable, onGuardado }) {
   const [form] = Form.useForm();
@@ -286,6 +289,18 @@ function LugarDetalle({ ambito: nombreAmbito }) {
               key: "escenarios",
               label: `Escenarios (${l.escenarios.length})`,
               children: <PartesLugar ambito={ambito} tipo="escenarios" lugar={l} editable={editable} onCambio={lugar.recargar} />
+            },
+            {
+              key: "plano",
+              label: "Plano",
+              // Quien puede modificar el lugar lo dibuja; los demás lo ven (si tiene)
+              children: editable ? (
+                <EditorPlano lugar={l} servicio={ambito.servicio} onGuardado={lugar.recargar} />
+              ) : planoDeLugar(l) ? (
+                <VisorPlano plano={planoDeLugar(l)} titulo={`Plano de ${l.nombre}`} />
+              ) : (
+                <Empty description="Este lugar no tiene plano: los sectores se eligen de la lista." />
+              )
             },
             {
               key: "datos",

@@ -64,7 +64,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | POST | `/api/admin/usuarios` | 🔒 superadmin | Crear un superadmin o un usuario de productora | 201 / 400 / 409 |
 | PUT | `/api/admin/usuarios/:id` | 🔒 superadmin | Editar (solo los campos que vienen; `password` solo si viene) | 200 / 400 / 404 / 409 |
 | GET | `/api/admin/lugares?origen=plataforma\|propio` | 🔒 superadmin | Listar lugares (de `v_lugares`, con capacidad total) | 200 / 400 |
-| GET | `/api/admin/lugares/:id` | 🔒 superadmin | Lugar con sus `escenarios` y `espacios` | 200 / 404 |
+| GET | `/api/admin/lugares/:id` | 🔒 superadmin | Lugar con sus `escenarios`, `espacios` y `elementos` del plano (con su `geometria`) | 200 / 404 |
 | POST | `/api/admin/lugares` | 🔒 superadmin | Crear un lugar de la plataforma (con `capacidad` para el sector "General") | 201 / 400 / 409 |
 | PUT | `/api/admin/lugares/:id` | 🔒 superadmin | Editar (solo los de la plataforma) | 200 / 400 / 403 / 404 / 409 |
 | DELETE | `/api/admin/lugares/:id` | 🔒 superadmin | Borrar (solo de la plataforma y sin eventos) | 204 / 403 / 404 / 409 |
@@ -72,6 +72,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | PUT / DELETE | `/api/admin/lugares/:id/escenarios/:idHijo` | 🔒 superadmin | Editar / borrar escenario (no si un evento lo usa) | 200 / 204 / 404 / 409 |
 | POST | `/api/admin/lugares/:id/espacios` | 🔒 superadmin | Agregar sector (`nombre`, `capacidad`, `modalidad`, `color`) | 201 / 400 / 403 / 409 |
 | PUT / DELETE | `/api/admin/lugares/:id/espacios/:idHijo` | 🔒 superadmin | Editar / borrar sector (no el último ni uno con tarifas) | 200 / 204 / 404 / 409 |
+| PUT | `/api/admin/lugares/:id/plano` | 🔒 superadmin | Guardar el plano completo: `{ ancho, alto, espacios, escenarios, elementos }`, en una transacción. Las formas tienen que entrar en el lienzo; `ancho` y `alto` en `null` quitan el plano | 200 / 400 / 403 / 404 |
 | GET | `/api/admin/artistas?id_empresa=` | 🔒 superadmin | Artistas de todas las productoras (solo lectura) | 200 |
 | GET | `/api/admin/eventos?estado=&id_empresa=` | 🔒 superadmin | Eventos de todas las productoras, con entradas vendidas y recaudado | 200 / 400 |
 | PATCH | `/api/admin/eventos/:id/estado` | 🔒 superadmin | `{ estado: "borrador" }` despublica, `{ estado: "cancelado" }` cancela | 200 / 400 / 404 / 409 |
@@ -85,7 +86,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | PUT | `/api/panel/artistas/:id` | 🔒 empresa | Editar (solo los campos que vienen) | 200 / 400 / 404 / 409 |
 | DELETE | `/api/panel/artistas/:id` | 🔒 empresa | Borrar (no si tiene presentaciones: se da de baja) | 204 / 404 / 409 |
 | GET | `/api/panel/eventos` | 🔒 empresa | Eventos de la productora, con jornadas, shows, tarifas y entradas vendidas | 200 |
-| GET | `/api/panel/eventos/:id` | 🔒 empresa | Todo el evento para el asistente: escenarios del lugar (con `habilitado`), sectores, jornadas, line-up y tarifas | 200 / 404 |
+| GET | `/api/panel/eventos/:id` | 🔒 empresa | Todo el evento para el asistente: escenarios del lugar (con `habilitado`), sectores, jornadas, line-up, tarifas y el `plano` del lugar (o `null`) | 200 / 404 |
 | POST | `/api/panel/eventos` | 🔒 empresa | Crear en borrador. Genera una jornada por día y habilita todos los escenarios del lugar | 201 / 400 |
 | PUT | `/api/panel/eventos/:id` | 🔒 empresa | Editar. El lugar solo cambia si no hay line-up ni tarifas (RN-21) | 200 / 400 / 404 / 409 |
 | DELETE | `/api/panel/eventos/:id` | 🔒 empresa | Borrar con todo (no si tiene ventas: se cancela) | 204 / 404 / 409 |
@@ -99,7 +100,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | POST, PUT, DELETE | `/api/panel/eventos/:id/tarifas[/:idHijo]` | 🔒 empresa | `id_espacio`, `id_jornada` (`null` = abono), `nombre`, `precio`, `venta_desde`, `venta_hasta`, `activa`. Sin cupo: es la capacidad del sector | 201 / 200 / 204 / 400 / 404 / 409 |
 | GET | `/api/public/eventos?q=&ciudad=&tipo=` | todos | Cartelera (`v_cartelera`, solo lo que no terminó) | 200 / 400 |
 | GET | `/api/public/ciudades` | todos | Ciudades con eventos en cartelera | 200 |
-| GET | `/api/public/eventos/:id` | todos | Detalle: jornadas, line-up, tarifas activas con `disponibles` y `en_venta`, `cargo_servicio_pct` | 200 / 404 |
+| GET | `/api/public/eventos/:id` | todos | Detalle: jornadas, line-up, tarifas activas con `disponibles` y `en_venta`, `cargo_servicio_pct` y el `plano` del lugar (o `null`) | 200 / 404 |
 | GET | `/api/public/artistas/:id` | todos | Artista y sus próximas presentaciones (solo si toca en un evento de la cartelera) | 200 / 404 |
 | POST | `/api/cliente/compras/cotizar` | 🔒 cliente | `{ id_evento, items: [{ id_tarifa, cantidad }] }` → detalle, subtotal, service charge y total | 200 / 400 / 404 / 409 |
 | POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` y `tarjeta` (`numero`, `nombre`, `vencimiento`, `cvv`). Pago simulado: termina en 0000 → `rechazada` | 201 / 400 / 404 / 409 |
