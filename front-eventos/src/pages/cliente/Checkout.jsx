@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { comprar, cotizar } from "../../services/clienteService.js";
+import { useAuth } from "../../context/auth.js";
 import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
 import { itemsDelCarrito, leerCarrito, vaciarCarrito } from "../../utils/carrito.js";
 import { pesos } from "../../utils/formato.js";
@@ -54,8 +55,16 @@ function Resumen({ cotizacion }) {
   );
 }
 
+// Qué pasó con el mail de las entradas (lo informa la API al comprar)
+const AVISO_CORREO = {
+  enviado: (email) => `Te las mandamos por mail a ${email}, con sus QR.`,
+  sin_configurar: () => "El envío de mails no está configurado en este servidor: las entradas están en Mis entradas.",
+  error: () => "No pudimos mandarte el mail, pero las entradas ya son tuyas: las ves en Mis entradas y desde ahí podés pedirlas por mail."
+};
+
 function Resultado({ compra, idEvento, onReintentar }) {
   const aprobada = compra.estado === "pagada";
+  const { usuario } = useAuth();
   // Pago aprobado: lluvia de entraditas y sello; rechazado: la caja se sacude
   useEffect(() => {
     if (aprobada) lluviaDeEntradas();
@@ -73,6 +82,11 @@ function Resultado({ compra, idEvento, onReintentar }) {
           : "La tarjeta fue rechazada (es una simulación: las terminadas en 0000 se rechazan). No se te cobró nada."}
       </p>
       {aprobada && <p className="text-sm text-gris">Comprobante: <span className="font-mono text-papel">{compra.referencia_pago}</span></p>}
+      {aprobada && compra.correo && (
+        <p className={`entra border-l-4 pl-3 text-sm ${compra.correo === "enviado" ? "border-verde text-papel" : "border-amarillo text-amarillo"}`} style={{ "--i": 3 }}>
+          {AVISO_CORREO[compra.correo]?.(usuario?.email)}
+        </p>
+      )}
       <div className="flex flex-wrap gap-3">
         {aprobada ? (
           <Link viewTransition to="/mis-entradas" className={botonPrimario}>

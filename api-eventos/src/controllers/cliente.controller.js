@@ -4,6 +4,8 @@ import pool from "../data/db.js";
 import { ErrorHttp } from "../utils/ErrorHttp.js";
 import { actualizar } from "../utils/sql.js";
 import { AHORA, HOY, hora } from "../utils/fechas.js";
+import { firmarEntrada } from "../utils/tokens.js";
+import { enviarEntradas } from "../utils/correoEntradas.js";
 
 // Rol cliente: cotizar, comprar (pago simulado), ver sus compras y entradas, editar su perfil.
 // Reglas: docs/comun/dominio.md, RN-22 a RN-30.
@@ -121,6 +123,7 @@ export const comprar = async (req, res) => {
   const { medio_pago, tarjeta } = req.body;
   const aprobada = medio_pago === "transferencia" || !tarjeta.numero.endsWith("0000");
   const cliente = await pool.connect();
+  let respuesta;
   try {
     await cliente.query("BEGIN");
     const detalle = await prepararCompra(cliente, req.body, true);
@@ -161,18 +164,44 @@ export const comprar = async (req, res) => {
       );
     }
     await cliente.query("COMMIT");
-
-    res.status(201).json({
+    respuesta = {
       ...detalle,
       ...compra,
       mensaje: aprobada ? "¡Listo! Tus entradas ya están en Mis entradas" : "El pago fue rechazado. Probá con otra tarjeta"
-    });
+    };
   } catch (error) {
     await cliente.query("ROLLBACK");
     throw error;
   } finally {
     cliente.release();
   }
+
+  // Con el pago aprobado, las entradas van por mail. Si el mail falla, la compra ya está hecha:
+  // se avisa (correo: "error") y se pueden pedir de nuevo desde Mis entradas.
+  if (aprobada) {
+    respuesta.correo = await enviarEntradas(pool, req.usuario.id_usuario, { id_compra: respuesta.id_compra })
+      .then((r) => (r?.enviado ? "enviado" : "sin_configurar"))
+      .catch((error) => {
+        console.error("No se pudo mandar el mail de las entradas:", error.message);
+        return "error";
+      });
+  }
+  res.status(201).json(respuesta);
+};
+
+// "Mandármelas por mail": las entradas válidas de un evento, al mail de la cuenta
+export const enviarEntradasPorMail = async (req, res) => {
+  let resultado;
+  try {
+    resultado = await enviarEntradas(pool, req.usuario.id_usuario, { id_evento: req.body.id_evento });
+  } catch (error) {
+    console.error("No se pudo mandar el mail de las entradas:", error.message);
+    throw new ErrorHttp(503, "No pudimos mandar el mail. Probá de nuevo en un rato");
+  }
+  if (!resultado) {
+    throw new ErrorHttp(404, "No tenés entradas válidas de ese evento");
+  }
+  res.json({ enviado: resultado.enviado, mensaje: resultado.enviado ? "Te mandamos las entradas por mail" : "El envío de mails no está configurado en este servidor" });
 };
 
 const SELECT_COMPRA = `
@@ -182,7 +211,9 @@ const SELECT_COMPRA = `
   FROM compras c JOIN eventos ev ON ev.id_evento = c.id_evento
   WHERE c.id_usuario = $1`;
 
-// Entradas con lo necesario para mostrarlas y el QR (el código)
+// Entradas con lo necesario para mostrarlas. El QR es "qr": un JWT con el código, firmado por la API
+// (utils/tokens.js); el código se muestra debajo para escribirlo a mano si el QR no se puede leer.
+const conQr = (entradas) => entradas.map((e) => ({ ...e, qr: firmarEntrada(e.codigo) }));
 const SELECT_ENTRADA = `
   SELECT en.id_entrada, en.codigo, en.estado, en.precio_pagado, c.id_compra,
          t.nombre AS tarifa, t.id_jornada, j.fecha AS fecha_jornada, es.nombre AS espacio,
@@ -216,13 +247,13 @@ export const obtenerCompra = async (req, res) => {
     req.usuario.id_usuario,
     req.params.id
   ]);
-  res.json({ ...rows[0], entradas });
+  res.json({ ...rows[0], entradas: conQr(entradas) });
 };
 
 // Entradas de compras pagadas
 export const obtenerEntradas = async (req, res) => {
   const { rows } = await pool.query(`${SELECT_ENTRADA} AND c.estado = 'pagada' ${ORDEN_ENTRADAS}`, [req.usuario.id_usuario]);
-  res.json(rows);
+  res.json(conQr(rows));
 };
 
 const buscarPerfil = async (id) =>

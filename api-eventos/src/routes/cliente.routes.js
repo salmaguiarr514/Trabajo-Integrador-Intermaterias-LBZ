@@ -6,12 +6,13 @@ import {
   comprar,
   cotizar,
   editarPerfil,
+  enviarEntradasPorMail,
   obtenerCompra,
   obtenerCompras,
   obtenerEntradas,
   obtenerPerfil
 } from "../controllers/cliente.controller.js";
-import { comprarSchema, cotizarSchema, perfilSchema } from "../schemas/cliente.schema.js";
+import { comprarSchema, cotizarSchema, enviarEntradasSchema, perfilSchema } from "../schemas/cliente.schema.js";
 import { idParams } from "../schemas/comunes.js";
 
 // /api/cliente/*: solo clientes (RN-26: solo un cliente puede comprar)
@@ -23,6 +24,7 @@ router.post("/compras", validar(comprarSchema), comprar);
 router.get("/compras", obtenerCompras);
 router.get("/compras/:id", validar(idParams, "params"), obtenerCompra);
 router.get("/entradas", obtenerEntradas);
+router.post("/entradas/enviar", validar(enviarEntradasSchema), enviarEntradasPorMail); // reenviarlas por mail
 router.get("/perfil", obtenerPerfil);
 router.put("/perfil", validar(perfilSchema), editarPerfil);
 

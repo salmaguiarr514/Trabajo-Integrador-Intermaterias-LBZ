@@ -1,8 +1,9 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { QRCodeSVG } from "qrcode.react";
-import { obtenerCompras, obtenerEntradas } from "../../services/clienteService.js";
+import { enviarEntradasPorMail, obtenerCompras, obtenerEntradas } from "../../services/clienteService.js";
+import { mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaMes, pesos, rangoLargo } from "../../utils/formato.js";
 import { AFICHE } from "../../tema.js";
@@ -22,7 +23,8 @@ const ESTADO_COMPRA = {
   cancelada: "text-gris"
 };
 
-// Una entrada: el QR lleva el código (UUID, RN-29) que se escanea en la puerta.
+// Una entrada: el QR es un JWT firmado por la API con el código de la entrada (RN-29): en la puerta se
+// verifica la firma, así que un QR modificado no entra. Debajo va el código, para escribirlo si no se lee.
 // Tocándolo se abre a pantalla completa, en blanco, para que el lector lo tome fácil (Escape o "Cerrar" vuelve).
 // numero/total: cuál es entre las del evento, para que cada QR tenga un nombre distinto al leerlo
 function Entrada({ entrada, numero, total }) {
@@ -40,7 +42,7 @@ function Entrada({ entrada, numero, total }) {
         aria-label={`Mostrar en pantalla completa el QR de la entrada ${numero} de ${total}: ${entrada.espacio}, ${dia}`}
         className={`grid shrink-0 place-items-center border-b-2 border-papel bg-papel p-3 sm:border-r-2 sm:border-b-0 ${anulada ? "opacity-40" : ""}`}
       >
-        <QRCodeSVG value={entrada.codigo} size={112} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" aria-hidden="true" />
+        <QRCodeSVG value={entrada.qr ?? entrada.codigo} size={112} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" aria-hidden="true" />
       </button>
       <dialog
         ref={pantalla}
@@ -52,7 +54,7 @@ function Entrada({ entrada, numero, total }) {
           <p className="font-afiche text-3xl uppercase leading-tight text-balance">{entrada.evento}</p>
           <p className="text-base font-semibold">{dia} · {entrada.espacio} · {entrada.tarifa}</p>
           <div className="relative w-full">
-            <QRCodeSVG value={entrada.codigo} size={512} aria-label={`Código QR de la entrada ${entrada.codigo}`} style={{ display: "block", width: "100%", height: "auto" }} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
+            <QRCodeSVG value={entrada.qr ?? entrada.codigo} size={512} aria-label={`Código QR de la entrada ${entrada.codigo}`} style={{ display: "block", width: "100%", height: "auto" }} bgColor={AFICHE.papel} fgColor={AFICHE.tinta} level="M" />
             <span className="escaneo" aria-hidden="true" />
           </div>
           <p className="font-mono text-sm break-all">{entrada.codigo}</p>
@@ -77,6 +79,35 @@ function Entrada({ entrada, numero, total }) {
         )}
       </div>
     </article>
+  );
+}
+
+// "Mandármelas por mail": las entradas válidas del evento, al mail de la cuenta (con sus QR)
+function BotonMail({ idEvento }) {
+  const [estado, setEstado] = useState({ enviando: false, texto: "", error: false });
+  const mandar = async () => {
+    setEstado({ enviando: true, texto: "", error: false });
+    try {
+      const { data } = await enviarEntradasPorMail(idEvento);
+      setEstado({ enviando: false, texto: data.mensaje, error: !data.enviado });
+    } catch (error) {
+      setEstado({ enviando: false, texto: mensajeDeError(error, "No pudimos mandar el mail"), error: true });
+    }
+  };
+  return (
+    <div className="grid justify-items-end gap-1">
+      <button
+        type="button"
+        onClick={mandar}
+        disabled={estado.enviando}
+        className="border-2 border-papel px-3 py-1.5 text-xs font-bold uppercase tracking-widest hover:bg-papel hover:text-tinta disabled:border-borde disabled:text-borde"
+      >
+        {estado.enviando ? "Mandando…" : "Mandármelas por mail"}
+      </button>
+      <p role="status" className={`entra text-xs ${estado.error ? "text-amarillo" : "text-verde"}`}>
+        {estado.texto}
+      </p>
+    </div>
   );
 }
 
@@ -164,10 +195,13 @@ function MisEntradas() {
                   {rangoLargo(g.fecha_inicio, g.fecha_fin)} · {g.lugar}, {g.direccion}, {g.ciudad}
                 </p>
               </div>
-              <span className="text-sm font-bold uppercase tracking-widest text-gris">
-                {g.entradas.length} {g.entradas.length === 1 ? "entrada" : "entradas"}
-                {g.estado_evento === "cancelado" && <span className="ml-2 text-fucsia">· evento cancelado</span>}
-              </span>
+              <div className="grid justify-items-end gap-2">
+                <span className="text-sm font-bold uppercase tracking-widest text-gris">
+                  {g.entradas.length} {g.entradas.length === 1 ? "entrada" : "entradas"}
+                  {g.estado_evento === "cancelado" && <span className="ml-2 text-fucsia">· evento cancelado</span>}
+                </span>
+                {g.estado_evento !== "cancelado" && g.entradas.some((e) => e.estado === "valida") && <BotonMail idEvento={g.id_evento} />}
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {g.entradas.map((e, i) => (

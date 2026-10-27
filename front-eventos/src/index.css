@@ -294,86 +294,8 @@
 
 /* ─── A todo volumen ───
    Movimiento con personalidad de recital para el sitio del cliente. Las piezas de JS están en
-   utils/movimiento.js, utils/reflector.js (foco de escenario) y components/afiche.jsx (TituloLetras,
+   utils/movimiento.js y components/afiche.jsx (TituloLetras,
    ImporteAnimado). Todo lo que mueve corre solo sin "menos movimiento". */
-
-/* Foco de escenario: penumbra, el elemento en foco por encima, el canvas del haz y el rig del techo */
-.foco-penumbra {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  background: rgb(5 3 4 / 0.76);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-.foco-penumbra.prendida {
-  opacity: 1;
-}
-
-.en-foco {
-  position: relative;
-  z-index: 31;
-}
-
-.foco-escena {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 32;
-  pointer-events: none;
-}
-
-.foco-rig {
-  position: fixed;
-  inset: 0 0 auto;
-  height: 120px;
-  z-index: 33;
-  pointer-events: none;
-  translate: 0 -130px;
-  transition: translate 380ms cubic-bezier(0.2, 1.35, 0.35, 1);
-}
-
-.foco-rig.prendido {
-  translate: 0 0;
-}
-
-.foco-truss {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 22px;
-  border-block: 3px solid #5c5560;
-  background:
-    repeating-linear-gradient(60deg, transparent 0 9px, #4a4450 9px 12px, transparent 12px 21px),
-    repeating-linear-gradient(-60deg, transparent 0 9px, #4a4450 9px 12px, transparent 12px 21px),
-    #141016;
-  box-shadow: 0 6px 14px rgb(0 0 0 / 0.6);
-}
-
-.foco-cabeza {
-  position: absolute;
-  top: 12px;
-  width: 56px;
-  margin-left: -28px;
-  transform-origin: 28px 6px;
-}
-
-.foco-cabeza svg {
-  display: block;
-  width: 56px;
-  height: auto;
-}
-
-.foco-cabeza .lente {
-  transition: fill 300ms;
-}
-
-.foco-cabeza.activa .lente {
-  fill: #fff4d6;
-  filter: drop-shadow(0 0 8px #ffe8a8) drop-shadow(0 0 22px #ffd23f);
-}
 
 /* Tarjeta de evento: se inclina en 3D siguiendo el mouse (--rx/--ry), con un brillo que lo sigue (--mx/--my).
    Las variables se registran sin herencia: al moverse el mouse solo se recalcula la tarjeta, no todo lo que tiene adentro. */
@@ -541,7 +463,7 @@
     }
   }
 
-  /* Tarjetas: inclinación 3D, y en foco se adelantan con rebote */
+  /* Tarjetas: inclinación 3D que sigue al mouse */
   .tarjeta-afiche {
     transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
     transition:
@@ -563,11 +485,6 @@
     box-shadow: 12px 12px 0 var(--color-fucsia);
   }
 
-  .en-foco > .tarjeta-afiche {
-    scale: 1.08;
-    translate: 0 -10px;
-    box-shadow: 14px 16px 0 var(--color-fucsia), 0 34px 70px rgb(0 0 0 / 0.7);
-  }
 
   /* Line-up: cada show entra deslizándose; el cierre late dos veces */
   .fila-show {
@@ -613,9 +530,10 @@
     }
   }
 
-  /* QR a pantalla completa: línea de escaneo, tres pasadas */
+  /* QR a pantalla completa: línea de escaneo, tres pasadas. Al terminar desaparece (backwards, no both):
+     si quedara quieta encima del QR, a un lector le podría costar tomarlo */
   .dialogo-qr[open] .escaneo {
-    animation: escanea 900ms ease-in-out 3 alternate both;
+    animation: escanea 900ms ease-in-out 3 alternate backwards;
     animation-delay: 200ms;
   }
 
@@ -1033,6 +951,59 @@
   @keyframes late-sector {
     50% {
       stroke-width: 13;
+    }
+  }
+}
+
+/* ─── Control de acceso: cámara y cartel del resultado ─── */
+.escaner-qr {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.escaner-qr-visor {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 12px;
+  background: #000;
+  aspect-ratio: 4 / 3;
+  max-height: 60vh;
+}
+
+.escaner-qr-visor video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Cada resultado aparece con un golpe: entra si pasa, se sacude si no */
+  .veredicto--ok {
+    animation: veredicto-ok 420ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+  }
+
+  .veredicto--no {
+    animation: veredicto-no 380ms ease-in-out both;
+  }
+
+  @keyframes veredicto-ok {
+    from {
+      opacity: 0;
+      scale: 0.92;
+    }
+  }
+
+  @keyframes veredicto-no {
+    20%,
+    60% {
+      translate: -8px 0;
+    }
+
+    40%,
+    80% {
+      translate: 8px 0;
     }
   }
 }

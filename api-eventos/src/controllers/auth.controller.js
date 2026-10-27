@@ -3,6 +3,7 @@ import pool from "../data/db.js";
 import { firmarToken } from "../middlewares/autenticar.js";
 import { ErrorHttp } from "../utils/ErrorHttp.js";
 import { enviarCodigo, MAX_INTENTOS, SEGUNDOS_ENTRE_ENVIOS } from "../utils/verificacion.js";
+import { leerVerificacion } from "../utils/tokens.js";
 
 const SELECT_USUARIO = `
   SELECT u.*, e.nombre AS empresa, e.activo AS empresa_activa
@@ -82,7 +83,7 @@ export const registro = async (req, res) => {
     db.release();
   }
 
-  res.status(201).json({ mensaje: `Te mandamos un código a ${email}`, email });
+  res.status(201).json({ mensaje: `Te mandamos un código y un enlace a ${email}`, email });
 };
 
 // Mismo error para email inexistente o ya verificado: no revela qué emails están registrados
@@ -117,6 +118,31 @@ export const verificar = async (req, res) => {
   await pool.query("DELETE FROM codigos_verificacion WHERE id_usuario = $1", [usuario.id_usuario]);
 
   // Queda logueado al verificar
+  res.json({ token: firmarToken(usuario), usuario: usuarioPublico(usuario) });
+};
+
+// El botón del mail: un JWT firmado por la API con el id del código vigente. Sirve una sola vez:
+// si ya se verificó, o se pidió un código nuevo (otro id), el enlace deja de valer.
+export const verificarEnlace = async (req, res) => {
+  const datos = leerVerificacion(req.body.token);
+  const usuario = await buscarPorEmail(datos.email);
+  if (!usuario || usuario.id_usuario !== datos.id_usuario) {
+    throw new ErrorHttp(400, "El enlace no es válido. Pedí un código nuevo");
+  }
+  if (usuario.email_verificado) {
+    throw new ErrorHttp(409, "Tu email ya está verificado: ingresá con tu contraseña", { motivo: "ya_verificado" });
+  }
+  const { rows } = await pool.query(
+    "SELECT 1 FROM codigos_verificacion WHERE id_codigo = $1 AND id_usuario = $2 AND expira > NOW()",
+    [datos.id_codigo, usuario.id_usuario]
+  );
+  if (!rows[0]) {
+    throw new ErrorHttp(400, "Ese enlace ya no sirve: pediste un código nuevo o venció. Usá el último mail");
+  }
+
+  verificarActivo(usuario);
+  await pool.query("UPDATE usuarios SET email_verificado = TRUE WHERE id_usuario = $1", [usuario.id_usuario]);
+  await pool.query("DELETE FROM codigos_verificacion WHERE id_usuario = $1", [usuario.id_usuario]);
   res.json({ token: firmarToken(usuario), usuario: usuarioPublico(usuario) });
 };
 

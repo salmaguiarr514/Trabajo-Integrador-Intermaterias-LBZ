@@ -45,6 +45,10 @@ export const comprarSchema = z
   })
   .refine((c) => c.medio_pago === "transferencia" || c.tarjeta, { message: "Completá los datos de la tarjeta", path: ["tarjeta"] });
 
+export const enviarEntradasSchema = z.object({
+  id_evento: z.number({ error: "Falta el evento" }).int().positive()
+});
+
 export const perfilSchema = z
   .object({
     nombre: z.string().trim().min(1, "El nombre es obligatorio").max(100),
