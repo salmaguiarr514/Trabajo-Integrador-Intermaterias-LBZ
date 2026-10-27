@@ -1,0 +1,21 @@
+# Trae los cambios del repo del grupo (urendadiego) a este fork cada 15 minutos.
+# Vercel está conectado a este fork: cada sincronización con cambios despliega el sitio.
+name: Sincronizar con el repo del grupo
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: # botón "Run workflow" para sincronizar en el momento
+
+permissions:
+  contents: write
+
+jobs:
+  sincronizar:
+    if: github.repository == 'salmaguiarr514/Trabajo-Integrador-Intermaterias-LBZ'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Traer main del repo del grupo
+        run: gh api --method POST "repos/${{ github.repository }}/merge-upstream" -f branch=main
+        env:
+          GH_TOKEN: ${{ github.token }}
