@@ -106,10 +106,15 @@ function Login() {
               className={campoClase}
             />
           </Campo>
-          <label className="-mt-2 flex items-center gap-2 text-sm text-gris">
-            <input type="checkbox" checked={verClave} onChange={(e) => setVerClave(e.target.checked)} className="size-4 accent-amarillo" />
-            Mostrar la contraseña
-          </label>
+          <div className="-mt-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+            <label className="flex items-center gap-2 text-gris">
+              <input type="checkbox" checked={verClave} onChange={(e) => setVerClave(e.target.checked)} className="size-4 accent-amarillo" />
+              Mostrar la contraseña
+            </label>
+            <Link viewTransition to="/recuperar" state={{ email: datos.email.trim() }} className="font-semibold text-papel underline underline-offset-4 hover:text-amarillo">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
 
           <button type="submit" disabled={enviando} className={botonPrimario}>
             {enviando ? "Ingresando…" : "Ingresar"}

@@ -86,3 +86,18 @@ export const editarUsuario = async (req, res) => {
 };
 
 // Los usuarios no se borran (tienen compras e historial): se dan de baja con activo = false.
+
+// Borra un usuario. Uno con compras no se borra (perdería su historial y sus entradas): se da de baja
+// con "activo". El superadmin no se puede borrar a sí mismo.
+export const eliminarUsuario = async (req, res) => {
+  const u = await buscarUsuario(req.params.id);
+  if (u.id_usuario === req.usuario.id_usuario) {
+    throw new ErrorHttp(409, "No podés borrar tu propia cuenta");
+  }
+  const { rows } = await pool.query("SELECT COUNT(*)::INT AS cantidad FROM compras WHERE id_usuario = $1", [u.id_usuario]);
+  if (rows[0].cantidad > 0) {
+    throw new ErrorHttp(409, "Tiene compras: dalo de baja con el interruptor en lugar de borrarlo, así no se pierde su historial");
+  }
+  await pool.query("DELETE FROM usuarios WHERE id_usuario = $1", [u.id_usuario]); // sus códigos se borran solos (CASCADE)
+  res.status(204).send();
+};

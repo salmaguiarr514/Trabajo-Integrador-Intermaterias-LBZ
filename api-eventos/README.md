@@ -54,6 +54,8 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | POST | `/api/auth/verificar` | todos | `{ email, codigo }` → verifica el email e inicia sesión → `{ token, usuario }` | 200 / 400 / 429 |
 | POST | `/api/auth/verificar-enlace` | todos | `{ token }` → el botón del mail (un JWT de un solo uso): verifica el email e inicia sesión → `{ token, usuario }` | 200 / 400 / 409 |
 | POST | `/api/auth/reenviar-codigo` | todos | `{ email }` → manda un código nuevo (uno por minuto) | 200 / 429 / 503 |
+| POST | `/api/auth/recuperar` | todos | `{ email }` → "¿Olvidaste tu contraseña?": manda un enlace (JWT de 30 minutos, de un solo uso). Responde siempre lo mismo | 200 / 503 |
+| POST | `/api/auth/restablecer` | todos | `{ token, password }` → contraseña nueva, email verificado e inicia sesión → `{ token, usuario }` | 200 / 400 / 403 |
 | GET | `/api/auth/yo` | 🔒 cualquiera | Usuario de la sesión | 200 / 401 |
 | GET | `/api/admin/empresas` | 🔒 superadmin | Listar productoras | 200 |
 | GET | `/api/admin/empresas/:id` | 🔒 superadmin | Obtener una | 200 / 404 |
@@ -64,6 +66,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | GET | `/api/admin/usuarios/:id` | 🔒 superadmin | Obtener uno | 200 / 404 |
 | POST | `/api/admin/usuarios` | 🔒 superadmin | Crear un superadmin o un usuario de productora | 201 / 400 / 409 |
 | PUT | `/api/admin/usuarios/:id` | 🔒 superadmin | Editar (solo los campos que vienen; `password` solo si viene) | 200 / 400 / 404 / 409 |
+| DELETE | `/api/admin/usuarios/:id` | 🔒 superadmin | Borrar. No si tiene compras (se da de baja con `activo`) ni la propia cuenta | 204 / 404 / 409 |
 | GET | `/api/admin/lugares?origen=plataforma\|propio` | 🔒 superadmin | Listar lugares (de `v_lugares`, con capacidad total) | 200 / 400 |
 | GET | `/api/admin/lugares/:id` | 🔒 superadmin | Lugar con sus `escenarios`, `espacios` y `elementos` del plano (con su `geometria`) | 200 / 404 |
 | POST | `/api/admin/lugares` | 🔒 superadmin | Crear un lugar de la plataforma (con `capacidad` para el sector "General") | 201 / 400 / 409 |
@@ -120,6 +123,9 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
   (un JWT firmado, de un solo uso: deja de valer si se pide otro código) y el código de 6 dígitos, por si prefiere escribirlo.
   El login responde 403 con `motivo: "email_no_verificado"` (el front lo manda a `/verificar`).
   El código vence a los 15 minutos y con 5 intentos fallidos hay que pedir otro. Los usuarios que crea el superadmin no lo necesitan.
+  Una cuenta que nunca se verificó no bloquea el email: registrarse de nuevo la actualiza y manda otro código; también se puede
+  recuperar con "¿Olvidaste tu contraseña?" (el enlace verifica el email). `registro`, `reenviar-codigo` y `recuperar` devuelven
+  `correo: "sin_configurar"` si el servidor no tiene Gmail, para que el front no prometa un mail que no va a salir.
   - El mail sale de una cuenta de Gmail (`GMAIL_USUARIO` y `GMAIL_CLAVE_APP` en el `.env`, ver `.env.example`).
     Si no están configuradas, **el mail aparece en la consola de la API** (con el código y el enlace): sirve para probar sin Gmail.
     Con `CORREO_CARPETA` cada mail se guarda además como `.eml`, para verlo tal cual (también el de las entradas, con los QR).

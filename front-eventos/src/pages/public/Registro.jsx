@@ -47,9 +47,10 @@ function Registro() {
     setEnviando(true);
     const { confirmar: _confirmar, ...enviar } = datos;
     try {
-      await registro({ ...enviar, nombre: enviar.nombre.trim(), email: enviar.email.trim() });
+      const creada = await registro({ ...enviar, nombre: enviar.nombre.trim(), email: enviar.email.trim() });
       // La cuenta queda creada pero hay que verificar el email con el código que llega por mail
-      navigate("/verificar", { replace: true, state: { email: enviar.email.trim() }, viewTransition: true });
+      // (correo: "sin_configurar" si este servidor no manda mails: la pantalla lo avisa)
+      navigate("/verificar", { replace: true, state: { email: enviar.email.trim(), correo: creada.correo }, viewTransition: true });
     } catch (err) {
       // Los errores de validación de la API se muestran debajo de cada campo
       const campos = erroresPorCampo(err);
