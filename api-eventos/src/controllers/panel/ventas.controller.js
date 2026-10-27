@@ -1,6 +1,7 @@
 import pool from "../../data/db.js";
 import { ErrorHttp } from "../../utils/ErrorHttp.js";
 import { AHORA, hora } from "../../utils/fechas.js";
+import { leerEntrada } from "../../utils/tokens.js";
 
 // Fase 7: ventas de un evento y control de acceso en la puerta. Todo de la productora del usuario.
 
@@ -81,7 +82,9 @@ export const obtenerVentasEvento = async (req, res) => {
 // La base lo garantiza (trigger ingresos_validos y UNIQUE (id_entrada, id_jornada)); acá se arman mensajes
 // claros para la persona de la puerta antes de intentar el ingreso.
 export const validarEntrada = async (req, res) => {
-  const { codigo, id_jornada } = req.body;
+  const { id_jornada } = req.body;
+  // El QR es un JWT: si la firma no es de esta API (QR inventado o modificado), no se busca nada
+  const { codigo, origen } = leerEntrada(req.body.codigo);
 
   const { rows: jornadas } = await pool.query(
     `SELECT j.id_jornada, j.fecha, j.id_evento, ev.nombre AS evento
@@ -145,6 +148,7 @@ export const validarEntrada = async (req, res) => {
     abono: e.jornada_tarifa === null,
     // Para pedir el documento si hace falta: nombre e inicial del apellido
     titular: `${e.nombre}${e.apellido ? ` ${e.apellido[0]}.` : ""}`,
+    origen, // "qr" (firma verificada) o "codigo" (escrito a mano)
     ...contador[0]
   });
 };

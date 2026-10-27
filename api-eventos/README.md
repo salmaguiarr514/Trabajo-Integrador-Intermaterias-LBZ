@@ -52,6 +52,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | POST | `/api/auth/login` | todos | `{ email, password }` → `{ token, usuario }` | 200 / 400 / 401 / 403 |
 | POST | `/api/auth/registro` | todos | Alta de **cliente**. Manda un código por mail → `{ mensaje, email }` (sin token) | 201 / 400 / 409 / 503 |
 | POST | `/api/auth/verificar` | todos | `{ email, codigo }` → verifica el email e inicia sesión → `{ token, usuario }` | 200 / 400 / 429 |
+| POST | `/api/auth/verificar-enlace` | todos | `{ token }` → el botón del mail (un JWT de un solo uso): verifica el email e inicia sesión → `{ token, usuario }` | 200 / 400 / 409 |
 | POST | `/api/auth/reenviar-codigo` | todos | `{ email }` → manda un código nuevo (uno por minuto) | 200 / 429 / 503 |
 | GET | `/api/auth/yo` | 🔒 cualquiera | Usuario de la sesión | 200 / 401 |
 | GET | `/api/admin/empresas` | 🔒 superadmin | Listar productoras | 200 |
@@ -92,7 +93,7 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | DELETE | `/api/panel/eventos/:id` | 🔒 empresa | Borrar con todo (no si tiene ventas: se cancela) | 204 / 404 / 409 |
 | PATCH | `/api/panel/eventos/:id/estado` | 🔒 empresa | `publicado` (pide jornada, show y tarifa activa: RN-20), `borrador` (despublicar, sin ventas) o `cancelado` | 200 / 400 / 404 / 409 |
 | GET | `/api/panel/eventos/:id/ventas` | 🔒 empresa | Totales (subtotal, service charge, total, compras y rechazadas), ventas por tarifa y por día, ocupación (`v_disponibilidad`), asistencia (`v_asistencia`) y últimas compras sin datos del comprador | 200 / 404 |
-| POST | `/api/panel/entradas/validar` | 🔒 empresa | Control de acceso: `{ codigo, id_jornada }`. Registra el ingreso o dice por qué no pasa (otro evento, otro día, anulada, ya ingresó y a qué hora) | 201 / 400 / 404 / 409 |
+| POST | `/api/panel/entradas/validar` | 🔒 empresa | Control de acceso: `{ codigo, id_jornada }`, donde `codigo` es lo que leyó el lector (el QR, un JWT firmado por la API) o el código escrito a mano. Un QR con la firma inválida responde 400. Registra el ingreso o dice por qué no pasa (otro evento, otro día, anulada, ya ingresó y a qué hora); la respuesta dice el `origen` (`qr` o `codigo`) | 201 / 400 / 404 / 409 |
 | GET | `/api/panel/eventos/:id/disponibilidad` | 🔒 empresa | Capacidad, vendidas y libres por jornada y sector (`v_disponibilidad`) | 200 / 404 |
 | POST, PUT, DELETE | `/api/panel/eventos/:id/jornadas[/:idHijo]` | 🔒 empresa | Jornadas (`fecha` dentro del evento, `hora_apertura`, `nombre`) | 201 / 200 / 204 / 400 / 404 / 409 |
 | PUT | `/api/panel/eventos/:id/escenarios` | 🔒 empresa | `{ escenarios: [ids] }` reemplaza los habilitados (no se saca uno con shows) | 200 / 400 / 409 |
@@ -103,10 +104,11 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | GET | `/api/public/eventos/:id` | todos | Detalle: jornadas, line-up, tarifas activas con `disponibles` y `en_venta`, `cargo_servicio_pct` y el `plano` del lugar (o `null`) | 200 / 404 |
 | GET | `/api/public/artistas/:id` | todos | Artista y sus próximas presentaciones (solo si toca en un evento de la cartelera) | 200 / 404 |
 | POST | `/api/cliente/compras/cotizar` | 🔒 cliente | `{ id_evento, items: [{ id_tarifa, cantidad }] }` → detalle, subtotal, service charge y total | 200 / 400 / 404 / 409 |
-| POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` y `tarjeta` (`numero`, `nombre`, `vencimiento`, `cvv`). Pago simulado: termina en 0000 → `rechazada` | 201 / 400 / 404 / 409 |
+| POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` y `tarjeta` (`numero`, `nombre`, `vencimiento`, `cvv`). Pago simulado: termina en 0000 → `rechazada`. Si se aprueba, manda las entradas por mail con sus QR; `correo` dice cómo salió (`enviado`, `sin_configurar` o `error`) | 201 / 400 / 404 / 409 |
 | GET | `/api/cliente/compras` | 🔒 cliente | Mis compras (también las rechazadas) | 200 |
 | GET | `/api/cliente/compras/:id` | 🔒 cliente | Una compra con sus entradas | 200 / 404 |
-| GET | `/api/cliente/entradas` | 🔒 cliente | Mis entradas de compras pagadas, con el `codigo` (UUID) para el QR | 200 |
+| GET | `/api/cliente/entradas` | 🔒 cliente | Mis entradas de compras pagadas: `qr` (un JWT firmado con el código, es lo que va en el QR) y `codigo` (UUID, para escribirlo a mano) | 200 |
+| POST | `/api/cliente/entradas/enviar` | 🔒 cliente | `{ id_evento }` → manda por mail las entradas válidas de ese evento, con sus QR | 200 / 404 / 503 |
 | GET | `/api/cliente/perfil` | 🔒 cliente | Mis datos | 200 |
 | PUT | `/api/cliente/perfil` | 🔒 cliente | `nombre`, `apellido`, `dni`, `telefono`. Para cambiar la contraseña: `password_actual` y `password_nueva` | 200 / 400 |
 | GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |
@@ -114,11 +116,13 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 - Errores: siempre `{ mensaje }`. Si son de validación, además `errores: [{ campo, mensaje }]`.
 - Sin token o con token vencido → 401. Con un rol que no corresponde → 403.
 - Un usuario dado de baja, o de una productora dada de baja, no puede iniciar sesión (403).
-- Verificación del email: un cliente recién registrado no puede iniciar sesión hasta ingresar el código de 6 dígitos que le llega por mail.
+- Verificación del email: un cliente recién registrado no puede iniciar sesión hasta verificar el email. El mail trae un botón con un enlace
+  (un JWT firmado, de un solo uso: deja de valer si se pide otro código) y el código de 6 dígitos, por si prefiere escribirlo.
   El login responde 403 con `motivo: "email_no_verificado"` (el front lo manda a `/verificar`).
   El código vence a los 15 minutos y con 5 intentos fallidos hay que pedir otro. Los usuarios que crea el superadmin no lo necesitan.
   - El mail sale de una cuenta de Gmail (`GMAIL_USUARIO` y `GMAIL_CLAVE_APP` en el `.env`, ver `.env.example`).
-    Si no están configuradas, **el código aparece en la consola de la API**: sirve para probar sin Gmail.
+    Si no están configuradas, **el mail aparece en la consola de la API** (con el código y el enlace): sirve para probar sin Gmail.
+    Con `CORREO_CARPETA` cada mail se guarda además como `.eml`, para verlo tal cual (también el de las entradas, con los QR).
   - Para sacar la contraseña de aplicación: cuenta de Google → Seguridad → activar la verificación en 2 pasos →
     "Contraseñas de aplicaciones" → crear una para "Backstage". Son 16 letras.
 - Empresas: `nombre` y `cuit` (formato `30-12345678-9`) son obligatorios; `cargo_servicio_pct` va de 0 a 100 (por defecto 10).

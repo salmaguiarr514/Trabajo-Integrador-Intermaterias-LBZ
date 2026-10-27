@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { inicioDeRol, useAuth } from "../../context/auth.js";
 import { mensajeDeError } from "../../services/api.js";
 import * as authService from "../../services/authService.js";
@@ -8,16 +8,21 @@ import { Aviso, botonPrimario, Campo, campoClase } from "../../components/afiche
 
 const SEGUNDOS_ENTRE_ENVIOS = 60;
 
-// Se llega desde el registro o desde el login (si la cuenta no está verificada).
+// Se llega desde el registro o desde el login (si la cuenta no está verificada), o desde el botón del mail.
 // El email viene en location.state; si se entra directo, se pide.
+// Con ?token=… (el botón del mail) se verifica solo: el token es un JWT de un solo uso que firma la API.
 function VerificarEmail() {
-  const { usuario, verificar } = useAuth();
+  const { usuario, verificar, verificarEnlace } = useAuth();
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [params, setParams] = useSearchParams();
+  const tokenEnlace = params.get("token");
+  const [conEnlace, setConEnlace] = useState(Boolean(tokenEnlace));
+  const enlaceUsado = useRef(false);
   const [email, setEmail] = useState(state?.email ?? "");
   const [codigo, setCodigo] = useState("");
   const [error, setError] = useState("");
-  const [aviso, setAviso] = useState(state?.email ? `Te mandamos un código de 6 números a ${state.email}.` : "");
+  const [aviso, setAviso] = useState(state?.email ? `Te mandamos un mail a ${state.email} con un botón para verificar y un código de 6 números.` : "");
   const [enviando, setEnviando] = useState(false);
   const [espera, setEspera] = useState(state?.reenviar ? 0 : SEGUNDOS_ENTRE_ENVIOS);
   const reenvioInicial = useRef(false);
@@ -48,6 +53,20 @@ function VerificarEmail() {
     if (error && !enviando) campoCodigo.current?.focus();
   }, [error, enviando]);
 
+  // Viene del botón del mail: se verifica sin escribir nada. Si el enlace no sirve, queda el código
+  useEffect(() => {
+    if (!tokenEnlace || enlaceUsado.current) return;
+    enlaceUsado.current = true;
+    verificarEnlace(tokenEnlace)
+      .then((verificado) => navigate(inicioDeRol(verificado.rol), { replace: true }))
+      .catch((err) => {
+        setError(mensajeDeError(err, "No se pudo verificar con el enlace"));
+        setConEnlace(false);
+        setParams({}, { replace: true });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Viene del login: el código que tenía pudo haber vencido, se manda uno nuevo
   useEffect(() => {
     if (state?.reenviar && state?.email && !reenvioInicial.current) {
@@ -57,8 +76,20 @@ function VerificarEmail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (usuario) {
+  if (usuario && !conEnlace) {
     return <Navigate to={inicioDeRol(usuario.rol)} replace />;
+  }
+
+  if (conEnlace) {
+    return (
+      <div className="mx-auto grid w-full max-w-xl gap-8">
+        <section className="entra grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8" aria-busy="true">
+          <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-6xl">Verificando tu email</h1>
+          <p role="status" className="text-base font-medium">Un segundo: estamos confirmando el enlace del mail.</p>
+          <span className="ruedita" aria-hidden="true" />
+        </section>
+      </div>
+    );
   }
 
   const enviarCodigo = async (valor = codigo) => {
@@ -79,7 +110,7 @@ function VerificarEmail() {
     <div className="mx-auto grid w-full max-w-xl gap-8">
       <section className="entra grid gap-4 border-2 border-papel bg-fucsia p-6 text-tinta shadow-[8px_8px_0_var(--color-amarillo)] sm:p-8">
         <h1 className="font-afiche text-5xl uppercase leading-[0.92] text-balance sm:text-6xl">Verificá tu email</h1>
-        <p className="text-base font-medium">Ingresá el código que te llegó por mail. Si no lo ves, fijate en spam.</p>
+        <p className="text-base font-medium">Tocá el botón del mail que te mandamos, o escribí acá el código. Si no lo ves, fijate en spam.</p>
       </section>
 
       <form

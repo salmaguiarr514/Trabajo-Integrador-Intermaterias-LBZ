@@ -6,7 +6,6 @@ import { mensajeDeError } from "../../services/api.js";
 import { diaMes, pesos } from "../../utils/formato.js";
 import { useTitulo } from "../../hooks/useTitulo.js";
 import { ErrorCarga, Hueco, TituloLetras } from "../../components/afiche.jsx";
-import { useReflector } from "../../hooks/useReflector.js";
 import { enderezar, inclinar } from "../../utils/movimiento.js";
 import { conTransicion } from "../../utils/transicion.js";
 
@@ -16,7 +15,7 @@ const TIPOS = [
   { valor: "recital", texto: "Recitales" }
 ];
 
-function TarjetaEvento({ evento, onAbrir }) {
+function TarjetaEvento({ evento }) {
   const { dia, mes, semana } = diaMes(evento.fecha_inicio);
   const varios = evento.fecha_inicio !== evento.fecha_fin;
   // Al abrir este evento, la tarjeta se transforma en la portada del detalle (mismo view-transition-name)
@@ -27,10 +26,9 @@ function TarjetaEvento({ evento, onAbrir }) {
       to={`/eventos/${evento.id_evento}`}
       style={viaja ? { viewTransitionName: "portada-evento" } : undefined}
       state={{ previa: evento }} // el detalle muestra esto al instante, mientras llega el resto
-      onClick={onAbrir}
       onPointerEnter={() => adelantarEvento(evento.id_evento)}
       onFocus={() => adelantarEvento(evento.id_evento)}
-      // tarjeta-afiche: se inclina en 3D siguiendo el mouse y se adelanta bajo el foco (index.css)
+      // tarjeta-afiche: se inclina en 3D siguiendo el mouse (index.css)
       onPointerMove={inclinar}
       onPointerLeave={enderezar}
       className="tarjeta-afiche group flex flex-col border-2 border-papel bg-noche text-papel shadow-[6px_6px_0_var(--color-fucsia)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amarillo"
@@ -103,8 +101,6 @@ function Cartelera() {
   const [intento, setIntento] = useState(0); // "Reintentar" lo suma y vuelve a pedir
   const [artistas, setArtistas] = useState(memoria.artistas); // para la cinta: los de toda la cartelera, sin filtros
   const [cintaPausada, setCintaPausada] = useState(false);
-  // Foco de escenario: al pasar el mouse (o llegar con Tab) a un evento, el resto baja la luz y un haz lo ilumina
-  const foco = useReflector();
   // Al filtrar o buscar, las tarjetas que quedan se acomodan y las que salen se desvanecen
   const [grillaAnimada] = useAutoAnimate({ duration: 300, easing: "cubic-bezier(0.2, 0, 0, 1)" });
   useTitulo("Cartelera");
@@ -238,9 +234,8 @@ function Cartelera() {
         <section ref={grillaAnimada} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {eventos.map((e, i) => (
             // al aparecer, entran en cascada
-            // foco.props: el contenedor recibe el foco de escenario (queda por encima de la penumbra)
-            <div key={e.id_evento} className="entra relative grid grid-cols-1" style={{ "--i": i + 4 }} {...foco.props}>
-              <TarjetaEvento evento={e} onAbrir={() => foco.apagar(true)} />
+            <div key={e.id_evento} className="entra grid grid-cols-1" style={{ "--i": i + 4 }}>
+              <TarjetaEvento evento={e} />
             </div>
           ))}
         </section>
