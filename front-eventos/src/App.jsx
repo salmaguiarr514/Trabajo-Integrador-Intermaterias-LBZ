@@ -25,6 +25,8 @@ export const router = createBrowserRouter(
         <Route path="/login" lazy={cargar(() => import("./pages/public/Login.jsx"))} />
         <Route path="/registro" lazy={cargar(() => import("./pages/public/Registro.jsx"))} />
         <Route path="/verificar" lazy={cargar(() => import("./pages/public/VerificarEmail.jsx"))} />
+        <Route path="/recuperar" lazy={cargar(() => import("./pages/public/Recuperar.jsx"))} />
+        <Route path="/restablecer" lazy={cargar(() => import("./pages/public/Restablecer.jsx"))} />
         <Route path="/eventos/:id" element={<EventoDetalle />} />
         <Route element={<RutaProtegida roles={["cliente"]} />}>
           <Route path="/checkout/:id" lazy={cargar(() => import("./pages/cliente/Checkout.jsx"))} />

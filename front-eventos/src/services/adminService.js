@@ -6,6 +6,8 @@ import api from "./api.js";
 export const obtenerUsuarios = (filtros) => api.get("/admin/usuarios", { params: filtros });
 export const crearUsuario = (usuario) => api.post("/admin/usuarios", usuario);
 export const actualizarUsuario = (id, usuario) => api.put(`/admin/usuarios/${id}`, usuario);
+// No borra a uno con compras (se da de baja con "activo")
+export const eliminarUsuario = (id) => api.delete(`/admin/usuarios/${id}`);
 
 // Lugares: en lugaresService.js (lo comparten superadmin y productora)
 

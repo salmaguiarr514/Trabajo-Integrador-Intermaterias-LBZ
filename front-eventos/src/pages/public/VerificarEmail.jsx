@@ -8,6 +8,9 @@ import { Aviso, botonPrimario, Campo, campoClase } from "../../components/afiche
 
 const SEGUNDOS_ENTRE_ENVIOS = 60;
 
+// Si el servidor no tiene Gmail configurado, el mail no sale: se dice claro en vez de "te mandamos un mail"
+const SIN_CORREO = "Este servidor todavía no tiene configurado el envío de mails, así que el código no te va a llegar. El código queda en la consola de la API: pedíselo a quien la administra, o probá más tarde.";
+
 // Se llega desde el registro o desde el login (si la cuenta no está verificada), o desde el botón del mail.
 // El email viene en location.state; si se entra directo, se pide.
 // Con ?token=… (el botón del mail) se verifica solo: el token es un JWT de un solo uso que firma la API.
@@ -22,7 +25,13 @@ function VerificarEmail() {
   const [email, setEmail] = useState(state?.email ?? "");
   const [codigo, setCodigo] = useState("");
   const [error, setError] = useState("");
-  const [aviso, setAviso] = useState(state?.email ? `Te mandamos un mail a ${state.email} con un botón para verificar y un código de 6 números.` : "");
+  const [aviso, setAviso] = useState(
+    state?.correo === "sin_configurar"
+      ? SIN_CORREO
+      : state?.email
+        ? `Te mandamos un mail a ${state.email} con un botón para verificar y un código de 6 números.`
+        : ""
+  );
   const [enviando, setEnviando] = useState(false);
   const [espera, setEspera] = useState(state?.reenviar ? 0 : SEGUNDOS_ENTRE_ENVIOS);
   const reenvioInicial = useRef(false);
@@ -39,8 +48,8 @@ function VerificarEmail() {
   const reenviar = async (destino = email) => {
     setError("");
     try {
-      await authService.reenviarCodigo(destino);
-      setAviso(`Te mandamos un código nuevo a ${destino}.`);
+      const { data } = await authService.reenviarCodigo(destino);
+      setAviso(data.correo === "sin_configurar" ? SIN_CORREO : `Te mandamos un código nuevo a ${destino}.`);
       setEspera(SEGUNDOS_ENTRE_ENVIOS);
     } catch (err) {
       setError(mensajeDeError(err, "No se pudo mandar el código. Probá de nuevo en un rato."));
@@ -168,6 +177,13 @@ function VerificarEmail() {
             Volver al ingreso
           </Link>
         </div>
+        <p className="border-t-2 border-dashed border-linea pt-4 text-sm text-gris">
+          ¿No te llega el código o te olvidaste la contraseña?{" "}
+          <Link viewTransition to="/recuperar" state={{ email }} className="font-semibold text-papel underline underline-offset-4 hover:text-amarillo">
+            Recuperá tu cuenta con una contraseña nueva
+          </Link>
+          : el enlace que te mandamos también verifica el email.
+        </p>
       </form>
     </div>
   );

@@ -2,11 +2,12 @@ import { randomInt } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { enviarCorreo } from "./correo.js";
 import { boton, COLORES, escaparHtml, parrafo, plantilla, titulo } from "./plantillaCorreo.js";
-import { firmarVerificacion } from "./tokens.js";
+import { firmarRestablecer, firmarVerificacion } from "./tokens.js";
 
 export const MINUTOS_VIGENCIA = 15;
 export const MAX_INTENTOS = 5;
 export const SEGUNDOS_ENTRE_ENVIOS = 60;
+export const MINUTOS_RECUPERACION = 30;
 
 // Genera un código nuevo (borra los anteriores del usuario), lo guarda hasheado y lo manda por mail
 // junto con un enlace que verifica de un toque (un JWT de un solo uso, ver utils/tokens.js).
@@ -41,6 +42,30 @@ export const enviarCodigo = async (db, usuario) => {
         parrafo(enlace ? "O escribí este código en la pantalla de verificación:" : "Escribí este código en la pantalla de verificación:", COLORES.gris),
         `<p style="margin:0 0 18px;font-family:Anton,Impact,sans-serif;font-size:40px;letter-spacing:10px;color:${COLORES.amarillo}">${codigo}</p>`,
         parrafo(`El enlace y el código vencen en ${MINUTOS_VIGENCIA} minutos. Si no creaste una cuenta en Backstage, ignorá este mail.`, COLORES.gris)
+      ].join("")
+    })
+  });
+};
+
+// Mail para elegir una contraseña nueva (y, de paso, verificar el email si nunca se verificó).
+// El enlace es un JWT de un solo uso: deja de servir en cuanto se cambia la contraseña (utils/tokens.js).
+export const enviarRecuperacion = async (usuario) => {
+  const base = process.env.FRONTEND_URL?.replace(/\/$/, "");
+  const enlace = `${base}/restablecer?token=${firmarRestablecer(usuario, MINUTOS_RECUPERACION)}`;
+  return enviarCorreo({
+    para: usuario.email,
+    asunto: "Elegí una contraseña nueva para Backstage",
+    texto: `Hola ${usuario.nombre}, para elegir una contraseña nueva entrá a este enlace: ${enlace}\nVence en ${MINUTOS_RECUPERACION} minutos. Si no lo pediste, ignorá este mail: tu contraseña sigue igual.`,
+    html: plantilla({
+      previa: "Elegí una contraseña nueva",
+      contenido: [
+        titulo("Recuperá tu cuenta"),
+        parrafo(`Hola ${escaparHtml(usuario.nombre)}, nos pidieron una contraseña nueva para tu cuenta de Backstage.`),
+        boton("Elegir una contraseña nueva", enlace),
+        parrafo(
+          `El enlace vence en ${MINUTOS_RECUPERACION} minutos y sirve una sola vez.${usuario.email_verificado ? "" : " Al usarlo, tu email también queda verificado."} Si no lo pediste, ignorá este mail: tu contraseña sigue igual.`,
+          COLORES.gris
+        )
       ].join("")
     })
   });

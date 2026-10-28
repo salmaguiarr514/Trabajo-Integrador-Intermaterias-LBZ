@@ -29,3 +29,10 @@ export const verificarEnlaceSchema = z.object({
 });
 
 export const reenviarSchema = z.object({ email });
+
+export const recuperarSchema = z.object({ email });
+
+export const restablecerSchema = z.object({
+  token: z.string({ error: "Falta el enlace" }).trim().min(20, "El enlace no es válido").max(2000, "El enlace no es válido"),
+  password: z.string({ error: "Elegí una contraseña" }).min(6, "La contraseña debe tener al menos 6 caracteres").max(72)
+});

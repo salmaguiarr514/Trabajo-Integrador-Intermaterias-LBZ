@@ -1,7 +1,8 @@
+import { createHash } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { ErrorHttp } from "./ErrorHttp.js";
 
-// Tokens JWT que no son la sesión: el QR de cada entrada y el enlace para verificar el email.
+// Tokens JWT que no son la sesión: el QR de cada entrada, el enlace para verificar el email y el de recuperar la contraseña.
 // Cada uno lleva su propósito ("t"), así un token de un tipo nunca sirve para otro.
 // Se firman con su propia clave si está en el .env, o con JWT_SECRET.
 const claveEntradas = () => process.env.ENTRADAS_SECRET || process.env.JWT_SECRET;
@@ -45,5 +46,31 @@ export const leerVerificacion = (token) => {
     return { id_usuario: Number(datos.sub), email: datos.email, id_codigo: Number(datos.jti) };
   } catch (error) {
     throw new ErrorHttp(400, error.name === "TokenExpiredError" ? "El enlace venció. Pedí un código nuevo" : "El enlace no es válido. Pedí un código nuevo");
+  }
+};
+
+// ─── Recuperar la contraseña ────────────────────────────────────────────────
+// Va por mail (POST /auth/recuperar). "h" es una huella de la contraseña actual (un hash del hash, no el hash):
+// en cuanto se cambia la contraseña el enlace deja de servir, así que se usa una sola vez.
+// Restablecerla también verifica el email: el enlace prueba que el mail es de esa persona.
+const huella = (hashContraseña) => createHash("sha256").update(hashContraseña).digest("base64url").slice(0, 16);
+
+export const firmarRestablecer = (usuario, minutos) =>
+  jwt.sign({ t: "restablecer", sub: String(usuario.id_usuario), email: usuario.email, h: huella(usuario.password_hash) }, claveVerificacion(), {
+    expiresIn: `${minutos}m`
+  });
+
+// Devuelve los datos del token; vigente(usuario) dice si todavía sirve para ese usuario (no se cambió la contraseña)
+export const leerRestablecer = (token) => {
+  try {
+    const datos = jwt.verify(token, claveVerificacion(), { algorithms: ["HS256"] });
+    if (datos.t !== "restablecer") throw new Error("no es de recuperación");
+    return {
+      id_usuario: Number(datos.sub),
+      email: datos.email,
+      vigente: (usuario) => usuario.id_usuario === Number(datos.sub) && huella(usuario.password_hash) === datos.h
+    };
+  } catch (error) {
+    throw new ErrorHttp(400, error.name === "TokenExpiredError" ? "El enlace venció. Pedí uno nuevo" : "El enlace no es válido. Pedí uno nuevo");
   }
 };
