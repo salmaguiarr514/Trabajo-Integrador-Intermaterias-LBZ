@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const CLAVE_TOKEN = "backstage_token";
+export const CLAVE_TOKEN = "backstage_token";
 
 export const leerToken = () => localStorage.getItem(CLAVE_TOKEN);
 export const guardarToken = (token) => localStorage.setItem(CLAVE_TOKEN, token);
