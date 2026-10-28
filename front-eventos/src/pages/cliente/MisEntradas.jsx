@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { QRCodeSVG } from "qrcode.react";
-import { enviarEntradasPorMail, obtenerCompras, obtenerEntradas } from "../../services/clienteService.js";
+import { descargarEntradaPdf, enviarEntradasPorMail, obtenerCompras, obtenerEntradas } from "../../services/clienteService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaMes, pesos, rangoLargo } from "../../utils/formato.js";
@@ -29,6 +29,22 @@ const ESTADO_COMPRA = {
 // numero/total: cuál es entre las del evento, para que cada QR tenga un nombre distinto al leerlo
 function Entrada({ entrada, numero, total }) {
   const pantalla = useRef(null);
+  const [pdf, setPdf] = useState({ bajando: false, error: "" });
+
+  // El PDF llega como archivo (con el token de la sesión): se guarda con el nombre que manda la API
+  const descargar = async () => {
+    setPdf({ bajando: true, error: "" });
+    try {
+      const respuesta = await descargarEntradaPdf(entrada.id_entrada);
+      const nombre = /filename="([^"]+)"/.exec(respuesta.headers["content-disposition"] ?? "")?.[1] ?? `entrada-${numero}.pdf`;
+      const url = URL.createObjectURL(respuesta.data);
+      Object.assign(document.createElement("a"), { href: url, download: nombre }).click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setPdf({ bajando: false, error: "" });
+    } catch {
+      setPdf({ bajando: false, error: "No se pudo descargar el PDF. Probá de nuevo." });
+    }
+  };
   const anulada = entrada.estado !== "valida";
   const usada = entrada.ingresos > 0;
   const dia = entrada.id_jornada ? etiquetaDia(entrada.fecha_jornada) : `Abono · ${entrada.cantidad_jornadas} jornadas`;
@@ -72,6 +88,18 @@ function Entrada({ entrada, numero, total }) {
         <p className="font-afiche text-2xl uppercase leading-tight">{entrada.espacio}</p>
         <p className="text-sm text-gris">{entrada.tarifa} · {pesos(entrada.precio_pagado)}</p>
         <p className="mt-auto pt-2 font-mono text-xs break-all text-gris">{entrada.codigo}</p>
+        {!anulada && (
+          <button
+            type="button"
+            onClick={descargar}
+            disabled={pdf.bajando}
+            aria-label={`Descargar en PDF la entrada ${numero} de ${total}: ${entrada.espacio}, ${dia}`}
+            className="mt-1 self-start text-xs font-bold uppercase tracking-widest text-papel underline underline-offset-4 hover:text-amarillo disabled:text-gris"
+          >
+            {pdf.bajando ? "Preparando el PDF…" : "Descargar PDF"}
+          </button>
+        )}
+        {pdf.error && <p role="status" className="text-xs text-amarillo">{pdf.error}</p>}
         {(anulada || usada) && (
           <span className="mt-1 justify-self-start text-xs font-bold uppercase tracking-widest text-amarillo">
             {anulada ? "Anulada" : entrada.id_jornada ? "Ya ingresó" : `Ingresó ${entrada.ingresos} de ${entrada.cantidad_jornadas} jornadas`}

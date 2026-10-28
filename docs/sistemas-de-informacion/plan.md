@@ -18,7 +18,7 @@ Todos los integrantes tienen que poder explicar las decisiones. Texto completo d
 | [guia-preguntas.md](relevamiento/guia-preguntas.md) | Guía general de la entrevista: 55 preguntas por bloque, preguntas de validación y qué no preguntar |
 | [entrevista-1-2026-10-13.md](relevamiento/entrevista-1-2026-10-13.md) | Transcripción completa de la primera entrevista |
 | [preguntas-entrevista-2.md](relevamiento/preguntas-entrevista-2.md) | Lista de preguntas de la entrevista 2, con ✅ las ya respondidas |
-| [respuestas-enrevista-2.md](relevamiento/respuestas-enrevista-2.md) | Conversación de la entrevista 2 (en curso; al terminar se renombra a `entrevista-2-2026-10-14.md`) |
+| [entrevista-2-2026-10-14.md](relevamiento/entrevista-2-2026-10-14.md) | Conversación de la entrevista 2, pegada textual (en curso: se completa con las preguntas que faltan) |
 | **analisis/** | |
 | [comparacion-dominio-alcance.md](analisis/comparacion-dominio-alcance.md) | Versión 0: el dominio que mandamos, la devolución de la profesora (09/10) y qué sobraba, faltaba o era hipótesis |
 | [analisis-v1.md](analisis/analisis-v1.md) | Versión 1 del análisis, a partir de la entrevista 1: hechos F01–F33, sistema organizacional, SI, dominio, dudas |
@@ -39,7 +39,7 @@ Cada entrevista se guarda textual en `relevamiento/entrevista-N-AAAA-MM-DD.md`.
 | Exigencia | Estado | Dónde / qué falta |
 | --- | --- | --- |
 | Definir qué necesitamos averiguar | ✅ | [guia-preguntas.md](relevamiento/guia-preguntas.md), a partir de "Qué debe descubrir cada grupo" |
-| Preguntas y repreguntas sobre procesos, responsabilidades, información y reglas | ✅ | Entrevistas [1](relevamiento/entrevista-1-2026-10-13.md) y [2](relevamiento/respuestas-enrevista-2.md) |
+| Preguntas y repreguntas sobre procesos, responsabilidades, información y reglas | ✅ | Entrevistas [1](relevamiento/entrevista-1-2026-10-13.md) y [2](relevamiento/entrevista-2-2026-10-14.md) |
 | Preguntas sobre **situaciones excepcionales** | ✅ | Rechazo, cancelación por el cliente y por Backstage, proveedor que no puede o se baja, servicio atrasado, cambio de fecha con proveedor confirmado, tarea cancelada o reasignada |
 | Aclarar dudas | 🟡 | D1–D10 respondidas ([notas](analisis/notas-entrevista-2.md)). Quedan: nombre del estado del rechazo y la **contradicción sobre la cancelación** (preguntas 2 y 3), "vencida" como estado o condición (21b) |
 | **Validar con el cliente nuestras interpretaciones y propuestas** | 🟡 | Validados: resumen de la entrevista 1, "confirmado", "pedido = solicitud", registro centralizado, ver compromisos al registrar un cambio. Faltan las preguntas 22, 24, 28 y el cierre (29) |
@@ -118,7 +118,7 @@ El criterio de cumplimiento pide demostrarlos en el software. En el análisis ti
 | 13/10 | Entrevista 1 con el cliente | [Transcripción](relevamiento/entrevista-1-2026-10-13.md) |
 | 13/10 | Análisis versión 1: 33 hechos, 10 dudas | [analisis-v1.md](analisis/analisis-v1.md) |
 | 14/10 | Consigna actualizada; carpeta reorganizada; guía de la entrevista 2 | Este documento |
-| 14/10 | Entrevista 2 (en curso): el cliente valida el resumen; se responden D1–D10 y las excepciones; aparece una contradicción sobre la cancelación | [Respuestas](relevamiento/respuestas-enrevista-2.md), [notas](analisis/notas-entrevista-2.md) |
+| 14/10 | Entrevista 2 (en curso): el cliente valida el resumen; se responden D1–D10 y las excepciones; aparece una contradicción sobre la cancelación | [Respuestas](relevamiento/entrevista-2-2026-10-14.md), [notas](analisis/notas-entrevista-2.md) |
 | 14/10 | Se completa la entrevista 1 con los datos de los proveedores (F21) | [§7b](relevamiento/entrevista-1-2026-10-13.md#7b-datos-de-los-proveedores) |
 | 14/10 | Revisión general contra la consigna | [§6](#6-revisión-general-14102026) |
 
@@ -140,6 +140,35 @@ Cada vuelta tiene la misma forma: **preguntar → registrar → analizar → det
 | 8 | Escribir el [informe final](#5-informe-final) a partir de la última versión del análisis | Entregable final | ⬜ |
 
 **Pendientes del grupo:** la fecha de entrega del informe todavía no está definida.
+
+### Ruta para cerrar (28/10/2026)
+
+Meta: **terminar las entrevistas y completar la consigna** sin abrir alcance nuevo.
+
+| # | Qué se hace | Cómo | Resultado |
+| --- | --- | --- | --- |
+| 1 | Terminar la entrevista 2 | 8 preguntas, en el orden de [preguntas-entrevista-2.md](relevamiento/preguntas-entrevista-2.md#qué-falta-preguntar-en-este-orden): 30, 3, 2, 21b, 22, 24, 28 y el cierre (29). Una por mensaje, pegando cada respuesta textual en la [transcripción](relevamiento/entrevista-2-2026-10-14.md) | Contradicción de la cancelación resuelta, estados cerrados, sede ubicada, "servicio" validado |
+| 2 | Volcar las respuestas | Agregar cada una a las [notas](analisis/notas-entrevista-2.md), cerrar el ⚠ y marcar ✅ | Notas al día |
+| 3 | Escribir `analisis-v2.md` | Con "Cambios respecto de la v1" a partir de la tabla de la [§6](#6-revisión-general-14102026) y las 12 reglas nuevas | Versión 2 |
+| 4 | Completar las partes 🟡 y ⬜ de la §2 dentro de v2 | Ver abajo | Consigna cubierta |
+| 5 | Revisión de coherencia | Propósito ↔ límite ↔ componentes ↔ modelo, y que cada afirmación tenga respaldo o esté marcada como hipótesis | Lista para el informe |
+| 6 | Informe final | Artifact con gráficos, a partir de v2 (§5) | Entregable |
+
+**Qué parte de la consigna resuelve cada pregunta que falta:**
+
+| Pregunta | Cierra |
+| --- | --- |
+| 30 (sede) | "No inventar": la v1 afirmaba algo no preguntado. Límite y entorno del sistema |
+| 3 y 2 (cancelación y nombre del rechazo) | Estados del evento y recorridos de cancelación y rechazo |
+| 21b (tarea vencida) | Estados de la tarea: ¿estado o condición calculada? |
+| 22 (cargar antes de confirmar) | Reglas y controles de calidad de la información |
+| 24 (pendientes juntos o por evento) | Información que necesita cada actor y vista de pendientes |
+| 28 (servicio) | Lenguaje ubicuo y justificación de los Bounded Contexts |
+| 29 (cierre) | Validar con el cliente el recorrido completo y los términos clave |
+
+**Qué se escribe en v2 sin necesidad de preguntar más** (ya hay respaldo en las entrevistas): vista por actor, diagrama de flujos de información,
+controles de calidad (datos mínimos, cambios con dato anterior y motivo, nada se borra, compromisos atrasados), escenarios de los cinco recorridos,
+matriz de permisos, estados de la tarea y atributos del modelo conceptual.
 
 ---
 
@@ -206,6 +235,6 @@ que el criterio de cumplimiento pide demostrar. El análisis escrito, en cambio,
 ### Orden para retomar
 
 1. Terminar la entrevista 2: preguntas **2, 3 y 30** primero; después 21b, 22, 24, 28 y el cierre.
-2. Renombrar las respuestas a `entrevista-2-2026-10-14.md` con el mismo formato que la entrevista 1.
+2. ~~Renombrar las respuestas a `entrevista-2-2026-10-14.md`~~ (hecho el 28/10). Falta darle el mismo formato que la entrevista 1 cuando termine.
 3. Escribir `analisis-v2.md` con la tabla de cambios de arriba.
 4. Hacer los gráficos y armar el informe.

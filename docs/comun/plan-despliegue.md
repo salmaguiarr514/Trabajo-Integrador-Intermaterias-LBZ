@@ -3,7 +3,8 @@
 Cómo llevar Backstage desde la PC de cada uno hasta el sitio público en Vercel (con Supabase) y cómo armar la demo de Sistemas Operativos con Docker en Linux.
 Es el plan operativo: el porqué de cada decisión está en [infraestructura.md](infraestructura.md), y las fases del producto en [plan-desarrollo.md](../programacion-2/plan-desarrollo.md) §7.
 
-Estado al 2026-10-27: el código de la app funciona contra Supabase y está preparado para Vercel (F3), pero el sitio no está desplegado.
+Estado al 2026-10-28: el sitio está publicado en Vercel contra Supabase y se actualiza solo con cada push a `main` (ver [§6.1](#61-cómo-quedó-el-despliegue)).
+**Sitio: https://backstage-ebon.vercel.app** · API: https://backstage-api-sage.vercel.app/api
 Los archivos Docker de la demo de SO ya están en `main` (sin probar). El Postgres propio expuesto a internet y la migración desde Supabase se **descartaron** (ver [infraestructura.md](infraestructura.md)).
 
 ---
@@ -25,8 +26,8 @@ Los archivos Docker de la demo de SO ya están en `main` (sin probar). El Postgr
 
 | Pieza | Desarrollo (cada PC) | Demo de Sistemas Operativos | Sitio público |
 | --- | --- | --- | --- |
-| Front (`front-eventos`) | `npm run dev` en `localhost:5173` | Build dentro de la imagen de nginx | Vercel, proyecto `front` |
-| API (`api-eventos`) | `npm run dev` en `localhost:3000` | Contenedores `api1`, `api2`, `api3` | Vercel, proyecto `api` |
+| Front (`front-eventos`) | `npm run dev` en `localhost:5173` | Build dentro de la imagen de nginx | Vercel, proyecto `backstage` |
+| API (`api-eventos`) | `npm run dev` en `localhost:3000` | Contenedores `api1`, `api2`, `api3` | Vercel, proyecto `backstage-api` |
 | Base de datos | Postgres en Docker local, o Supabase | Postgres en Docker, PC de acceso | Supabase |
 | Balanceo | No aplica | nginx en la PC de acceso | No aplica: lo hace Vercel |
 | Sistema | Windows o Linux | **Linux** (VM en cada una de las 3 PCs) | — |
@@ -62,9 +63,9 @@ Antes de empezar, en la PC de cada uno:
 | F1 | Postgres en Docker | F0 | `docker-compose.acceso.yml` (o solo su servicio `db`), scripts `01`–`12` cargados | 🟡 archivos listos, sin probar |
 | F2 | App local contra la base local | F1 | API y front funcionando en la PC contra el Postgres del contenedor | ⬜ |
 | F3 | Preparar el código para Vercel | F2 | Commits con los cambios de la sección 5 | ✅ 2026-10-26 (probado en local simulando la función; F2 no hizo falta porque el sitio público usa Supabase) |
-| F4 | Desplegar la API en Vercel | F3 | `/api/salud` responde desde internet, contra Supabase | ⬜ |
-| F5 | Desplegar el front en Vercel | F4 | Front público que habla con la API pública | ⬜ |
-| F6 | Verificación en producción | F5 | Lista de humo completa en el sitio público | ⬜ |
+| F4 | Desplegar la API en Vercel | F3 | `/api/salud` responde desde internet, contra Supabase | ✅ 2026-10-27 |
+| F5 | Desplegar el front en Vercel | F4 | Front público que habla con la API pública | ✅ 2026-10-27 |
+| F6 | Verificación en producción | F5 | Lista de humo completa en el sitio público | 🟡 probados 1, 2, 3, 9 y login de superadmin; faltan compra, control de acceso y mails |
 | F9 | Demo de Sistemas Operativos | F1 | En 3 PCs con Linux: nginx y base en la PC de acceso, una réplica de la API en cada PC | 🟡 archivos listos, sin probar |
 | F10 | Data warehouse | F1 | Esquema `dw` cargado en la base local (ver [data-warehouse.md](../base-de-datos/data-warehouse.md)) | ⬜ |
 
@@ -189,7 +190,29 @@ Los archivos que existen (`/assets/...`, `/favicon…`) se siguen sirviendo tal 
 
 Supabase está en EE. UU. (`aws-1-us-west-2`, Oregón), por eso `api-eventos/vercel.json` ya trae `"regions": ["pdx1"]` (Portland): la función queda al lado de la base. No se cambia.
 
-**Listo cuando:** los cuatro commits están en `main`, `npm run build` del front pasa, y la lista de humo pasa en local.
+### F3.5. Fecha de nacimiento y provincia en el registro
+
+Decidido el 2026-10-22. Cada cliente que se registra carga su fecha de nacimiento y su provincia. Sirve para el análisis de clientes del data warehouse
+([data-warehouse.md](../base-de-datos/data-warehouse.md)). Es un cambio de esquema, así que va como script numerado y se avisa en el grupo antes de correrlo.
+
+1. **Script nuevo** `api-eventos/database/13_usuarios_nacimiento_provincia.sql`:
+   ```sql
+   ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS fecha_nacimiento DATE;
+   ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS provincia VARCHAR(100);
+   ```
+   Las columnas son **nullable** en la base: los usuarios que ya existen (los de los seeds y los de Supabase) no tienen esos datos, y no se les pide nada después.
+   Quien se registra desde ahora **sí** los tiene que cargar: la obligatoriedad se controla en la API, no en la base.
+2. **Montaje en Docker:** el compose de acceso monta la carpeta `database/` entera, así que `13_…` se carga solo en bases nuevas. Como el volumen de desarrollo ya existe, en las bases que ya están creadas se corre a mano con `psql -f`, en orden. Nunca con `down -v`.
+3. **Supabase:** el script se corre también ahí, **avisando antes en el grupo**, porque la base es compartida.
+4. **Lista cerrada de provincias:** las 24 jurisdicciones argentinas, en una constante compartida entre API y front. Una lista cerrada evita textos libres que después no se pueden agrupar en el DW.
+5. **API:** en la validación del registro de clientes (`POST` de registro, con zod), `fecha_nacimiento` es obligatoria, tiene que ser una fecha pasada y no puede ser de hace más de 120 años; `provincia` tiene que estar en la lista.
+6. **Front:** el formulario de `/registro` suma los dos campos, con mensajes de error por campo (ya existen para el resto del formulario).
+7. **Aviso legal:** el formulario explica para qué se usan los datos (análisis estadístico interno) y pide el consentimiento, según la Ley 25.326 de protección de datos personales. El texto lo revisa el grupo antes de publicarlo.
+8. **Prueba:** lista de humo, ítem 11. Además, `SELECT fecha_nacimiento, provincia FROM usuarios WHERE rol = 'cliente' ORDER BY id_usuario DESC LIMIT 1;` muestra los datos del cliente recién creado.
+
+**Listo cuando:** el registro exige los dos datos, la base los guarda, los usuarios viejos siguen entrando sin cambios, y la lista de humo pasa.
+
+**Listo cuando:** los cuatro commits de F3 (y F3.5) están en `main`, `npm run build` del front pasa, y la lista de humo pasa en local.
 
 ---
 
@@ -233,6 +256,28 @@ Por eso se prueba siempre en la URL de producción. Si hace falta probar preview
 
 **Listo cuando:** la lista de humo de la sección 8 pasa en la URL de producción.
 
+### 6.1. Cómo quedó el despliegue
+
+| Proyecto de Vercel | Carpeta (Root Directory) | URL de producción |
+| --- | --- | --- |
+| `backstage` | `front-eventos` | https://backstage-ebon.vercel.app |
+| `backstage-api` | `api-eventos` | https://backstage-api-sage.vercel.app/api |
+
+Los dos están en la cuenta de Vercel de Salma (equipo `banco5`). Las variables de la API son las de F4, con Gmail ya cargado (`Backstage.entradas@gmail.com`).
+`ENTRADAS_SECRET` y `VERIFICACION_SECRET` no están cargadas: se usa `JWT_SECRET`.
+
+**Cómo se actualiza.** Vercel solo puede conectarse a repos de la cuenta de GitHub de quien lo administra, así que hay un fork en el medio:
+
+1. Se hace push a `main` de este repo (`urendadiego/Trabajo-Integrador-Intermaterias-LBZ`), como siempre.
+2. El fork `salmaguiarr514/Trabajo-Integrador-Intermaterias-LBZ` trae esos cambios cada 15 minutos con una GitHub Action (`.github/workflows/sincronizar-fork.yml`, solo existe en el fork).
+3. Vercel ve el cambio en el fork y despliega el front y la API.
+
+Reglas para que no se trabe:
+- **Nunca hacer push al fork.** Todo va a este repo. Si el fork tiene cambios propios que chocan, la sincronización falla y el sitio deja de actualizarse.
+- **No agregar archivos en `.github/workflows/` de este repo.** La Action del fork no tiene permiso para copiar workflows y la sincronización fallaría.
+- Si se necesita una variable de entorno nueva en producción, avisar a Salma: se carga en el panel de Vercel, no en el repo.
+- Si un cambio no aparece en el sitio después de 15 minutos, revisar la pestaña **Actions** del fork (una cruz roja indica que la sincronización falló).
+
 ---
 
 ## 7. Verificación en producción (F6)
@@ -259,6 +304,7 @@ Se corre en local (F2) y en producción (F6), y antes de cada despliegue. Si un 
 | 8 | Control de acceso: escanear una entrada válida y repetirla | La primera entra; la segunda se rechaza |
 | 9 | Consola del navegador | Sin errores de CORS |
 | 10 | Vencer la sesión (token viejo o borrar el token) y pedir algo | Vuelve al login |
+| 11 | Registrar un cliente nuevo (con fecha de nacimiento y provincia) | Se crea y los dos datos quedan guardados; sin ellos, el registro se rechaza |
 
 Los usuarios y contraseñas de demo están en los seeds `10_seed_plataforma.sql` y `11_seed_demo.sql`. No se escriben en este documento.
 

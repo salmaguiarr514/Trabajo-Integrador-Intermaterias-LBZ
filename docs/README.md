@@ -7,7 +7,7 @@ Cada carpeta corresponde a una materia. Lo que usan varias materias está en `co
 | `comun/` | [dominio.md](comun/dominio.md) | El negocio: empresa, actores, modelo de negocio, procesos, estados, reglas RN-01…RN-30, casos de uso | Prog. 2 y Base de Datos |
 | | [plan-despliegue.md](comun/plan-despliegue.md) | Plan paso a paso: Docker, base local, subida a Vercel, demo de SO y lista de humo | Todas |
 | | [infraestructura.md](comun/infraestructura.md) | Dónde corre cada cosa: Vercel + Supabase para el sitio, Docker en Linux para la demo de SO | Todas |
-| | [alcance-entre-materias.md](comun/alcance-entre-materias.md) | En qué no coinciden el plan y Sistemas de Información, y qué hay que decidir | Todas |
+| | [alcance-entre-materias.md](comun/alcance-entre-materias.md) | Qué hay que hacer en cada materia, quién se encarga y qué no mezclar | Todas |
 | `programacion-2/` | [plan-desarrollo.md](programacion-2/plan-desarrollo.md) | Plan para construir el sitio: roles y permisos, endpoints, pantallas, fases y reparto | Programación 2 |
 | `base-de-datos/` | [der.md](base-de-datos/der.md) | DER: entidades, cardinalidades, restricciones, triggers, borrado, 3FN | Base de Datos |
 | | [backstage.dbml](base-de-datos/backstage.dbml) | El modelo para abrir en dbdiagram.io y exportar el diagrama | Base de Datos |

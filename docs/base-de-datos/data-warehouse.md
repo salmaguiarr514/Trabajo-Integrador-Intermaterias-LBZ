@@ -25,8 +25,8 @@ Infraestructura general (Postgres dockerizado para la demo y el DW, Vercel + Sup
 | **Ocupación** | ¿Qué porcentaje de la capacidad se vende por sector, evento y lugar? ¿Qué eventos se agotan y en cuántos días? ¿Qué lugares se llenan más en promedio? |
 | **Clientes** | ¿Cuántos clientes compran una vez y cuántos vuelven? ¿Cuál es el ticket promedio? ¿Cómo se comportan las cohortes por mes de alta? ¿Qué medios de pago se rechazan más? |
 
-> **Límite de los datos:** `usuarios` no guarda edad ni zona del cliente. Si queremos análisis demográfico,
-> hay que agregar `fecha_nacimiento` y `provincia` al registro (un script nuevo y un cambio chico en el front). **Decisión pendiente.**
+> **Datos del cliente:** desde F3.5 del [plan de despliegue](../comun/plan-despliegue.md), el registro guarda `fecha_nacimiento` y `provincia` (script `13`).
+> Los clientes anteriores al cambio quedan sin esos datos: el análisis demográfico se hace sobre los que los tienen y se aclara en el informe.
 
 ---
 
@@ -90,7 +90,7 @@ Las entradas de **abono** (`tarifas.id_jornada` NULL) valen para todas las jorna
 | `dim_sector` | nombre del espacio, modalidad (de pie / sentado), capacidad, lugar | Tipo 1 |
 | `dim_evento` | nombre, tipo (recital / festival), estado, fechas, cantidad de jornadas, género del headliner | Tipo 1 |
 | `dim_tarifa` | nombre (General, Preventa 1…), abono o por día, precio de lista | Tipo 1 |
-| `dim_cliente` | fecha de alta, mes de cohorte | Tipo 1. Sin nombre ni email: el DW no necesita datos personales |
+| `dim_cliente` | fecha de alta, mes de cohorte, provincia, rango de edad (menor de 25, 25–34, 35–44, 45–54, 55 o más). Sin nombre, email ni fecha exacta de nacimiento | Tipo 1 |
 | `dim_medio_pago` | crédito, débito, transferencia | Fija |
 | `dim_artista` + `puente_evento_artista` | artista: nombre, género, país. Puente: `headliner`, `peso` (1 / cantidad de artistas del evento) | Tipo 1. El puente resuelve el N:M evento–artista sin duplicar ventas: se suma `monto × peso` |
 

@@ -1,6 +1,6 @@
 # Notas de la entrevista 2
 
-Qué aportó cada respuesta de la [entrevista 2](../relevamiento/respuestas-enrevista-2.md) al [análisis v1](analisis-v1.md).
+Qué aportó cada respuesta de la [entrevista 2](../relevamiento/entrevista-2-2026-10-14.md) al [análisis v1](analisis-v1.md).
 Se vuelca en `analisis-v2.md` cuando termine la entrevista.
 
 ## Apertura (resumen de la entrevista 1)

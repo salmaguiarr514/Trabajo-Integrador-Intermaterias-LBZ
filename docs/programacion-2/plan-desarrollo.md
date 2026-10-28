@@ -305,6 +305,7 @@ El script nuevo se corre en Supabase **y** queda en el repo, para que la base de
 4. **Data warehouse** para Base de Datos: esquema `dw` en la misma base, ETL con procedimientos SQL, entrega con consultas analíticas documentadas.
    Responde ventas, asistencia, ocupación y clientes. Ver [data-warehouse.md](../base-de-datos/data-warehouse.md).
 5. **Sistemas Operativos:** el despliegue con nginx + réplicas se mantiene aparte, para la demo, contra el Postgres dockerizado.
+6. **Registro de clientes:** guarda fecha de nacimiento y provincia, obligatorias para cliente nuevo; script `13_…` (2026-10-22). Detalle en [plan-despliegue.md](../comun/plan-despliegue.md) F3.5.
 
 ## 10. Decisiones tomadas (2026-10-27)
 

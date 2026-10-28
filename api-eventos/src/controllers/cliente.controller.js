@@ -5,7 +5,8 @@ import { ErrorHttp } from "../utils/ErrorHttp.js";
 import { actualizar } from "../utils/sql.js";
 import { AHORA, HOY, hora } from "../utils/fechas.js";
 import { firmarEntrada } from "../utils/tokens.js";
-import { enviarEntradas } from "../utils/correoEntradas.js";
+import { buscarEntradas, enviarEntradas, nombrePdf } from "../utils/correoEntradas.js";
+import { pdfEntrada } from "../utils/pdfEntrada.js";
 
 // Rol cliente: cotizar, comprar (pago simulado), ver sus compras y entradas, editar su perfil.
 // Reglas: docs/comun/dominio.md, RN-22 a RN-30.
@@ -187,6 +188,19 @@ export const comprar = async (req, res) => {
       });
   }
   res.status(201).json(respuesta);
+};
+
+// El PDF de una entrada (botón "Descargar PDF" de Mis entradas). "N de M" cuenta entre las del mismo evento.
+export const descargarEntrada = async (req, res) => {
+  const { rows: una } = await buscarEntradas(pool, req.usuario.id_usuario, { id_entrada: req.params.id });
+  if (!una[0]) {
+    throw new ErrorHttp(404, "Esa entrada no es tuya o ya no es válida");
+  }
+  const { rows: delEvento } = await buscarEntradas(pool, req.usuario.id_usuario, { id_evento: una[0].id_evento });
+  const numero = delEvento.findIndex((e) => e.id_entrada === una[0].id_entrada) + 1;
+  const pdf = await pdfEntrada(una[0], { numero, total: delEvento.length });
+  res.set({ "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="${nombrePdf(una[0], numero)}"` });
+  res.send(pdf);
 };
 
 // "Mandármelas por mail": las entradas válidas de un evento, al mail de la cuenta

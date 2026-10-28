@@ -7,6 +7,7 @@ import {
   cotizar,
   editarPerfil,
   enviarEntradasPorMail,
+  descargarEntrada,
   obtenerCompra,
   obtenerCompras,
   obtenerEntradas,
@@ -25,6 +26,7 @@ router.get("/compras", obtenerCompras);
 router.get("/compras/:id", validar(idParams, "params"), obtenerCompra);
 router.get("/entradas", obtenerEntradas);
 router.post("/entradas/enviar", validar(enviarEntradasSchema), enviarEntradasPorMail); // reenviarlas por mail
+router.get("/entradas/:id/pdf", validar(idParams, "params"), descargarEntrada); // la entrada en PDF
 router.get("/perfil", obtenerPerfil);
 router.put("/perfil", validar(perfilSchema), editarPerfil);
 
