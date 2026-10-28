@@ -122,13 +122,13 @@ function PasoJornadas({ evento, soloLectura, onCambio }) {
                   <Button icon={<EditOutlined />} onClick={() => setModal({ abierto: true, jornada: j })} />
                 </Tooltip>
                 <Popconfirm
-                  title="Eliminar jornada"
+                  title="¿Eliminar esta jornada?"
                   description={
                     j.cantidad_presentaciones + j.cantidad_tarifas > 0
-                      ? `Se borran también sus ${j.cantidad_presentaciones} shows y ${j.cantidad_tarifas} tarifas. ¿Seguro?`
-                      : "¿Seguro?"
+                      ? `Se borran también sus ${j.cantidad_presentaciones} shows y ${j.cantidad_tarifas} tarifas. No se puede deshacer.`
+                      : "No se puede deshacer."
                   }
-                  okText="Eliminar"
+                  okText="Eliminar jornada"
                   cancelText="Cancelar"
                   okButtonProps={{ danger: true }}
                   onConfirm={() => eliminar(j)}

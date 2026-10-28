@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { Alert, Button, Card, Col, Empty, Input, Row, Select, Space, Tag, Typography } from "antd";
-import { CheckCircleFilled, CloseCircleFilled, ScanOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Empty, Input, Row, Select, Space, Tag, Typography } from "antd";
+import { CheckCircleFilled, CloseCircleFilled, ScanOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { obtenerEvento, obtenerEventos, obtenerVentasEvento, validarEntrada } from "../../services/panelService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { diaCorto, numero } from "../../utils/formato.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import { PANEL } from "../../tema.js";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
+import EscanerQR from "../../components/EscanerQR.jsx";
 
-const VERDE = "#52c41a";
-const ROJO = "#ff4d4f";
+const VERDE = PANEL.ok;
+const ROJO = PANEL.error;
 
 // La jornada que conviene controlar: la de hoy, o la próxima, o la última
 const jornadaSugerida = (jornadas) => {
@@ -26,7 +29,7 @@ function Veredicto({ resultado }) {
       <div style={{ textAlign: "center", padding: "40px 16px" }}>
         <ScanOutlined style={{ fontSize: 56, opacity: 0.4 }} />
         <Typography.Paragraph type="secondary" style={{ marginTop: 12 }}>
-          Escaneá el QR de la entrada o pegá el código.
+          Escaneá el QR de la entrada (con la cámara o un lector) o escribí el código.
         </Typography.Paragraph>
       </div>
     );
@@ -36,16 +39,20 @@ function Veredicto({ resultado }) {
   return (
     <div
       role="status"
+      className={`veredicto ${ok ? "veredicto--ok" : "veredicto--no"}`}
       style={{ textAlign: "center", padding: "28px 16px", borderRadius: 12, background: `${color}22`, border: `2px solid ${color}` }}
     >
       {ok ? <CheckCircleFilled style={{ fontSize: 64, color }} /> : <CloseCircleFilled style={{ fontSize: 64, color }} />}
-      <Typography.Title level={1} style={{ color, margin: "8px 0 4px", letterSpacing: 2 }}>{ok ? "ADELANTE" : "NO PASA"}</Typography.Title>
+      <Typography.Title level={2} style={{ color, margin: "8px 0 4px", letterSpacing: 2, fontSize: 38 }}>{ok ? "ADELANTE" : "NO PASA"}</Typography.Title>
       {ok ? (
         <Space orientation="vertical" size={2}>
           <Typography.Text style={{ fontSize: 20 }} strong>{resultado.espacio}</Typography.Text>
           <Typography.Text type="secondary">
             {resultado.abono ? "Abono" : "Entrada del día"} · {resultado.tarifa} · {resultado.titular}
           </Typography.Text>
+          <Tag color={resultado.origen === "qr" ? "green" : "gold"} style={{ marginTop: 6, marginInlineEnd: 0 }}>
+            {resultado.origen === "qr" ? "QR con firma verificada" : "Código escrito a mano: pedí el documento"}
+          </Tag>
         </Space>
       ) : (
         <Typography.Text style={{ fontSize: 18 }}>{resultado.mensaje}</Typography.Text>
@@ -55,7 +62,9 @@ function Veredicto({ resultado }) {
 }
 
 // /panel/acceso — control de acceso en la puerta (fase 7, RN-24).
-// Un lector de QR de mano funciona como teclado: escribe el código y aprieta Enter.
+// El QR de cada entrada es un JWT firmado por la API, que verifica la firma antes de dejar pasar.
+// Se lee con la cámara (celular o notebook) o con un lector de mano, que funciona como teclado:
+// escribe el contenido del QR y aprieta Enter. Si el QR no se puede leer, se escribe el código de la entrada.
 function ControlAcceso() {
   const [params, setParams] = useSearchParams();
   const eventos = useCarga(obtenerEventos, "eventos", "No se pudieron cargar los eventos");
@@ -67,7 +76,10 @@ function ControlAcceso() {
   const [resultado, setResultado] = useState(null);
   const [historial, setHistorial] = useState([]);
   const [contador, setContador] = useState(null); // { ingresos, entradas } de la jornada
+  const [camara, setCamara] = useState(false);
+  const [vez, setVez] = useState(0); // cada resultado nuevo vuelve a animar el cartel
   const campo = useRef(null);
+  const ocupado = useRef(false); // la cámara puede leer de nuevo mientras se valida
 
   const jornadas = detalle.datos ? detalle.datos.jornadas : [];
   const jornada = jornadas.find((j) => j.id_jornada === idJornada) ?? jornadas.find((j) => j.id_jornada === jornadaSugerida(jornadas));
@@ -88,7 +100,7 @@ function ControlAcceso() {
   }, [idEvento, jornada?.id_jornada]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (eventos.cargando) return <Cargando />;
-  if (eventos.error) return <Alert type="error" showIcon title={eventos.error} />;
+  if (eventos.error) return <ErrorPanel mensaje={eventos.error} onReintentar={eventos.recargar} />;
 
   // Solo tiene sentido controlar eventos que se venden
   const opcionesEventos = eventos.datos
@@ -102,9 +114,11 @@ function ControlAcceso() {
     setContador(null);
   };
 
-  const validar = async () => {
-    const texto = codigo.trim();
-    if (!texto || !jornada) return;
+  // texto: lo que leyó la cámara, o lo escrito en el campo (lector de mano o a mano)
+  const validar = async (leido) => {
+    const texto = (typeof leido === "string" ? leido : codigo).trim();
+    if (!texto || !jornada || ocupado.current) return;
+    ocupado.current = true;
     setValidando(true);
     try {
       const { data } = await validarEntrada(texto, jornada.id_jornada);
@@ -116,9 +130,12 @@ function ControlAcceso() {
       setResultado({ valida: false, mensaje });
       setHistorial((h) => [{ hora: dayjs().format("HH:mm"), ok: false, texto: mensaje, codigo: texto }, ...h].slice(0, 12));
     } finally {
+      ocupado.current = false;
+      setVez((v) => v + 1);
       setValidando(false);
       setCodigo("");
-      campo.current?.focus();
+      // Con la cámara no: en el celular abriría el teclado
+      if (!camara) campo.current?.focus();
     }
   };
 
@@ -129,8 +146,9 @@ function ControlAcceso() {
       <Card>
         <Row gutter={[16, 16]}>
           <Col xs={24} md={14}>
-            <Typography.Text type="secondary">Evento</Typography.Text>
+            <label htmlFor="acceso-evento" style={{ color: "rgba(255, 255, 255, 0.65)" }}>Evento</label>
             <Select
+              id="acceso-evento"
               style={{ width: "100%", marginTop: 4 }}
               placeholder="Elegí el evento"
               value={idEvento ?? undefined}
@@ -140,8 +158,9 @@ function ControlAcceso() {
             />
           </Col>
           <Col xs={24} md={10}>
-            <Typography.Text type="secondary">Día que se controla</Typography.Text>
+            <label htmlFor="acceso-dia" style={{ color: "rgba(255, 255, 255, 0.65)" }}>Día que se controla</label>
             <Select
+              id="acceso-dia"
               style={{ width: "100%", marginTop: 4 }}
               placeholder="Elegí el día"
               disabled={!jornada}
@@ -170,6 +189,18 @@ function ControlAcceso() {
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={15}>
             <Card>
+              <Button
+                block
+                size="large"
+                icon={<VideoCameraOutlined />}
+                onClick={() => setCamara(!camara)}
+                disabled={!jornada}
+                aria-pressed={camara}
+                style={{ marginBottom: 12 }}
+              >
+                {camara ? "Cerrar la cámara" : "Usar la cámara"}
+              </Button>
+              {camara && jornada && <EscanerQR onLeer={validar} />}
               <Space.Compact style={{ width: "100%", marginBottom: 16 }}>
                 <Input
                   ref={campo}
@@ -177,7 +208,7 @@ function ControlAcceso() {
                   autoFocus
                   allowClear
                   prefix={<ScanOutlined />}
-                  placeholder="Código de la entrada"
+                  placeholder="Escaneá con el lector o escribí el código"
                   value={codigo}
                   onChange={(e) => setCodigo(e.target.value)}
                   onPressEnter={validar}
@@ -188,7 +219,7 @@ function ControlAcceso() {
                   Validar
                 </Button>
               </Space.Compact>
-              <Veredicto resultado={resultado} />
+              <Veredicto key={vez} resultado={resultado} />
             </Card>
           </Col>
           <Col xs={24} lg={9}>

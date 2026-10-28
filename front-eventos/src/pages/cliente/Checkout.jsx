@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { comprar, cotizar } from "../../services/clienteService.js";
+import { useAuth } from "../../context/auth.js";
 import { erroresPorCampo, mensajeDeError } from "../../services/api.js";
 import { itemsDelCarrito, leerCarrito, vaciarCarrito } from "../../utils/carrito.js";
 import { pesos } from "../../utils/formato.js";
+import { useTitulo } from "../../hooks/useTitulo.js";
+import { conTransicion } from "../../utils/transicion.js";
+import { Aviso, botonPrimario, botonSecundario, Campo, campoClase, TituloLetras } from "../../components/afiche.jsx";
+import { lluviaDeEntradas } from "../../utils/movimiento.js";
 
 const MEDIOS = [
   { valor: "credito", texto: "Crédito" },
   { valor: "debito", texto: "Débito" },
   { valor: "transferencia", texto: "Transferencia" }
 ];
-
-const campoClase =
-  "w-full border-2 border-borde bg-tinta px-3 py-2.5 text-papel placeholder:text-gris/60 focus:border-amarillo focus:outline-none";
 
 // 4111 1111 1111 1111 mientras se escribe
 const formatearTarjeta = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
@@ -21,19 +23,9 @@ const formatearVencimiento = (v) => {
   return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
 };
 
-function Campo({ etiqueta, error, children }) {
-  return (
-    <label className="grid gap-1.5 text-sm">
-      <span className="font-bold uppercase tracking-widest text-gris">{etiqueta}</span>
-      {children}
-      {error && <span className="text-fucsia">{error}</span>}
-    </label>
-  );
-}
-
 function Resumen({ cotizacion }) {
   return (
-    <section className="border-2 border-papel bg-noche">
+    <section className="entra border-2 border-papel bg-noche" style={{ "--i": 1 }}>
       <h2 className="border-b-2 border-papel px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em]">Tu compra</h2>
       <div className="grid gap-2 p-4 text-sm">
         <p className="font-afiche text-2xl uppercase leading-tight">{cotizacion.evento.nombre}</p>
@@ -46,12 +38,12 @@ function Resumen({ cotizacion }) {
             <span className="tabular-nums">{pesos(l.importe)}</span>
           </div>
         ))}
-        <div className="mt-1 flex justify-between gap-3 border-t-2 border-dashed border-borde pt-2">
+        <div className="mt-1 flex justify-between gap-3 border-t-2 border-dashed border-linea pt-2">
           <span className="text-gris">Subtotal</span>
           <span className="tabular-nums">{pesos(cotizacion.subtotal)}</span>
         </div>
         <div className="flex justify-between gap-3">
-          <span className="text-gris">Service charge ({cotizacion.cargo_servicio_pct}%)</span>
+          <span className="text-gris">Cargo por servicio ({cotizacion.cargo_servicio_pct}%)</span>
           <span className="tabular-nums">{pesos(cotizacion.cargo_servicio)}</span>
         </div>
         <div className="flex items-baseline justify-between gap-3 pt-1">
@@ -63,10 +55,23 @@ function Resumen({ cotizacion }) {
   );
 }
 
+// Qué pasó con el mail de las entradas (lo informa la API al comprar)
+const AVISO_CORREO = {
+  enviado: (email) => `Te las mandamos por mail a ${email}, con sus QR.`,
+  sin_configurar: () => "El envío de mails no está configurado en este servidor: las entradas están en Mis entradas.",
+  error: () => "No pudimos mandarte el mail, pero las entradas ya son tuyas: las ves en Mis entradas y desde ahí podés pedirlas por mail."
+};
+
 function Resultado({ compra, idEvento, onReintentar }) {
   const aprobada = compra.estado === "pagada";
+  const { usuario } = useAuth();
+  // Pago aprobado: lluvia de entraditas y sello; rechazado: la caja se sacude
+  useEffect(() => {
+    if (aprobada) lluviaDeEntradas();
+  }, [aprobada]);
   return (
-    <section className={`grid justify-items-start gap-4 border-2 p-6 sm:p-8 ${aprobada ? "border-verde" : "border-fucsia"}`}>
+    <section className={`relative grid justify-items-start gap-4 border-2 p-6 sm:p-8 ${aprobada ? "border-verde" : "sacude border-fucsia"}`}>
+      {aprobada && <span className="sello text-verde" aria-hidden="true">Pagado</span>}
       <span className={`px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-tinta ${aprobada ? "bg-verde" : "bg-fucsia"}`}>
         {aprobada ? "Pago aprobado" : "Pago rechazado"}
       </span>
@@ -77,17 +82,22 @@ function Resultado({ compra, idEvento, onReintentar }) {
           : "La tarjeta fue rechazada (es una simulación: las terminadas en 0000 se rechazan). No se te cobró nada."}
       </p>
       {aprobada && <p className="text-sm text-gris">Comprobante: <span className="font-mono text-papel">{compra.referencia_pago}</span></p>}
+      {aprobada && compra.correo && (
+        <p className={`entra border-l-4 pl-3 text-sm ${compra.correo === "enviado" ? "border-verde text-papel" : "border-amarillo text-amarillo"}`} style={{ "--i": 3 }}>
+          {AVISO_CORREO[compra.correo]?.(usuario?.email)}
+        </p>
+      )}
       <div className="flex flex-wrap gap-3">
         {aprobada ? (
-          <Link to="/mis-entradas" className="border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
+          <Link viewTransition to="/mis-entradas" className={botonPrimario}>
             Ver mis entradas
           </Link>
         ) : (
-          <button type="button" onClick={onReintentar} className="border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
+          <button type="button" onClick={onReintentar} className={botonPrimario}>
             Probar con otra tarjeta
           </button>
         )}
-        <Link to={`/eventos/${idEvento}`} className="border-2 border-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-papel hover:bg-noche">
+        <Link viewTransition to={`/eventos/${idEvento}`} className={botonSecundario}>
           Volver al evento
         </Link>
       </div>
@@ -99,6 +109,7 @@ function Resultado({ compra, idEvento, onReintentar }) {
 function Checkout() {
   const { id } = useParams();
   const [items] = useState(() => itemsDelCarrito(leerCarrito(id)));
+  useTitulo("Pagar");
   const [cotizacion, setCotizacion] = useState(null);
   const [errorCotizar, setErrorCotizar] = useState(items.length === 0 ? "No elegiste entradas todavía." : "");
   const [medio, setMedio] = useState("credito");
@@ -144,7 +155,7 @@ function Checkout() {
       <section className="grid justify-items-start gap-4 py-12">
         <h1 className="font-afiche text-5xl uppercase leading-none">No se puede comprar así</h1>
         <p className="max-w-prose text-gris">{errorCotizar}</p>
-        <Link to={`/eventos/${id}`} className="border-2 border-papel bg-papel px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-tinta hover:border-fucsia hover:bg-fucsia">
+        <Link viewTransition to={`/eventos/${id}`} className={botonPrimario}>
           Elegir entradas
         </Link>
       </section>
@@ -155,42 +166,45 @@ function Checkout() {
 
   return (
     <div className="grid grid-cols-1 gap-8">
-      <Link to={`/eventos/${id}`} className="justify-self-start text-xs font-bold uppercase tracking-widest text-gris hover:text-papel">
+      <Link viewTransition to={`/eventos/${id}`} className="justify-self-start text-xs font-bold uppercase tracking-widest text-gris hover:text-papel">
         ← Cambiar entradas
       </Link>
-      <h1 className="font-afiche text-6xl uppercase leading-[0.9]">Pagar</h1>
+      <TituloLetras texto="Pagar" className="font-afiche text-6xl uppercase leading-[0.9]" />
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <Resumen cotizacion={cotizacion} />
 
-        <form onSubmit={pagar} className="grid gap-5 border-2 border-papel bg-noche p-5" noValidate>
+        <form onSubmit={pagar} className="entra grid gap-5 border-2 border-papel bg-noche p-5" style={{ "--i": 2 }} noValidate>
           <div className="border-2 border-dashed border-amarillo px-3 py-2 text-sm text-amarillo">
             Pago simulado: no se cobra nada. Para probar un rechazo, usá una tarjeta terminada en <strong>0000</strong>.
           </div>
 
-          <div className="grid gap-1.5">
-            <span className="text-sm font-bold uppercase tracking-widest text-gris">Medio de pago</span>
+          {/* Botones de opción nativos: se recorren con las flechas y se leen como "1 de 3, seleccionado" */}
+          <fieldset className="grid gap-1.5">
+            <legend className="mb-1.5 text-sm font-semibold">Medio de pago</legend>
             <div className="flex flex-wrap gap-2">
               {MEDIOS.map((m) => (
-                <button
-                  key={m.valor}
-                  type="button"
-                  aria-pressed={medio === m.valor}
-                  onClick={() => setMedio(m.valor)}
-                  className={`border-2 px-4 py-2 text-xs font-bold uppercase tracking-widest ${
-                    medio === m.valor ? "border-papel bg-papel text-tinta" : "border-borde text-gris hover:border-papel hover:text-papel"
-                  }`}
-                >
-                  {m.texto}
-                </button>
+                <label key={m.valor} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="medio"
+                    value={m.valor}
+                    checked={medio === m.valor}
+                    onChange={() => conTransicion(() => setMedio(m.valor))}
+                    className="peer sr-only"
+                  />
+                  <span className={`${medio === m.valor ? "vt-medio-activo " : ""}block border-2 border-borde px-4 py-2 text-xs font-bold uppercase tracking-widest text-gris hover:border-papel hover:text-papel peer-checked:border-papel peer-checked:bg-papel peer-checked:text-tinta peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-amarillo`}>
+                    {m.texto}
+                  </span>
+                </label>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           {medio === "transferencia" ? (
-            <p className="text-sm text-gris">Se aprueba al instante (es una simulación).</p>
+            <p className="vt-panel-medio text-sm text-gris">Se aprueba al instante (es una simulación).</p>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="vt-panel-medio grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <Campo etiqueta="Número de tarjeta" error={errores.numero}>
                   <input
@@ -238,14 +252,10 @@ function Checkout() {
           )}
 
           {(errores.general || errores.tarjeta) && (
-            <p role="alert" className="border-2 border-fucsia px-3 py-2 text-sm text-fucsia">{errores.general ?? errores.tarjeta}</p>
+            <Aviso>{errores.general ?? errores.tarjeta}</Aviso>
           )}
 
-          <button
-            type="submit"
-            disabled={pagando}
-            className="border-2 border-papel bg-papel py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-tinta hover:border-fucsia hover:bg-fucsia disabled:opacity-50"
-          >
+          <button type="submit" disabled={pagando} className={`${botonPrimario} py-3`}>
             {pagando ? "Procesando…" : `Pagar ${pesos(cotizacion.total)}`}
           </button>
         </form>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, App, Button, Card, Empty, Input, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { App, Button, Card, Empty, Input, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { eliminarArtista, obtenerArtistas } from "../../services/panelService.js";
 import { mensajeDeError } from "../../services/api.js";
@@ -7,6 +7,7 @@ import { useCarga } from "../../hooks/useCarga.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 import ArtistaModal from "./ArtistaModal.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 // Artistas de la productora (RN-12: cada una carga los suyos y solo programa artistas propios)
 function Artistas() {
@@ -15,8 +16,8 @@ function Artistas() {
   const [modal, setModal] = useState({ abierto: false, artista: null });
   const artistas = useCarga(obtenerArtistas, "artistas", "No se pudieron cargar los artistas");
 
-  if (artistas.cargando) return <Cargando texto="Cargando artistas..." />;
-  if (artistas.error) return <Alert type="error" showIcon title={artistas.error} />;
+  if (artistas.cargando) return <Cargando texto="Cargando artistas…" />;
+  if (artistas.error) return <ErrorPanel mensaje={artistas.error} onReintentar={artistas.recargar} />;
 
   const eliminar = async (a) => {
     try {
@@ -87,9 +88,9 @@ function Artistas() {
             </Tooltip>
           ) : (
             <Popconfirm
-              title="Eliminar artista"
-              description={`¿Seguro que querés eliminar a "${a.nombre}"?`}
-              okText="Eliminar"
+              title={`¿Eliminar a "${a.nombre}"?`}
+              description="Se borra de tus artistas y no se puede deshacer."
+              okText="Eliminar artista"
               cancelText="Cancelar"
               okButtonProps={{ danger: true }}
               onConfirm={() => eliminar(a)}

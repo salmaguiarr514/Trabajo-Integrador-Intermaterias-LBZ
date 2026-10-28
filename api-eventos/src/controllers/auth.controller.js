@@ -2,7 +2,13 @@ import bcrypt from "bcryptjs";
 import pool from "../data/db.js";
 import { firmarToken } from "../middlewares/autenticar.js";
 import { ErrorHttp } from "../utils/ErrorHttp.js";
-import { enviarCodigo, MAX_INTENTOS, SEGUNDOS_ENTRE_ENVIOS } from "../utils/verificacion.js";
+import { enviarCodigo, enviarRecuperacion, MAX_INTENTOS, SEGUNDOS_ENTRE_ENVIOS } from "../utils/verificacion.js";
+import { leerRestablecer, leerVerificacion } from "../utils/tokens.js";
+import { configurado as correoConfigurado } from "../utils/correo.js";
+
+// Si este servidor no tiene Gmail configurado, el mail no sale (queda en la consola de la API):
+// el front lo avisa en vez de decir "te mandamos un código". No depende del email, así que no revela nada.
+const estadoCorreo = () => (correoConfigurado ? "enviado" : "sin_configurar");
 
 const SELECT_USUARIO = `
   SELECT u.*, e.nombre AS empresa, e.activo AS empresa_activa
@@ -54,20 +60,37 @@ export const login = async (req, res) => {
 };
 
 // El cliente queda creado sin verificar y recibe un código por mail. Recién con
-// POST /verificar obtiene el token. Si el mail no sale, no se crea el usuario.
+// POST /verificar obtiene el token. Si el mail falla, no se crea el usuario.
+// Una cuenta que nunca se verificó no bloquea el email: registrarse de nuevo la actualiza con los datos
+// nuevos (contraseña incluida) y manda otro código. Una verificada, o que no es de cliente, sí lo bloquea.
 export const registro = async (req, res) => {
   const { email, password, nombre, apellido, dni, telefono } = req.body;
+  const existente = await buscarPorEmail(email);
+  if (existente && (existente.email_verificado || existente.rol !== "cliente")) {
+    throw new ErrorHttp(409, "Ya hay una cuenta con ese email: ingresá con tu contraseña");
+  }
   const hash = await bcrypt.hash(password, 10);
+  const datos = [email, hash, nombre, apellido ?? null, dni ?? null, telefono ?? null];
 
   const db = await pool.connect();
   try {
     await db.query("BEGIN");
-    const { rows } = await db.query(
-      `INSERT INTO usuarios (email, password_hash, nombre, apellido, dni, telefono, rol)
-       VALUES ($1, $2, $3, $4, $5, $6, 'cliente')
-       RETURNING *`,
-      [email, hash, nombre, apellido ?? null, dni ?? null, telefono ?? null]
-    );
+    const { rows } = existente
+      ? await db.query(
+          `UPDATE usuarios SET password_hash = $2, nombre = $3, apellido = $4, dni = $5, telefono = $6
+           WHERE id_usuario = $7 AND email = $1 AND NOT email_verificado
+           RETURNING *`,
+          [...datos, existente.id_usuario]
+        )
+      : await db.query(
+          `INSERT INTO usuarios (email, password_hash, nombre, apellido, dni, telefono, rol)
+           VALUES ($1, $2, $3, $4, $5, $6, 'cliente')
+           RETURNING *`,
+          datos
+        );
+    if (!rows[0]) {
+      throw new ErrorHttp(409, "Ya hay una cuenta con ese email: ingresá con tu contraseña");
+    }
     try {
       await enviarCodigo(db, rows[0]);
     } catch (error) {
@@ -82,7 +105,7 @@ export const registro = async (req, res) => {
     db.release();
   }
 
-  res.status(201).json({ mensaje: `Te mandamos un código a ${email}`, email });
+  res.status(201).json({ mensaje: `Te mandamos un código y un enlace a ${email}`, email, correo: estadoCorreo() });
 };
 
 // Mismo error para email inexistente o ya verificado: no revela qué emails están registrados
@@ -120,6 +143,31 @@ export const verificar = async (req, res) => {
   res.json({ token: firmarToken(usuario), usuario: usuarioPublico(usuario) });
 };
 
+// El botón del mail: un JWT firmado por la API con el id del código vigente. Sirve una sola vez:
+// si ya se verificó, o se pidió un código nuevo (otro id), el enlace deja de valer.
+export const verificarEnlace = async (req, res) => {
+  const datos = leerVerificacion(req.body.token);
+  const usuario = await buscarPorEmail(datos.email);
+  if (!usuario || usuario.id_usuario !== datos.id_usuario) {
+    throw new ErrorHttp(400, "El enlace no es válido. Pedí un código nuevo");
+  }
+  if (usuario.email_verificado) {
+    throw new ErrorHttp(409, "Tu email ya está verificado: ingresá con tu contraseña", { motivo: "ya_verificado" });
+  }
+  const { rows } = await pool.query(
+    "SELECT 1 FROM codigos_verificacion WHERE id_codigo = $1 AND id_usuario = $2 AND expira > NOW()",
+    [datos.id_codigo, usuario.id_usuario]
+  );
+  if (!rows[0]) {
+    throw new ErrorHttp(400, "Ese enlace ya no sirve: pediste un código nuevo o venció. Usá el último mail");
+  }
+
+  verificarActivo(usuario);
+  await pool.query("UPDATE usuarios SET email_verificado = TRUE WHERE id_usuario = $1", [usuario.id_usuario]);
+  await pool.query("DELETE FROM codigos_verificacion WHERE id_usuario = $1", [usuario.id_usuario]);
+  res.json({ token: firmarToken(usuario), usuario: usuarioPublico(usuario) });
+};
+
 // Siempre responde lo mismo (no revela si el email existe). Un envío por minuto como máximo.
 export const reenviarCodigo = async (req, res) => {
   const usuario = await buscarPorEmail(req.body.email);
@@ -142,7 +190,37 @@ export const reenviarCodigo = async (req, res) => {
     }
   }
 
-  res.json({ mensaje: "Si el email está registrado y sin verificar, te mandamos un código nuevo" });
+  res.json({ mensaje: "Si el email está registrado y sin verificar, te mandamos un código nuevo", correo: estadoCorreo() });
+};
+
+// "¿Olvidaste tu contraseña?": manda un enlace para elegir una nueva. Siempre responde lo mismo
+// (no revela si el email existe). Sirve también para una cuenta que nunca verificó el email.
+export const recuperar = async (req, res) => {
+  const usuario = await buscarPorEmail(req.body.email);
+  if (usuario?.activo) {
+    try {
+      await enviarRecuperacion(usuario);
+    } catch (error) {
+      console.error(error);
+      throw new ErrorHttp(503, "No pudimos mandarte el mail. Probá de nuevo en un rato");
+    }
+  }
+  res.json({ mensaje: "Si el email está registrado, te mandamos un enlace para elegir una contraseña nueva", correo: estadoCorreo() });
+};
+
+// El enlace del mail de recuperación (un JWT que deja de servir en cuanto cambia la contraseña).
+// Cambia la contraseña, deja el email verificado (el enlace prueba que el mail es suyo) e inicia sesión.
+export const restablecer = async (req, res) => {
+  const datos = leerRestablecer(req.body.token);
+  const usuario = await buscarPorEmail(datos.email);
+  if (!usuario || !datos.vigente(usuario)) {
+    throw new ErrorHttp(400, "Este enlace ya se usó o no es válido. Pedí uno nuevo");
+  }
+  verificarActivo(usuario);
+  const hash = await bcrypt.hash(req.body.password, 10);
+  await pool.query("UPDATE usuarios SET password_hash = $1, email_verificado = TRUE WHERE id_usuario = $2", [hash, usuario.id_usuario]);
+  await pool.query("DELETE FROM codigos_verificacion WHERE id_usuario = $1", [usuario.id_usuario]);
+  res.json({ token: firmarToken(usuario), usuario: usuarioPublico(usuario) });
 };
 
 export const yo = async (req, res) => {

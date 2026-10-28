@@ -13,6 +13,9 @@ import TagOrigen from "../../components/TagOrigen.jsx";
 import LugarCampos from "./LugarCampos.jsx";
 import ParteLugarModal from "./ParteLugarModal.jsx";
 import { AMBITOS } from "./ambitos.js";
+import EditorPlano from "../../components/plano/EditorPlano.jsx";
+import VisorPlano from "../../components/plano/VisorPlano.jsx";
+import { planoDeLugar } from "../../components/plano/geometria.js";
 
 function DatosLugar({ ambito, lugar, editable, onGuardado }) {
   const [form] = Form.useForm();
@@ -68,13 +71,13 @@ function DatosLugar({ ambito, lugar, editable, onGuardado }) {
               Guardar cambios
             </Button>
             <Popconfirm
-              title="Eliminar lugar"
+              title={`¿Eliminar "${lugar.nombre}"?`}
               description={
                 lugar.cantidad_eventos > 0
                   ? "Tiene eventos: no se va a poder eliminar. Dalo de baja."
-                  : `Se borran también sus sectores y escenarios. ¿Seguro?`
+                  : "Se borran también sus sectores y escenarios, y no se puede deshacer."
               }
-              okText="Eliminar"
+              okText="Eliminar lugar"
               cancelText="Cancelar"
               okButtonProps={{ danger: true, disabled: lugar.cantidad_eventos > 0 }}
               onConfirm={eliminar}
@@ -162,9 +165,9 @@ function PartesLugar({ ambito, tipo, lugar, editable, onCambio }) {
                   </Tooltip>
                 ) : (
                   <Popconfirm
-                    title={esSector ? "Eliminar sector" : "Eliminar escenario"}
-                    description={`¿Seguro que querés eliminar "${p.nombre}"?`}
-                    okText="Eliminar"
+                    title={`¿Eliminar ${esSector ? "el sector" : "el escenario"} "${p.nombre}"?`}
+                    description="No se puede deshacer."
+                    okText={esSector ? "Eliminar sector" : "Eliminar escenario"}
                     cancelText="Cancelar"
                     okButtonProps={{ danger: true }}
                     onConfirm={() => eliminar(p)}
@@ -232,7 +235,10 @@ function LugarDetalle({ ambito: nombreAmbito }) {
         status="404"
         title="Lugar no encontrado"
         subTitle={lugar.error}
-        extra={<Button type="primary" onClick={() => navigate(ambito.ruta)}>Volver a lugares</Button>}
+        extra={[
+          <Button key="reintentar" onClick={lugar.recargar}>Reintentar</Button>,
+          <Button key="volver" type="primary" onClick={() => navigate(ambito.ruta)}>Volver a lugares</Button>
+        ]}
       />
     );
   }
@@ -246,7 +252,7 @@ function LugarDetalle({ ambito: nombreAmbito }) {
         <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(ambito.ruta)} style={{ paddingInline: 0 }}>
           Lugares
         </Button>
-        <Typography.Title level={2} style={{ margin: "8px 0 8px" }}>{l.nombre}</Typography.Title>
+        <Typography.Title level={1} style={{ margin: "8px 0 8px", fontSize: 30 }}>{l.nombre}</Typography.Title>
         <Space wrap>
           <TagOrigen lugar={l} />
           <Tag>{etiquetaTipoLugar(l.tipo)}</Tag>
@@ -283,6 +289,18 @@ function LugarDetalle({ ambito: nombreAmbito }) {
               key: "escenarios",
               label: `Escenarios (${l.escenarios.length})`,
               children: <PartesLugar ambito={ambito} tipo="escenarios" lugar={l} editable={editable} onCambio={lugar.recargar} />
+            },
+            {
+              key: "plano",
+              label: "Plano",
+              // Quien puede modificar el lugar lo dibuja; los demás lo ven (si tiene)
+              children: editable ? (
+                <EditorPlano lugar={l} servicio={ambito.servicio} onGuardado={lugar.recargar} />
+              ) : planoDeLugar(l) ? (
+                <VisorPlano plano={planoDeLugar(l)} titulo={`Plano de ${l.nombre}`} />
+              ) : (
+                <Empty description="Este lugar no tiene plano: los sectores se eligen de la lista." />
+              )
             },
             {
               key: "datos",

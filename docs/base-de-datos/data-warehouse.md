@@ -12,7 +12,7 @@ Decisiones (2026-10-22):
 | Cómo se muestran los análisis | **Consultas SQL documentadas** | Es lo que se entrega. Un tablero en la app o una herramienta de BI quedan como agregado opcional |
 | Qué preguntas responde | Ventas, asistencia, ocupación y clientes | Sección 1 |
 
-Infraestructura general (Postgres dockerizado, Vercel, Supabase transitorio): [infraestructura.md](../comun/infraestructura.md).
+Infraestructura general (Postgres dockerizado para la demo y el DW, Vercel + Supabase para el sitio): [infraestructura.md](../comun/infraestructura.md).
 
 ---
 
@@ -127,7 +127,7 @@ Los seeds de demo tienen pocas filas: con eso los análisis no muestran nada. Ha
 con `generate_series` y `random()`: unas 10 productoras, 60 eventos en dos años, 5.000 clientes y alrededor de 100.000 entradas, con curvas de venta creíbles
 (más ventas cerca de la fecha, algunos eventos agotados, 10–15 % de no-show).
 
-**Ese script nunca se corre en la base de producción**: solo en el Postgres local de cada uno, para desarrollar y para la defensa.
+**Ese script nunca se corre en Supabase** (la base del sitio público): solo en el Postgres local de cada uno, para desarrollar y para la defensa.
 
 ---
 
@@ -167,7 +167,7 @@ Postgres los corre solos al crear el contenedor, después de los `01`–`12`.
 | `21_dw_dim_fecha.sql` | Carga de `dim_fecha` (2024–2028) y `dim_hora` |
 | `22_dw_etl.sql` | Procedimientos del ETL |
 | `23_dw_consultas.sql` | Las 14 consultas y la de validación (no crea nada: es para correr y mostrar) |
-| `90_seed_volumen.sql` | Datos sintéticos. **Solo desarrollo:** no se monta en el contenedor de producción |
+| `90_seed_volumen.sql` | Datos sintéticos. **Solo desarrollo:** no se monta en el compose de la demo |
 
 ---
 
@@ -182,4 +182,4 @@ Postgres los corre solos al crear el contenedor, después de los `01`–`12`.
 | **DW5. Consultas** | `23_dw_consultas.sql` con las 14 consultas y sus resultados | ⬜ |
 | **DW6. Entrega** | Informe: preguntas, modelo, decisiones de diseño (grano, SCD, puente), ETL y resultados | ⬜ |
 
-Se puede empezar ya, en paralelo con la migración: DW2 a DW5 se prueban en un Postgres local en Docker y no dependen de Vercel ni de Supabase.
+Se puede empezar ya: DW2 a DW5 se prueban en un Postgres local en Docker y no dependen de Vercel ni de Supabase.

@@ -175,7 +175,7 @@ src/
 - `empresas` CRUD (lo que ya existe, se mueve acá).
 - `usuarios` CRUD (crear usuarios de rol empresa con su productora).
 - `lugares` CRUD del catálogo de la plataforma, con anidados `lugares/:id/escenarios` y `lugares/:id/espacios`,
-  y `GET/PUT lugares/:id/plano` (guarda de una vez el lienzo, las formas de espacios y escenarios y los elementos, en una transacción).
+  y `PUT lugares/:id/plano` (guarda de una vez el lienzo, las formas de espacios y escenarios y los elementos, en una transacción; el `GET lugares/:id` ya trae todo lo dibujado).
 - `artistas` GET de todos (solo lectura).
 - `eventos` GET de todos y `PATCH /:id/estado` (despublicar o cancelar).
 - `metricas` GET (productoras activas, eventos por estado, entradas vendidas, **recaudación por service charge** por productora y por mes).
@@ -266,18 +266,15 @@ src/
 | **5. Empresa** | Lugares y artistas propios, asistente de evento completo, publicar | 4 (usa el catálogo) | Hecha: inicio (próximos eventos y ventas), lugares propios, artistas, datos de la productora y asistente de eventos completo con publicar |
 | **6. Público y cliente** | Cartelera, detalle con grilla, registro, compra, mis entradas | 5 (necesita eventos publicados) | Hecha: cartelera, detalle con grilla, registro (con verificación del email), compra con service charge y pago simulado, mis entradas con QR. El checkout elige sectores de una lista: el plano queda para 7b |
 | **7. Ventas y control** | Ventas por evento, validar entradas, métricas | 6 | Hecha: ventas por evento (con ocupación y asistencia), control de acceso en la puerta y métricas del superadmin |
-| **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | |
-| **8. Deploy en Vercel** | Front y API publicados en Vercel (dos proyectos), todavía **contra Supabase**: `vercel.json` del front, variables de entorno, región `gru1`, CORS | 7 | |
-| **9. Postgres dockerizado** | Compose con Postgres solo (volumen, `restart`, backup diario), scripts `01`–`12` probados en una base vacía, usuario `backstage_app` sin superusuario | 1 | |
-| **10. Exponer la base** | Prueba de CGNAT en la PC servidor; port forwarding + DuckDNS o túnel TCP; SSL obligatorio; la API local conectada a la base por la dirección pública | 9 | |
-| **11. Migración** | Datos de Supabase copiados al Postgres propio, filas verificadas, `DATABASE_URL` de Vercel cambiada, sitio público probado. Supabase queda dos semanas de respaldo | 8, 10 | |
-| **12. Data warehouse** (Base de Datos) | Esquema `dw`, ETL en PL/pgSQL y consultas analíticas. Detalle y subfases en [data-warehouse.md](../base-de-datos/data-warehouse.md) | 9 (se prueba en un Postgres local) | |
-| **13. Demo de SO** | nginx + réplicas contra el mismo Postgres dockerizado. Detalle en el [plan de SO](../sistemas-operativos/plan.md) | 9 | |
+| **7b. Plano** | EditorPlano (admin y empresa), VisorPlano en tarifas y checkout, planos del seed | 4 (es un agregado: todo funciona sin plano) | Hecha: editor en el detalle del lugar (mover, estirar, polígonos, teclado y medidas exactas), plano en el paso de tarifas (tocar un sector carga su tarifa) y en la compra (el sector se elige en el mapa, pintado según la disponibilidad del día). El seed ya trae tres lugares dibujados (Aeródromo de Punilla, Movistar Arena y Niceto Club) |
+| **8. Deploy en Vercel** | Front y API publicados en Vercel (dos proyectos), todavía **contra Supabase**: `vercel.json` del front, variables de entorno, región `gru1`, CORS | 7 | Código listo (F3 del [plan de despliegue](../comun/plan-despliegue.md)): entrada de la función, `DB_POOL_MAX`, rutas del front y región `pdx1`, al lado de Supabase. Falta crear los dos proyectos en Vercel (F4 a F6) |
+| **9. Postgres dockerizado** | Postgres en el compose de la PC de acceso (volumen, `restart`), con la carpeta `database/` montada: scripts `01`–`12` probados en una base vacía | 1 | Archivos listos (`docker-compose.acceso.yml`); falta probarlos en una VM Linux |
+| **10. Data warehouse** (Base de Datos) | Esquema `dw`, ETL en PL/pgSQL y consultas analíticas. Detalle y subfases en [data-warehouse.md](../base-de-datos/data-warehouse.md) | 9 (se prueba en un Postgres local) | |
+| **11. Demo de SO** | En 3 PCs con Linux (VMs): nginx y la base en la PC de acceso, y una réplica de la API en cada PC. Detalle en el [plan de SO](../sistemas-operativos/plan.md) | 9 | Archivos listos (`docker-compose.acceso.yml` y `docker-compose.nodo.yml`); falta el ensayo |
 | **14. Cierre** | README actualizado, DER y modelo dimensional exportados, guion de la defensa | todo | |
 
-La infraestructura nueva (por qué Vercel, cómo llega Vercel a la base de la PC, migración y riesgos) está en [infraestructura.md](../comun/infraestructura.md).
-**Orden recomendado:** la 8 primero, porque es la de menos riesgo (el sitio queda público contra Supabase, que ya anda). La 9 y la 12 pueden ir en paralelo.
-La 11 es la única que corta algo y se hace cuando 8 y 10 ya están probadas.
+La infraestructura (Vercel con Supabase para el sitio público, Docker para la demo de SO) está en [infraestructura.md](../comun/infraestructura.md).
+**Orden recomendado:** la 8 primero, porque es la de menos riesgo (el sitio queda público contra Supabase, que ya anda). La 9, la 10 y la 11 son independientes del sitio público y pueden ir en paralelo.
 
 ### Reparto sugerido (después de hacer juntos las fases 1–3)
 - **Persona A, superadmin:** fase 4 completa (backend y front), métricas de recaudación y **el plano (7b)**, porque nace en la pantalla de lugares.
@@ -286,7 +283,7 @@ La 11 es la única que corta algo y se hace cuando 8 y 10 ya están probadas.
 
 Cada uno trabaja en ramas `feature/<tarea>` y abre un PR a `main`. Los cambios de esquema se avisan en el grupo **antes** de correrlos,
 porque la base es una sola: cada cambio va como un archivo SQL nuevo (`13_agrega_x.sql`), nunca se edita en vivo.
-Después de la migración (fase 11) la regla es más importante todavía: el script nuevo se corre en el Postgres de producción **y** queda en el repo para recrear la base.
+El script nuevo se corre en Supabase **y** queda en el repo, para que la base de Docker se pueda recrear igual.
 
 ---
 
@@ -303,10 +300,14 @@ Después de la migración (fase 11) la regla es más importante todavía: el scr
 ## 9. Decisiones tomadas (2026-10-22)
 
 1. **Hosting:** front y API en **Vercel**, como dos proyectos.
-2. **Base de producción:** un **Postgres propio en Docker**, en una PC del grupo, al que Vercel se conecta por internet. Ver [infraestructura.md](../comun/infraestructura.md).
-3. **Supabase:** se sigue usando hasta que el sitio ande en Vercel y el Postgres propio esté expuesto; después se migran los datos y se deja.
+2. **Base del sitio público:** sigue siendo **Supabase**. (Se había decidido migrar a un Postgres propio expuesto a internet; se descartó el 2026-10-27 por innecesario.)
+3. **Postgres dockerizado:** es el de la demo de SO y el del data warehouse, en local.
 4. **Data warehouse** para Base de Datos: esquema `dw` en la misma base, ETL con procedimientos SQL, entrega con consultas analíticas documentadas.
    Responde ventas, asistencia, ocupación y clientes. Ver [data-warehouse.md](../base-de-datos/data-warehouse.md).
-5. **Sistemas Operativos:** el despliegue con nginx + réplicas se mantiene aparte, para la demo, contra el mismo Postgres.
-6. **Servidor y Vercel:** la PC servidor de la base y la cuenta de Vercel son de Salma (2026-10-22).
-7. **Registro de clientes:** guarda fecha de nacimiento y provincia, obligatorias para cliente nuevo; script `13_…` (2026-10-22). Detalle en [plan-despliegue.md](../comun/plan-despliegue.md) F3.5.
+5. **Sistemas Operativos:** el despliegue con nginx + réplicas se mantiene aparte, para la demo, contra el Postgres dockerizado.
+6. **Registro de clientes:** guarda fecha de nacimiento y provincia, obligatorias para cliente nuevo; script `13_…` (2026-10-22). Detalle en [plan-despliegue.md](../comun/plan-despliegue.md) F3.5.
+
+## 10. Decisiones tomadas (2026-10-27)
+
+1. **Sistemas Operativos:** todo en **Linux** (VMs), en **3 PCs**, todo dockerizado: nginx y la base en la PC de acceso, una réplica de la API en cada PC. Ver el [plan de SO](../sistemas-operativos/plan.md).
+2. **Sin migración:** el sitio público queda con Supabase; no se expone ningún Postgres a internet.

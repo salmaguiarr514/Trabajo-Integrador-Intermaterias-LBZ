@@ -1,0 +1,7 @@
+{
+  "regions": ["pdx1"],
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }],
+  "functions": {
+    "api/index.js": { "includeFiles": "src/assets/**" }
+  }
+}

@@ -1,7 +1,8 @@
-import pool from "../data/db.js";
+import pool, { enTransaccion } from "../data/db.js";
 import { ErrorHttp } from "../utils/ErrorHttp.js";
 import { actualizar, insertar } from "../utils/sql.js";
 import { filtrosLugaresSchema } from "../schemas/lugares.schema.js";
+import { obtenerPlano } from "../utils/plano.js";
 
 // Lo usan el superadmin (/api/admin/lugares) y la productora (/api/panel/lugares).
 // Lo que cambia es el alcance, que sale del usuario del token (docs/comun/dominio.md, RN-06 y RN-07):
@@ -68,7 +69,7 @@ export const obtenerLugares = async (req, res) => {
 export const obtenerLugar = async (req, res) => {
   const lugar = await buscarLugar(req, req.params.id);
   const params = [lugar.id_lugar, empresaDe(req)];
-  const [escenarios, espacios] = await Promise.all([
+  const [escenarios, espacios, elementos] = await Promise.all([
     pool.query(
       `SELECT sc.*,
               (SELECT COUNT(*) FROM evento_escenarios ee JOIN eventos ev ON ev.id_evento = ee.id_evento
@@ -82,9 +83,10 @@ export const obtenerLugar = async (req, res) => {
                 WHERE t.id_espacio = es.id_espacio AND ($2::INT IS NULL OR ev.id_empresa = $2))::INT AS cantidad_tarifas
        FROM espacios es WHERE es.id_lugar = $1 ORDER BY es.capacidad DESC`,
       params
-    )
+    ),
+    pool.query("SELECT * FROM elementos_plano WHERE id_lugar = $1 ORDER BY id_elemento", [lugar.id_lugar])
   ]);
-  res.json({ ...lugar, escenarios: escenarios.rows, espacios: espacios.rows });
+  res.json({ ...lugar, escenarios: escenarios.rows, espacios: espacios.rows, elementos: elementos.rows });
 };
 
 // Un lugar nuevo arranca con el sector "General" (con la capacidad enviada) y el escenario "Principal".
@@ -206,4 +208,43 @@ export const eliminarEspacio = async (req, res) => {
     throw new ErrorHttp(404, "Sector no encontrado");
   }
   res.status(204).send();
+};
+
+// ─── Plano ──────────────────────────────────────────────────────────────────
+// Guarda el plano completo (planoSchema): el tamaño del lienzo, la forma de cada sector y escenario dibujado
+// y los elementos de referencia. Reemplaza lo que había, todo en una transacción.
+export const guardarPlano = async (req, res) => {
+  const lugar = await lugarEditable(req, req.params.id);
+  const { ancho, alto, espacios, escenarios, elementos } = req.body;
+  const id = lugar.id_lugar;
+
+  await enTransaccion(async (cliente) => {
+    await cliente.query("UPDATE lugares SET plano_ancho = $1, plano_alto = $2 WHERE id_lugar = $3", [ancho, alto, id]);
+    // Cada sector y escenario que viene tiene que ser de este lugar; los que no vienen quedan sin dibujar
+    for (const [tabla, columna, lista, nombre] of [
+      ["espacios", "id_espacio", espacios, "sector"],
+      ["escenarios", "id_escenario", escenarios, "escenario"]
+    ]) {
+      await cliente.query(`UPDATE ${tabla} SET geometria = NULL WHERE id_lugar = $1`, [id]);
+      if (lista.length === 0) continue;
+      const { rowCount } = await cliente.query(
+        `UPDATE ${tabla} t SET geometria = v.geometria
+         FROM jsonb_to_recordset($2::jsonb) AS v (${columna} INT, geometria JSONB)
+         WHERE t.${columna} = v.${columna} AND t.id_lugar = $1`,
+        [id, JSON.stringify(lista)]
+      );
+      if (rowCount !== new Set(lista.map((x) => x[columna])).size) {
+        throw new ErrorHttp(400, `Hay un ${nombre} que no es de este lugar (o está repetido)`);
+      }
+    }
+    await cliente.query("DELETE FROM elementos_plano WHERE id_lugar = $1", [id]);
+    if (elementos.length > 0) {
+      await cliente.query(
+        `INSERT INTO elementos_plano (id_lugar, tipo, etiqueta, geometria)
+         SELECT $1, v.tipo, v.etiqueta, v.geometria FROM jsonb_to_recordset($2::jsonb) AS v (tipo TEXT, etiqueta TEXT, geometria JSONB)`,
+        [id, JSON.stringify(elementos)]
+      );
+    }
+  });
+  res.json(await obtenerPlano("l.id_lugar = $1", [id]));
 };

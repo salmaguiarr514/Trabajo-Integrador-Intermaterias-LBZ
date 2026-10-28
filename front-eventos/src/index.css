@@ -1,13 +1,13 @@
 /* Estilos: los paneles (admin y productora) usan Ant Design; el sitio público usa Tailwind.
    Orden de capas: el reset de Tailwind (base) queda debajo de antd, y las utilidades de Tailwind
    encima. Así el reset no rompe antd y en el sitio público las clases de Tailwind siempre ganan.
-   Los estilos de antd van a la capa "antd" por el <StyleProvider layer> de main.jsx. */
+   Los estilos de antd van a la capa "antd" por el <StyleProvider layer> de layouts/ProveedorAntd.jsx.
+   Las fuentes (Anton e Inter) se cargan desde index.html, en paralelo con el JS. */
 @layer theme, base, antd, components, utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
-/* Tokens del sitio público: estética de afiche de recital */
+/* Tokens del sitio público: estética de afiche de recital (los colores de JS están en tema.js) */
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
   --font-afiche: "Anton", Impact, sans-serif;
@@ -15,19 +15,35 @@
   --color-noche: #17121a;
   --color-papel: #fff6ec;
   --color-gris: #c2b2bb;
-  --color-borde: #4a3a50;
+  /* borde: controles (campos, filtros, tarjetas de tarifa), 3,4:1 sobre noche.
+     linea: separadores decorativos, que no necesitan contraste. */
+  --color-borde: #75637c;
+  --color-linea: #4a3a50;
   --color-fucsia: #ff3d7f;
   --color-amarillo: #ffd23f;
   --color-verde: #3ddc97;
 }
 
 @layer base {
+  html {
+    /* La barra superior es fija: lo que recibe foco o se ancla no queda tapado */
+    scroll-padding-top: 5rem;
+  }
+
   body {
-    min-height: 100vh;
-    background:
-      radial-gradient(circle at 15% -10%, rgba(168, 85, 247, 0.25), transparent 40%),
-      radial-gradient(circle at 90% 0%, rgba(236, 72, 153, 0.18), transparent 35%),
-      #0b0b12;
+    min-height: 100dvh;
+    background: #0b0b12;
+  }
+
+  /* Sitio público: anillo de foco y selección con los colores del afiche */
+  .sitio :focus-visible {
+    outline: 2px solid var(--color-amarillo);
+    outline-offset: 2px;
+  }
+
+  .sitio ::selection {
+    background: var(--color-amarillo);
+    color: var(--color-tinta);
   }
 }
 
@@ -46,14 +62,68 @@
     padding: 24px 16px 48px;
   }
 
-  /* Barra superior fija con fondo translúcido */
+  /* Barra superior fija */
   .barra {
     position: sticky;
     top: 0;
     z-index: 10;
-    backdrop-filter: blur(10px);
-    background: rgba(11, 11, 18, 0.75);
+    background: #0b0b12;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Encabezado de una pantalla del panel: título a la izquierda, acciones a la derecha */
+  .encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* Fila de una lista que lleva a otra pantalla (un link de verdad, con hover y foco) */
+  .fila-enlace {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 8px;
+    margin-inline: -8px;
+    border-radius: 8px;
+    color: inherit;
+    transition: background-color 150ms ease-out;
+  }
+
+  .fila-enlace:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: inherit;
+  }
+
+  .fila-enlace + .fila-enlace {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Tablas de los paneles: las palabras no se parten por la mitad (antd las corta en la celda y en
+     Typography); si no entran, la tabla se desplaza de costado (todas tienen scroll x) */
+  .ant-table-cell,
+  .ant-table-cell .ant-typography {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  /* Encabezados de columna que ordenan: antd los hace enfocables pero sin marca de foco */
+  .ant-table-thead > tr > th:focus-visible {
+    outline: 2px solid #c084fc;
+    outline-offset: -2px;
+  }
+
+  /* Fila de filtros (Segmented) que en el celular no entra: se desplaza de costado en vez de salirse */
+  .desliza {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* Etiqueta violeta de antd (Plataforma, Abono, Superadmin): su texto quedaba en 3,4:1 */
+  .ant-tag.ant-tag-purple {
+    color: #d3adf7;
   }
 
   .barra-interior {
@@ -63,13 +133,877 @@
     gap: 12px;
   }
 
-  .barra .contenido.barra-interior {
-    padding-block: 14px;
-  }
-
   @media (max-width: 600px) {
     .ocultar-mobile {
       display: none;
+    }
+  }
+}
+
+/* Ruedita de carga sin antd (la usan también las rutas públicas) */
+@keyframes girar {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@layer components {
+  .ruedita {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    border-top-color: currentColor;
+    animation: girar 0.8s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ruedita {
+      animation-duration: 2.4s;
+    }
+  }
+}
+
+/* ─── Movimiento ───
+   Todo corre solo si el sistema no pide menos movimiento; si lo pide, las pantallas cambian al instante.
+   - Cambio de pantalla (View Transitions, viewTransition en los links): la barra de arriba queda quieta,
+     el contenido viejo se apaga subiendo y el nuevo entra desde abajo.
+   - Cambio dentro de una pantalla (utils/transicion.js: pestañas, filtros, opciones): la página no se mueve;
+     solo lo que tiene view-transition-name (la opción elegida, el panel que cambia) se desliza o funde.
+   - .entra: lo que aparece en pantalla entra subiendo, en cascada según --i (0, 1, 2…). */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: salir-pantalla 160ms ease-in both;
+  }
+
+  ::view-transition-new(root) {
+    animation: entrar-pantalla 360ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  html[data-transicion="local"]::view-transition-old(root),
+  html[data-transicion="local"]::view-transition-new(root) {
+    animation: none;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 340ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  /* La barra de arriba y el menú de los paneles no viajan con el contenido */
+  .sitio > header {
+    view-transition-name: barra-sitio;
+  }
+
+  .barra {
+    view-transition-name: barra-panel;
+  }
+
+  .ant-layout-sider {
+    view-transition-name: menu-panel;
+  }
+
+  @keyframes salir-pantalla {
+    to {
+      opacity: 0;
+      translate: 0 -12px;
+    }
+  }
+
+  @keyframes entrar-pantalla {
+    from {
+      opacity: 0;
+      translate: 0 18px;
+    }
+  }
+
+  .entra {
+    transition:
+      opacity 480ms cubic-bezier(0.2, 0, 0, 1),
+      translate 480ms cubic-bezier(0.2, 0, 0, 1);
+    transition-delay: calc(min(var(--i, 0), 8) * 70ms);
+  }
+
+  @starting-style {
+    .entra {
+      opacity: 0;
+      translate: 0 20px;
+    }
+  }
+
+  /* Pase con QR a pantalla completa: sube al abrirse y baja al cerrarse */
+  .dialogo-qr {
+    transition:
+      opacity 220ms cubic-bezier(0.2, 0, 0, 1),
+      translate 300ms cubic-bezier(0.2, 0, 0, 1),
+      overlay 300ms allow-discrete,
+      display 300ms allow-discrete;
+    opacity: 0;
+    translate: 0 48px;
+  }
+
+  .dialogo-qr[open] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @starting-style {
+    .dialogo-qr[open] {
+      opacity: 0;
+      translate: 0 48px;
+    }
+  }
+}
+
+/* Con movimiento reducido, el cambio de pantalla es inmediato (sin el fundido que el navegador pone por defecto) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Transiciones locales (utils/transicion.js): lo que se desliza (la opción elegida) o se funde (el panel que
+   cambia). Los nombres solo existen mientras corre una, así al cambiar de pantalla no se animan aparte. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-transicion="local"] .vt-filtro-activo {
+    view-transition-name: filtro-activo;
+  }
+
+  html[data-transicion="local"] .vt-pestana-activa {
+    view-transition-name: pestana-activa;
+  }
+
+  html[data-transicion="local"] .vt-panel-jornada {
+    view-transition-name: panel-jornada;
+  }
+
+  html[data-transicion="local"] .vt-filtro-sector {
+    view-transition-name: filtro-sector;
+  }
+
+  html[data-transicion="local"] .vt-medio-activo {
+    view-transition-name: medio-activo;
+  }
+
+  html[data-transicion="local"] .vt-panel-medio {
+    view-transition-name: panel-medio;
+  }
+}
+
+/* ─── A todo volumen ───
+   Movimiento con personalidad de recital para el sitio del cliente. Las piezas de JS están en
+   utils/movimiento.js y components/afiche.jsx (TituloLetras,
+   ImporteAnimado). Todo lo que mueve corre solo sin "menos movimiento". */
+
+/* Tarjeta de evento: se inclina en 3D siguiendo el mouse (--rx/--ry), con un brillo que lo sigue (--mx/--my).
+   Las variables se registran sin herencia: al moverse el mouse solo se recalcula la tarjeta, no todo lo que tiene adentro. */
+@property --rx {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --ry {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --mx {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --my {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+.tarjeta-afiche {
+  position: relative;
+}
+
+@media (hover: hover) {
+  .tarjeta-afiche:hover {
+    background-image: radial-gradient(circle at var(--mx) var(--my), rgb(255 246 236 / 0.14), transparent 45%);
+  }
+}
+
+/* Sello de pago */
+.sello {
+  position: absolute;
+  top: -18px;
+  right: 16px;
+  font-family: var(--font-afiche);
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border: 5px solid currentColor;
+  background: var(--color-tinta);
+  rotate: -10deg;
+  pointer-events: none;
+}
+
+.escaneo {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 0;
+  height: 4px;
+  background: var(--color-fucsia);
+  box-shadow: 0 0 0 1px var(--color-tinta);
+  opacity: 0;
+}
+
+.progreso-scroll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 3px;
+  background: var(--color-fucsia);
+  transform-origin: 0 50%;
+  scale: 0 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Cambio de pantalla más marcado: sale achicándose, entra subiendo con rebote (sin desenfoque: costaría
+     redibujar la pantalla entera en cada cuadro) */
+  ::view-transition-old(root) {
+    animation: salir-pantalla-fuerte 140ms ease-in both;
+  }
+
+  ::view-transition-new(root) {
+    animation: entrar-pantalla-fuerte 340ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+  }
+
+  html[data-transicion="local"]::view-transition-old(root),
+  html[data-transicion="local"]::view-transition-new(root) {
+    animation: none;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 340ms;
+    animation-timing-function: cubic-bezier(0.2, 1.35, 0.35, 1);
+  }
+
+  @keyframes salir-pantalla-fuerte {
+    to {
+      opacity: 0;
+      translate: 0 -16px;
+      scale: 0.98;
+    }
+  }
+
+  @keyframes entrar-pantalla-fuerte {
+    from {
+      opacity: 0;
+      translate: 0 28px;
+    }
+  }
+
+  /* Cascada con rebote */
+  .entra {
+    transition:
+      opacity 320ms cubic-bezier(0.2, 0, 0, 1),
+      translate 420ms cubic-bezier(0.2, 1.35, 0.35, 1);
+    transition-delay: calc(min(var(--i, 0), 8) * 40ms);
+  }
+
+  @starting-style {
+    .entra {
+      opacity: 0;
+      translate: 0 24px;
+    }
+  }
+
+  /* Títulos de afiche que caen letra por letra (TituloLetras) */
+  .letra {
+    display: inline-block;
+    animation: cae-letra 500ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(var(--n) * 28ms);
+  }
+
+  @keyframes cae-letra {
+    from {
+      opacity: 0;
+      translate: 0 -0.9em;
+      rotate: -14deg;
+    }
+
+    55% {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 1;
+      translate: 0 0;
+      rotate: 0deg;
+    }
+  }
+
+  /* Cinta de artistas en loop (se frena al pasar el mouse o con el botón) */
+  .cinta-pista {
+    animation: desliza-cinta 34s linear infinite;
+  }
+
+  .cinta:hover .cinta-pista,
+  .cinta.pausada .cinta-pista {
+    animation-play-state: paused;
+  }
+
+  @keyframes desliza-cinta {
+    to {
+      translate: -50% 0;
+    }
+  }
+
+  /* Tarjetas: inclinación 3D que sigue al mouse */
+  .tarjeta-afiche {
+    transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+    transition:
+      transform 420ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      scale 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      translate 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      box-shadow 200ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .tarjeta-afiche.siguiendo {
+    transition:
+      transform 50ms linear,
+      scale 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      translate 340ms cubic-bezier(0.2, 1.35, 0.35, 1),
+      box-shadow 200ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .tarjeta-afiche:hover {
+    box-shadow: 12px 12px 0 var(--color-fucsia);
+  }
+
+
+  /* Line-up: cada show entra deslizándose; el cierre late dos veces */
+  .fila-show {
+    animation: entra-show 380ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 35ms);
+  }
+
+  @keyframes entra-show {
+    from {
+      opacity: 0;
+      translate: -40px 0;
+    }
+  }
+
+  .cierre-late {
+    animation: late 600ms ease-in-out 2 both;
+    animation-delay: 300ms;
+  }
+
+  @keyframes late {
+    50% {
+      scale: 1.18;
+      background: var(--color-amarillo);
+      color: var(--color-tinta);
+    }
+  }
+
+  /* Mis entradas: cada entrada se da vuelta al aparecer */
+  .voltea {
+    transform-origin: 50% 0;
+    animation: voltea 540ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 60ms + 60ms);
+  }
+
+  @keyframes voltea {
+    from {
+      opacity: 0;
+      transform: perspective(900px) rotateX(-85deg);
+    }
+
+    40% {
+      opacity: 1;
+    }
+  }
+
+  /* QR a pantalla completa: línea de escaneo, tres pasadas. Al terminar desaparece (backwards, no both):
+     si quedara quieta encima del QR, a un lector le podría costar tomarlo */
+  .dialogo-qr[open] .escaneo {
+    animation: escanea 900ms ease-in-out 3 alternate backwards;
+    animation-delay: 200ms;
+  }
+
+  @keyframes escanea {
+    from {
+      top: 0;
+      opacity: 1;
+    }
+
+    to {
+      top: calc(100% - 4px);
+      opacity: 1;
+    }
+  }
+
+  /* Pago: el sello cae con rebote; si se rechaza, la caja se sacude */
+  .sello {
+    animation: cae-sello 480ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: 60ms;
+  }
+
+  @keyframes cae-sello {
+    from {
+      opacity: 0;
+      scale: 2.6;
+      rotate: -28deg;
+    }
+  }
+
+  .sacude {
+    animation: sacude 460ms ease-in-out both;
+  }
+
+  @keyframes sacude {
+    20%,
+    60% {
+      translate: -10px 0;
+    }
+
+    40%,
+    80% {
+      translate: 10px 0;
+    }
+  }
+
+  /* Barra de progreso del scroll, debajo de la barra del sitio */
+  @supports (animation-timeline: scroll()) {
+    .progreso-scroll {
+      animation: avanza-scroll linear both;
+      animation-timeline: scroll(root);
+    }
+
+    @keyframes avanza-scroll {
+      to {
+        scale: 1 1;
+      }
+    }
+  }
+}
+
+/* ─── Paneles en movimiento ───
+   Versión sobria de los efectos para las pantallas de trabajo (admin y productora): el contenido entra
+   en cascada, las filas de las tablas se escalonan y las barras de progreso se llenan. Los números de
+   los tableros cuentan con components/Indicador.jsx. Solo sin "menos movimiento". */
+@media (prefers-reduced-motion: no-preference) {
+  .contenido .encabezado,
+  .contenido .ant-card,
+  .contenido .ant-alert,
+  .contenido .ant-steps,
+  .contenido .ant-result {
+    animation: entra-panel 360ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  /* En las grillas de tarjetas, cada columna entra un poco después que la anterior */
+  .contenido .ant-col:nth-child(2) > .ant-card { animation-delay: 50ms; }
+  .contenido .ant-col:nth-child(3) > .ant-card { animation-delay: 100ms; }
+  .contenido .ant-col:nth-child(4) > .ant-card { animation-delay: 150ms; }
+  .contenido .ant-col:nth-child(5) > .ant-card { animation-delay: 200ms; }
+  .contenido .ant-col:nth-child(n + 6) > .ant-card { animation-delay: 250ms; }
+
+  /* Filas de las tablas: entran escalonadas (al cargar, filtrar o cambiar de página) */
+  .contenido .ant-table-tbody > tr.ant-table-row {
+    animation: entra-fila 300ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(2) { animation-delay: 25ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(3) { animation-delay: 50ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(4) { animation-delay: 75ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(5) { animation-delay: 100ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(6) { animation-delay: 125ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(7) { animation-delay: 150ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(8) { animation-delay: 175ms; }
+  .contenido .ant-table-tbody > tr.ant-table-row:nth-child(n + 9) { animation-delay: 200ms; }
+
+  @keyframes entra-panel {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+    }
+  }
+
+  @keyframes entra-fila {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
+  /* Barras de progreso (ocupación, cargo por servicio): se llenan desde cero al aparecer */
+  .contenido .ant-progress-track {
+    transform-origin: 0 50%;
+    transition: scale 800ms cubic-bezier(0.2, 0, 0, 1) 150ms;
+  }
+
+  @starting-style {
+    .contenido .ant-progress-track {
+      scale: 0 1;
+    }
+  }
+}
+
+/* ─── Plano del lugar ───
+   components/plano: VisorPlano (panel y sitio) y EditorPlano (panel). Cada tema define sus colores;
+   el color propio de cada sector llega en --c. El estado de un sector nunca es solo un color:
+   lleva su texto en el mapa, un rayado si está agotado y un borde punteado si no tiene venta. */
+.plano {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.plano svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 64vh;
+}
+
+.plano--panel {
+  --p-lienzo: #101019;
+  --p-borde-lienzo: rgb(255 255 255 / 0.12);
+  --p-grilla: rgb(255 255 255 / 0.05);
+  --p-texto: #ffffff;
+  --p-texto-suave: rgb(255 255 255 / 0.7);
+  --p-contorno: #0b0b12;
+  --p-elemento: rgb(255 255 255 / 0.06);
+  --p-elemento-borde: rgb(255 255 255 / 0.32);
+  --p-escenario: #2a1f3d;
+  --p-escenario-borde: #c084fc;
+  --p-escenario-texto: #ffffff;
+  --p-foco: #c084fc;
+  --p-elegido: #fadb14;
+  --p-aviso: #fadb14;
+}
+
+.plano--afiche {
+  --p-lienzo: var(--color-noche);
+  --p-borde-lienzo: var(--color-papel);
+  --p-grilla: rgb(255 246 236 / 0.05);
+  --p-texto: var(--color-papel);
+  --p-texto-suave: var(--color-gris);
+  --p-contorno: var(--color-tinta);
+  --p-elemento: rgb(255 246 236 / 0.05);
+  --p-elemento-borde: var(--color-borde);
+  --p-escenario: var(--color-papel);
+  --p-escenario-borde: var(--color-papel);
+  --p-escenario-texto: var(--color-tinta);
+  --p-foco: var(--color-amarillo);
+  --p-elegido: var(--color-amarillo);
+  --p-aviso: var(--color-amarillo);
+}
+
+.plano-lienzo {
+  fill: var(--p-lienzo);
+  stroke: var(--p-borde-lienzo);
+  stroke-width: 4;
+}
+
+.plano-grilla {
+  stroke: var(--p-grilla);
+  stroke-width: 2;
+}
+
+.plano-rotulo {
+  fill: var(--p-texto);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  paint-order: stroke;
+  stroke: var(--p-contorno);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  user-select: none;
+}
+
+.plano--afiche .plano-rotulo {
+  font-family: var(--font-afiche);
+  font-weight: 400;
+}
+
+.plano-detalle {
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.plano-elemento path {
+  fill: var(--p-elemento);
+  stroke: var(--p-elemento-borde);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+
+.plano-elemento .plano-rotulo {
+  fill: var(--p-texto-suave);
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.plano-escenario path {
+  fill: var(--p-escenario);
+  stroke: var(--p-escenario-borde);
+  stroke-width: 3;
+}
+
+.plano-escenario .plano-rotulo {
+  fill: var(--p-escenario-texto);
+  stroke: none;
+}
+
+.plano-sector .plano-forma {
+  fill: color-mix(in srgb, var(--c) 40%, transparent);
+  stroke: var(--c);
+  stroke-width: 3;
+  transition: fill 150ms ease-out; /* el borde (foco y elegido) cambia al instante */
+}
+
+.plano-sector--pocas .plano-forma {
+  stroke: var(--p-aviso);
+  stroke-dasharray: 14 6;
+}
+
+.plano-sector--agotado .plano-forma {
+  fill: color-mix(in srgb, var(--c) 14%, transparent);
+  stroke-dasharray: 10 6;
+}
+
+.plano-sector--sin_venta {
+  opacity: 0.5;
+}
+
+.plano-sector--sin_venta .plano-forma {
+  fill: color-mix(in srgb, var(--c) 10%, transparent);
+  stroke-dasharray: 4 6;
+}
+
+.plano-rayado {
+  stroke: var(--p-texto);
+  stroke-opacity: 0.28;
+  stroke-width: 3;
+}
+
+.plano-sector.elegible,
+.plano .editable {
+  cursor: pointer;
+  outline: none;
+}
+
+.plano-sector.elegible:focus-visible .plano-forma,
+.plano .editable:focus-visible path {
+  stroke: var(--p-foco);
+  stroke-width: 7;
+}
+
+@media (hover: hover) {
+  .plano-sector.elegible:hover .plano-forma {
+    fill: color-mix(in srgb, var(--c) 62%, transparent);
+  }
+}
+
+.plano-sector.elegido .plano-forma,
+.plano .editable.elegido path {
+  stroke: var(--p-elegido);
+  stroke-width: 7;
+  stroke-dasharray: none;
+}
+
+.plano-sector.elegido .plano-forma {
+  fill: color-mix(in srgb, var(--c) 72%, transparent);
+}
+
+.plano-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 0.8125rem;
+  color: var(--p-texto-suave);
+}
+
+.plano-clave::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  border: 2px solid var(--p-texto);
+  background: color-mix(in srgb, var(--p-texto) 30%, transparent);
+}
+
+.plano-clave--pocas::before {
+  border-color: var(--p-aviso);
+  border-style: dashed;
+}
+
+.plano-clave--agotado::before {
+  border-style: dashed;
+  background: repeating-linear-gradient(45deg, transparent 0 3px, color-mix(in srgb, var(--p-texto) 45%, transparent) 3px 5px);
+}
+
+.plano-clave--sin_venta::before {
+  border-style: dotted;
+  background: none;
+  opacity: 0.6;
+}
+
+/* Editor (panel) */
+.editor-plano {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .editor-plano {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+}
+
+.editor-plano svg {
+  touch-action: none; /* arrastrar formas con el dedo sin mover la página */
+}
+
+.plano .editable.fuera path {
+  stroke: #ff7875;
+  stroke-dasharray: 8 5;
+}
+
+.plano-manija {
+  fill: #ffffff;
+  stroke: #9333ea;
+  stroke-width: 3;
+  cursor: grab;
+}
+
+.plano-manija.esquina-0,
+.plano-manija.esquina-2 {
+  cursor: nwse-resize;
+}
+
+.plano-manija.esquina-1,
+.plano-manija.esquina-3 {
+  cursor: nesw-resize;
+}
+
+.plano-manija.activa {
+  fill: #fadb14;
+}
+
+.editor-plano-medidas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.editor-plano-campo {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: rgb(255 255 255 / 0.7);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Los sectores entran uno tras otro desde su centro; escenarios y elementos aparecen antes */
+  .plano-sector:not(.editable) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: entra-sector 460ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+    animation-delay: calc(min(var(--i, 0), 8) * 70ms + 150ms);
+  }
+
+  .plano-escenario:not(.editable),
+  .plano-elemento:not(.editable) {
+    animation: aparece-plano 320ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  @keyframes entra-sector {
+    from {
+      opacity: 0;
+      scale: 0.86;
+    }
+  }
+
+  @keyframes aparece-plano {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* El sector elegido late tres veces (y queda marcado con su borde) */
+  .plano-sector.elegido .plano-forma {
+    animation: late-sector 700ms ease-in-out 3;
+  }
+
+  @keyframes late-sector {
+    50% {
+      stroke-width: 13;
+    }
+  }
+}
+
+/* ─── Control de acceso: cámara y cartel del resultado ─── */
+.escaner-qr {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.escaner-qr-visor {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 12px;
+  background: #000;
+  aspect-ratio: 4 / 3;
+  max-height: 60vh;
+}
+
+.escaner-qr-visor video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Cada resultado aparece con un golpe: entra si pasa, se sacude si no */
+  .veredicto--ok {
+    animation: veredicto-ok 420ms cubic-bezier(0.2, 1.35, 0.35, 1) both;
+  }
+
+  .veredicto--no {
+    animation: veredicto-no 380ms ease-in-out both;
+  }
+
+  @keyframes veredicto-ok {
+    from {
+      opacity: 0;
+      scale: 0.92;
+    }
+  }
+
+  @keyframes veredicto-no {
+    20%,
+    60% {
+      translate: -8px 0;
+    }
+
+    40%,
+    80% {
+      translate: 8px 0;
     }
   }
 }

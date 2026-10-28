@@ -1,0 +1,107 @@
+import QRCode from "qrcode";
+import { enviarCorreo } from "./correo.js";
+import { COLORES, escaparHtml, parrafo, plantilla, titulo } from "./plantillaCorreo.js";
+import { firmarEntrada } from "./tokens.js";
+import { pdfEntrada } from "./pdfEntrada.js";
+
+// Mail con las entradas de una compra (al aprobarse el pago) o de un evento (botón "Mandármelas por mail").
+// Cada entrada va con su QR como imagen dentro del mail (el mismo JWT que muestra Mis entradas)
+// y adjunta en PDF, lista para imprimir o mostrar desde el celular (utils/pdfEntrada.js).
+//   await enviarEntradas(db, idUsuario, { id_compra })   o   { id_evento }
+// Devuelve lo de enviarCorreo ({ enviado }), o null si no hay entradas válidas para mandar.
+
+const dia = (iso) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+const rango = (inicio, fin) => (inicio === fin ? dia(inicio) : `del ${dia(inicio)} al ${dia(fin)}`);
+
+// Las entradas válidas de una compra o de un evento, con todo lo que llevan el mail y el PDF
+export const buscarEntradas = (db, idUsuario, { id_compra, id_evento, id_entrada }) =>
+  db.query(
+    `SELECT en.id_entrada, en.id_evento, en.codigo, en.precio_pagado, t.nombre AS tarifa, t.id_jornada, j.fecha AS fecha_jornada, es.nombre AS espacio,
+            ev.nombre AS evento, ev.tipo, ev.fecha_inicio, ev.fecha_fin, l.nombre AS lugar, l.direccion, l.ciudad, emp.nombre AS productora,
+            (SELECT COUNT(*) FROM jornadas jj WHERE jj.id_evento = ev.id_evento)::INT AS cantidad_jornadas,
+            u.email, u.nombre AS cliente, u.apellido, c.referencia_pago, to_char(c.fecha, 'YYYY-MM-DD"T"HH24:MI') AS fecha_compra
+     FROM entradas en
+     JOIN compras c   ON c.id_compra = en.id_compra
+     JOIN usuarios u  ON u.id_usuario = c.id_usuario
+     JOIN tarifas t   ON t.id_tarifa = en.id_tarifa
+     JOIN espacios es ON es.id_espacio = t.id_espacio
+     LEFT JOIN jornadas j ON j.id_jornada = t.id_jornada
+     JOIN eventos ev  ON ev.id_evento = en.id_evento
+     JOIN lugares l   ON l.id_lugar = ev.id_lugar
+     JOIN empresas emp ON emp.id_empresa = ev.id_empresa
+     WHERE c.id_usuario = $1 AND c.estado = 'pagada' AND en.estado = 'valida'
+       AND ($2::INT IS NULL OR c.id_compra = $2) AND ($3::INT IS NULL OR en.id_evento = $3) AND ($4::INT IS NULL OR en.id_entrada = $4)
+     ORDER BY j.fecha NULLS FIRST, en.id_entrada`,
+    [idUsuario, id_compra ?? null, id_evento ?? null, id_entrada ?? null]
+  );
+
+// Nombre del PDF: "entrada-2-campo-general-13-02.pdf" o "entrada-1-vip-abono.pdf"
+const sinAcentos = (t) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+export const nombrePdf = (e, numero) =>
+  `entrada-${numero}-${sinAcentos(e.espacio)}-${e.id_jornada ? `${e.fecha_jornada.slice(8, 10)}-${e.fecha_jornada.slice(5, 7)}` : "abono"}.pdf`;
+
+export const enviarEntradas = async (db, idUsuario, filtro) => {
+  const { rows } = await buscarEntradas(db, idUsuario, filtro);
+  if (rows.length === 0) return null;
+  const e = rows[0];
+
+  // QR en PNG dentro del mail (con los colores del sitio y margen para que lo lea cualquier lector)
+  // y cada entrada en PDF como adjunto
+  const adjuntos = (
+    await Promise.all(
+      rows.map(async (r, i) => [
+        {
+          filename: `entrada-${r.id_entrada}.png`,
+          content: await QRCode.toBuffer(firmarEntrada(r.codigo), { errorCorrectionLevel: "M", margin: 2, width: 360, color: { dark: COLORES.tinta, light: COLORES.papel } }),
+          cid: `entrada-${r.id_entrada}@backstage`
+        },
+        { filename: nombrePdf(r, i + 1), content: await pdfEntrada(r, { numero: i + 1, total: rows.length }), contentType: "application/pdf" }
+      ])
+    )
+  ).flat();
+
+  const vale = (r) => (r.id_jornada ? `Vale para el ${dia(r.fecha_jornada)}` : "Abono: vale para todas las jornadas");
+  const tarjetas = rows
+    .map(
+      (r, i) => `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;border:2px solid ${COLORES.papel};background:${COLORES.tinta}">
+        <tr>
+          <td width="170" valign="top" style="background:${COLORES.papel};padding:10px">
+            <img src="cid:entrada-${r.id_entrada}@backstage" width="150" height="150" alt="QR de la entrada ${i + 1}" style="display:block;width:150px;height:150px">
+          </td>
+          <td valign="top" style="padding:14px 16px;font-family:Inter,'Segoe UI',Arial,sans-serif;color:${COLORES.papel}">
+            <p style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:${COLORES.fucsia}">Entrada ${i + 1} de ${rows.length}</p>
+            <p style="margin:0 0 6px;font-family:Anton,Impact,sans-serif;font-size:24px;line-height:1.05;text-transform:uppercase">${escaparHtml(r.espacio)}</p>
+            <p style="margin:0 0 8px;font-size:14px;color:${COLORES.gris}">${escaparHtml(r.tarifa)} · ${vale(r)}</p>
+            <p style="margin:0;font-family:Consolas,monospace;font-size:11px;color:${COLORES.gris};word-break:break-all">${r.codigo}</p>
+          </td>
+        </tr>
+      </table>`
+    )
+    .join("");
+
+  const cantidad = rows.length === 1 ? "tu entrada" : `tus ${rows.length} entradas`;
+  return enviarCorreo({
+    para: e.email,
+    asunto: `${rows.length === 1 ? "Tu entrada" : "Tus entradas"} para ${e.evento}`,
+    texto:
+      `Hola ${e.cliente}, acá están ${cantidad} para ${e.evento} (${rango(e.fecha_inicio, e.fecha_fin)}, ${e.lugar}, ${e.ciudad}).\n` +
+      rows.map((r, i) => `Entrada ${i + 1}: ${r.espacio} · ${r.tarifa} · ${vale(r)} · código ${r.codigo}`).join("\n") +
+      `\nMostrá el QR en la puerta desde este mail o desde Mis entradas.`,
+    html: plantilla({
+      previa: `${cantidad[0].toUpperCase()}${cantidad.slice(1)} para ${escaparHtml(e.evento)}`,
+      contenido: [
+        `<p style="margin:0 0 10px;font-family:Inter,'Segoe UI',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:${COLORES.amarillo}">Pago aprobado${e.referencia_pago ? ` · ${e.referencia_pago}` : ""}</p>`,
+        titulo(escaparHtml(e.evento)),
+        parrafo(`${rango(e.fecha_inicio, e.fecha_fin)}<br>${escaparHtml(e.lugar)} · ${escaparHtml(e.direccion)}, ${escaparHtml(e.ciudad)}`, COLORES.gris),
+        parrafo(`Hola ${escaparHtml(e.cliente)}, acá están ${cantidad}. En la puerta mostrá el QR desde este mail, desde el PDF adjunto o desde <strong>Mis entradas</strong>: cada QR entra una vez por jornada.`),
+        tarjetas,
+        parrafo(`Te adjuntamos ${rows.length === 1 ? "la entrada en PDF" : `cada entrada en un PDF (${rows.length} archivos)`}, para imprimir o guardar en el celular.`),
+        parrafo("El QR está firmado por Backstage: si se modifica, no pasa el control. No lo compartas: quien lo muestre primero, entra.", COLORES.gris)
+      ].join("")
+    }),
+    adjuntos
+  });
+};

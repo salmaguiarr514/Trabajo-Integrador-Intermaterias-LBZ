@@ -23,4 +23,16 @@ export const verificarSchema = z.object({
   codigo: z.string().trim().regex(/^\d{6}$/, "El código tiene 6 números")
 });
 
+// El token del enlace del mail (un JWT; ver utils/tokens.js)
+export const verificarEnlaceSchema = z.object({
+  token: z.string({ error: "Falta el enlace de verificación" }).trim().min(20, "El enlace no es válido").max(2000, "El enlace no es válido")
+});
+
 export const reenviarSchema = z.object({ email });
+
+export const recuperarSchema = z.object({ email });
+
+export const restablecerSchema = z.object({
+  token: z.string({ error: "Falta el enlace" }).trim().min(20, "El enlace no es válido").max(2000, "El enlace no es válido"),
+  password: z.string({ error: "Elegí una contraseña" }).min(6, "La contraseña debe tener al menos 6 caracteres").max(72)
+});

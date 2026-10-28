@@ -46,3 +46,67 @@ const camposEspacio = {
 
 export const crearEspacioSchema = z.object(camposEspacio);
 export const editarEspacioSchema = z.object(camposEspacio).partial();
+
+// ─── Plano (2.2 del plan) ──────────────────────────────────────────────────
+// Una forma es un rectángulo o un polígono, en coordenadas del lienzo (0,0 arriba a la izquierda)
+const coordenada = z.number({ error: "Las coordenadas son números" }).min(0, "Las coordenadas no pueden ser negativas");
+const geometria = z.discriminatedUnion("tipo", [
+  z.object({
+    tipo: z.literal("rect"),
+    x: coordenada,
+    y: coordenada,
+    w: z.number().positive("El ancho de la forma tiene que ser mayor a 0"),
+    h: z.number().positive("El alto de la forma tiene que ser mayor a 0")
+  }),
+  z.object({
+    tipo: z.literal("poligono"),
+    puntos: z.array(z.tuple([coordenada, coordenada])).min(3, "Un polígono necesita al menos 3 puntos").max(40, "Un polígono puede tener hasta 40 puntos")
+  })
+], { error: "La forma es un rectángulo (rect) o un polígono" });
+
+// Lo que ocupa una forma: para verificar que entre en el lienzo
+const extremos = (g) =>
+  g.tipo === "rect" ? { x: g.x + g.w, y: g.y + g.h } : { x: Math.max(...g.puntos.map((p) => p[0])), y: Math.max(...g.puntos.map((p) => p[1])) };
+
+const medida = (mensaje) => z.number({ error: mensaje }).int(mensaje).min(200, "El lienzo mide al menos 200").max(4000, "El lienzo mide hasta 4000");
+
+// El plano completo de un lugar: reemplaza lo que había. Un sector o escenario que no viene queda sin dibujar.
+// Con ancho y alto en null se quita el plano (y todo lo dibujado).
+export const planoSchema = z
+  .object({
+    ancho: medida("El ancho del lienzo es un número entero").nullable(),
+    alto: medida("El alto del lienzo es un número entero").nullable(),
+    espacios: z.array(z.object({ id_espacio: z.number().int().positive(), geometria })).default([]),
+    escenarios: z.array(z.object({ id_escenario: z.number().int().positive(), geometria })).default([]),
+    elementos: z
+      .array(
+        z.object({
+          tipo: z.enum(["cabina_dj", "barra", "banos", "ingreso", "mangrullo", "otro"], { error: "Elegí el tipo de elemento" }),
+          etiqueta: opcional(z.string().trim().max(60, "La etiqueta tiene hasta 60 caracteres")),
+          geometria
+        })
+      )
+      .max(100, "El plano puede tener hasta 100 elementos")
+      .default([])
+  })
+  .superRefine((p, ctx) => {
+    if ((p.ancho === null) !== (p.alto === null)) {
+      ctx.addIssue({ code: "custom", path: ["alto"], message: "El lienzo necesita ancho y alto (o ninguno, para quitar el plano)" });
+      return;
+    }
+    const formas = [
+      ...p.espacios.map((e, i) => ["espacios", i, e.geometria]),
+      ...p.escenarios.map((e, i) => ["escenarios", i, e.geometria]),
+      ...p.elementos.map((e, i) => ["elementos", i, e.geometria])
+    ];
+    if (p.ancho === null) {
+      if (formas.length > 0) ctx.addIssue({ code: "custom", path: ["ancho"], message: "Sin lienzo no se puede dibujar: indicá el ancho y el alto" });
+      return;
+    }
+    for (const [lista, i, g] of formas) {
+      const { x, y } = extremos(g);
+      if (x > p.ancho || y > p.alto) {
+        ctx.addIssue({ code: "custom", path: [lista, i, "geometria"], message: `Una forma se sale del lienzo (${p.ancho} × ${p.alto})` });
+      }
+    }
+  });

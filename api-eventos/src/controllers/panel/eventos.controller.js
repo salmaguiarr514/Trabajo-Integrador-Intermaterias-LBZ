@@ -2,6 +2,7 @@ import pool, { enTransaccion } from "../../data/db.js";
 import { ErrorHttp } from "../../utils/ErrorHttp.js";
 import { actualizar, insertar } from "../../utils/sql.js";
 import { hora } from "../../utils/fechas.js";
+import { obtenerPlano } from "../../utils/plano.js";
 
 // Eventos de la productora del usuario (fase 5): el evento y todo lo que cuelga de él
 // (jornadas, escenarios habilitados, line-up y tarifas). Todo filtra por req.usuario.id_empresa:
@@ -71,11 +72,11 @@ export const obtenerEventos = async (req, res) => {
   res.json(rows);
 };
 
-// Todo lo que necesita el asistente en un solo pedido
+// Todo lo que necesita el asistente en un solo pedido (con el plano del lugar, si tiene, para elegir sectores)
 export const obtenerEvento = async (req, res) => {
   const evento = await buscarEvento(req, req.params.id);
   const id = evento.id_evento;
-  const [escenarios, espacios, jornadas, presentaciones, tarifas] = await Promise.all([
+  const [escenarios, espacios, jornadas, presentaciones, tarifas, plano] = await Promise.all([
     pool.query(
       `SELECT sc.id_escenario, sc.nombre, sc.descripcion,
               EXISTS (SELECT 1 FROM evento_escenarios ee WHERE ee.id_evento = $1 AND ee.id_escenario = sc.id_escenario) AS habilitado
@@ -108,7 +109,8 @@ export const obtenerEvento = async (req, res) => {
        LEFT JOIN jornadas j ON j.id_jornada = t.id_jornada
        WHERE t.id_evento = $1 ORDER BY es.capacidad DESC, j.fecha NULLS LAST, t.precio`,
       [id]
-    )
+    ),
+    obtenerPlano("l.id_lugar = $1", [evento.id_lugar])
   ]);
   res.json({
     ...evento,
@@ -116,7 +118,8 @@ export const obtenerEvento = async (req, res) => {
     espacios: espacios.rows,
     jornadas: jornadas.rows,
     presentaciones: presentaciones.rows,
-    tarifas: tarifas.rows
+    tarifas: tarifas.rows,
+    plano
   });
 };
 

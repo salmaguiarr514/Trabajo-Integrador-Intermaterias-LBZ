@@ -14,6 +14,8 @@ export const lugaresService = (ambito) => {
     // tipo: "escenarios" | "espacios"
     crearParte: (idLugar, tipo, datos) => api.post(`${base}/${idLugar}/${tipo}`, datos),
     actualizarParte: (idLugar, tipo, id, datos) => api.put(`${base}/${idLugar}/${tipo}/${id}`, datos),
-    eliminarParte: (idLugar, tipo, id) => api.delete(`${base}/${idLugar}/${tipo}/${id}`)
+    eliminarParte: (idLugar, tipo, id) => api.delete(`${base}/${idLugar}/${tipo}/${id}`),
+    // El plano completo: { ancho, alto, espacios, escenarios, elementos } (ancho y alto en null lo quitan)
+    guardarPlano: (idLugar, plano) => api.put(`${base}/${idLugar}/plano`, plano)
   };
 };

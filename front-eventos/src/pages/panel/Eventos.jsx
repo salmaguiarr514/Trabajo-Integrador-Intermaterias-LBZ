@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { Alert, App, Button, Card, Empty, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { App, Button, Card, Empty, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
 import { BarChartOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, PlusOutlined } from "@ant-design/icons";
 import { eliminarEvento, obtenerEventos } from "../../services/panelService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { useCarga } from "../../hooks/useCarga.js";
 import { numero, rangoFechas } from "../../utils/formato.js";
-import { COLOR_ESTADO } from "../../utils/estados.js";
+import { OPCIONES_ESTADO_EVENTO } from "../../utils/estados.js";
+import TagEstado from "../../components/TagEstado.jsx";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 // Qué le falta a un borrador para poder publicarse (RN-20)
 const faltante = (e) =>
@@ -22,8 +24,8 @@ function Eventos() {
   const { message } = App.useApp();
   const eventos = useCarga(obtenerEventos, "eventos", "No se pudieron cargar los eventos");
 
-  if (eventos.cargando) return <Cargando texto="Cargando eventos..." />;
-  if (eventos.error) return <Alert type="error" showIcon title={eventos.error} />;
+  if (eventos.cargando) return <Cargando texto="Cargando eventos…" />;
+  if (eventos.error) return <ErrorPanel mensaje={eventos.error} onReintentar={eventos.recargar} />;
 
   const eliminar = async (e) => {
     try {
@@ -59,13 +61,13 @@ function Eventos() {
     {
       title: "Estado",
       dataIndex: "estado",
-      filters: Object.keys(COLOR_ESTADO).map((estado) => ({ text: estado, value: estado })),
+      filters: OPCIONES_ESTADO_EVENTO.map((o) => ({ text: o.label, value: o.value })),
       onFilter: (valor, e) => e.estado === valor,
       render: (estado, e) => {
         const falta = estado === "borrador" ? faltante(e) : [];
         return (
           <Space orientation="vertical" size={2}>
-            <Tag color={COLOR_ESTADO[estado]}>{estado}</Tag>
+            <TagEstado estado={estado} />
             {falta.length > 0 && (
               <Typography.Text type="secondary" style={{ fontSize: 12 }}>Falta: {falta.join(", ")}</Typography.Text>
             )}

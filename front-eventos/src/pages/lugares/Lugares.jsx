@@ -13,6 +13,7 @@ import Encabezado from "../../components/Encabezado.jsx";
 import TagOrigen from "../../components/TagOrigen.jsx";
 import LugarCampos from "./LugarCampos.jsx";
 import { AMBITOS } from "./ambitos.js";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 function NuevoLugarModal({ ambito, abierto, onCerrar }) {
   const [form] = Form.useForm();
@@ -77,8 +78,8 @@ function Lugares({ ambito: nombreAmbito }) {
   const [creando, setCreando] = useState(false);
   const lugares = useCarga(() => ambito.servicio.obtenerLugares({ origen: origen || undefined }), origen, "No se pudieron cargar los lugares");
 
-  if (lugares.cargando) return <Cargando texto="Cargando lugares..." />;
-  if (lugares.error) return <Alert type="error" showIcon title={lugares.error} />;
+  if (lugares.cargando) return <Cargando texto="Cargando lugares…" />;
+  if (lugares.error) return <ErrorPanel mensaje={lugares.error} onReintentar={lugares.recargar} />;
 
   const texto = busqueda.trim().toLowerCase();
   const filtrados = lugares.datos.filter((l) =>
@@ -147,7 +148,9 @@ function Lugares({ ambito: nombreAmbito }) {
 
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-          <Segmented options={ambito.filtros} value={origen} onChange={setOrigen} />
+          <div className="desliza">
+            <Segmented options={ambito.filtros} value={origen} onChange={setOrigen} />
+          </div>
           <Input
             allowClear
             prefix={<SearchOutlined />}

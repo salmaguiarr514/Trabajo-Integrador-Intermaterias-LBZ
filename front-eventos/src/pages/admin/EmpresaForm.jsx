@@ -120,7 +120,7 @@ function EmpresaForm() {
       <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(LISTADO)} style={{ paddingInline: 0 }}>
         Volver
       </Button>
-      <Typography.Title level={2} style={{ marginTop: 8 }}>
+      <Typography.Title level={1} style={{ marginTop: 8, fontSize: 30 }}>
         {id ? "Editar productora" : "Nueva productora"}
       </Typography.Title>
 
@@ -155,8 +155,9 @@ function EmpresaForm() {
               </Form.Item>
             </Col>
             <Col xs={24} md={8}>
-              <Form.Item label="Service charge" required tooltip="Porcentaje que cobra Backstage sobre cada venta" {...estado("cargo_servicio_pct")}>
+              <Form.Item label="Cargo por servicio" htmlFor="cargo_servicio_pct" required tooltip="Porcentaje que cobra Backstage sobre cada venta" {...estado("cargo_servicio_pct")}>
                 <InputNumber
+                  id="cargo_servicio_pct"
                   min={0}
                   max={100}
                   step={0.5}
@@ -169,8 +170,8 @@ function EmpresaForm() {
             </Col>
             {id && (
               <Col span={24}>
-                <Form.Item label="Activa">
-                  <Switch checked={form.activo} onChange={(activo) => setForm({ ...form, activo })} />
+                <Form.Item label="Activa" htmlFor="empresa_activa">
+                  <Switch id="empresa_activa" checked={form.activo} onChange={(activo) => setForm({ ...form, activo })} />
                 </Form.Item>
               </Col>
             )}

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Alert, App, Button, Card, Empty, Input, Segmented, Space, Switch, Table, Tag, Tooltip, Typography } from "antd";
-import { CrownOutlined, EditOutlined, PlusOutlined, SearchOutlined, ShopOutlined, UserOutlined } from "@ant-design/icons";
-import { actualizarUsuario, obtenerUsuarios } from "../../services/adminService.js";
+import { App, Button, Card, Empty, Input, Popconfirm, Segmented, Space, Switch, Table, Tag, Tooltip, Typography } from "antd";
+import { CrownOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, ShopOutlined, UserOutlined } from "@ant-design/icons";
+import { actualizarUsuario, eliminarUsuario, obtenerUsuarios } from "../../services/adminService.js";
 import { obtenerEmpresas } from "../../services/empresasService.js";
 import { mensajeDeError } from "../../services/api.js";
 import { useAuth } from "../../context/auth.js";
@@ -10,6 +10,7 @@ import { fechaHora } from "../../utils/formato.js";
 import Cargando from "../../components/Cargando.jsx";
 import Encabezado from "../../components/Encabezado.jsx";
 import UsuarioModal from "./UsuarioModal.jsx";
+import ErrorPanel from "../../components/ErrorPanel.jsx";
 
 const ROL = {
   superadmin: { texto: "Superadmin", color: "purple", icono: <CrownOutlined /> },
@@ -35,8 +36,8 @@ function Usuarios() {
   const usuarios = useCarga(() => obtenerUsuarios({ rol: rol || undefined }), rol, "No se pudieron cargar los usuarios");
   const empresas = useCarga(obtenerEmpresas, "empresas", "No se pudieron cargar las productoras");
 
-  if (usuarios.cargando) return <Cargando texto="Cargando usuarios..." />;
-  if (usuarios.error) return <Alert type="error" showIcon title={usuarios.error} />;
+  if (usuarios.cargando) return <Cargando texto="Cargando usuarios…" />;
+  if (usuarios.error) return <ErrorPanel mensaje={usuarios.error} onReintentar={usuarios.recargar} />;
 
   const reemplazar = (u) =>
     usuarios.setDatos((lista) => {
@@ -57,6 +58,17 @@ function Usuarios() {
     }
   };
 
+  // Borrar un usuario. Si tiene compras, la API lo impide (perdería su historial): se da de baja con el interruptor
+  const borrar = async (u) => {
+    try {
+      await eliminarUsuario(u.id_usuario);
+      usuarios.setDatos((lista) => lista.filter((x) => x.id_usuario !== u.id_usuario));
+      message.success(`Se borró la cuenta de ${u.email}`);
+    } catch (error) {
+      message.error(mensajeDeError(error, "No se pudo borrar la cuenta"));
+    }
+  };
+
   const texto = busqueda.trim().toLowerCase();
   const filtrados = usuarios.datos.filter((u) =>
     [u.nombre, u.apellido, u.email, u.empresa, u.dni].some((c) => c?.toLowerCase().includes(texto))
@@ -74,6 +86,9 @@ function Usuarios() {
             {u.id_usuario === yo.id_usuario && <Typography.Text type="secondary"> (vos)</Typography.Text>}
           </Typography.Text>
           <Typography.Text type="secondary">{u.email}</Typography.Text>
+          {u.rol === "cliente" && !u.email_verificado && (
+            <Tag color="gold" style={{ marginTop: 4, marginInlineEnd: 0 }}>Email sin verificar</Tag>
+          )}
         </Space>
       )
     },
@@ -116,6 +131,7 @@ function Usuarios() {
       render: (activo, u) => (
         <Tooltip title={u.id_usuario === yo.id_usuario ? "No podés darte de baja a vos mismo" : undefined}>
           <Switch
+            aria-label={`Cuenta activa de ${u.nombre} ${u.apellido ?? ""}`.trim()}
             checked={activo}
             loading={cambiando === u.id_usuario}
             disabled={u.id_usuario === yo.id_usuario}
@@ -128,16 +144,41 @@ function Usuarios() {
       title: "Acciones",
       key: "acciones",
       align: "right",
-      render: (_, u) =>
-        u.rol === "cliente" ? (
-          <Tooltip title="Los datos de un cliente los edita el cliente desde su perfil">
-            <Button icon={<EditOutlined />} disabled />
-          </Tooltip>
-        ) : (
-          <Tooltip title="Editar">
-            <Button icon={<EditOutlined />} onClick={() => setModal({ abierto: true, usuario: u })} />
-          </Tooltip>
-        )
+      render: (_, u) => (
+        <Space>
+          {u.rol === "cliente" ? (
+            <Tooltip title="Los datos de un cliente los edita el cliente desde su perfil">
+              <Button icon={<EditOutlined />} disabled />
+            </Tooltip>
+          ) : (
+            <Tooltip title="Editar">
+              <Button icon={<EditOutlined />} onClick={() => setModal({ abierto: true, usuario: u })} />
+            </Tooltip>
+          )}
+          {u.id_usuario === yo.id_usuario ? (
+            <Tooltip title="No podés borrar tu propia cuenta">
+              <Button danger icon={<DeleteOutlined />} disabled />
+            </Tooltip>
+          ) : (
+            <Popconfirm
+              title={`¿Borrar la cuenta de ${u.email}?`}
+              description={
+                u.rol === "cliente" && !u.email_verificado
+                  ? "Nunca verificó el email. Se borra y puede registrarse de nuevo."
+                  : "No se puede deshacer. Si tiene compras no se borra: se da de baja con el interruptor."
+              }
+              okText="Borrar cuenta"
+              cancelText="Cancelar"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => borrar(u)}
+            >
+              <Tooltip title="Borrar">
+                <Button danger icon={<DeleteOutlined />} aria-label={`Borrar la cuenta de ${u.email}`} />
+              </Tooltip>
+            </Popconfirm>
+          )}
+        </Space>
+      )
     }
   ];
 
@@ -155,7 +196,9 @@ function Usuarios() {
 
       <Card>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-          <Segmented options={FILTROS} value={rol} onChange={setRol} />
+          <div className="desliza">
+            <Segmented options={FILTROS} value={rol} onChange={setRol} />
+          </div>
           <Input
             allowClear
             prefix={<SearchOutlined />}

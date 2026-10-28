@@ -1,0 +1,74 @@
+# PC de acceso (PC 1): nginx (balanceador + front), Postgres (base única) y la réplica api1.
+# Las otras dos réplicas corren en las PCs 2 y 3 con docker-compose.nodo.yml.
+#
+#   navegador ──► nginx :80 ─┬─ /     → front (React compilado)
+#                            └─ /api/ → round robin: api1 (esta PC), api2 (PC 2), api3 (PC 3)
+#   las 3 APIs ──► db :5432 (esta PC)
+#
+# Levantar:   docker compose -f docker-compose.acceso.yml up -d --build
+# Ver estado: docker compose -f docker-compose.acceso.yml ps
+# Nunca usar "down -v": borra el volumen con los datos.
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: eventos-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # Publicado a la red local para que lleguen las réplicas de las otras PCs
+    ports:
+      - "5432:5432"
+    volumes:
+      - datos-postgres:/var/lib/postgresql/data
+      # Corren solos la primera vez (volumen vacío), en orden alfabético.
+      # 00_reset.sql también corre, pero en una base vacía no hace nada
+      - ./api-eventos/database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./api-eventos
+    container_name: eventos-api1
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      INSTANCIA: api1
+      # Sin DATABASE_URL: db.js usa las DB_*
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRA: ${JWT_EXPIRA:-8h}
+      GMAIL_USUARIO: ${GMAIL_USUARIO:-}
+      GMAIL_CLAVE_APP: ${GMAIL_CLAVE_APP:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: eventos-nginx
+    restart: unless-stopped
+    environment:
+      IP_PC1: ${IP_PC1}
+      IP_PC2: ${IP_PC2}
+      IP_PC3: ${IP_PC3}
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  datos-postgres:

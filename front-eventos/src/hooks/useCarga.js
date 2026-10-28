@@ -5,7 +5,8 @@ import { mensajeDeError } from "../services/api.js";
 //   const { datos, cargando, error, recargar, setDatos } =
 //     useCarga(() => obtenerLugares({ origen }), origen, "No se pudieron cargar los lugares");
 // - cargando: solo es true la primera vez (después se muestran los datos anteriores mientras llegan los nuevos)
-// - recargar(): vuelve a pedir los datos (por ejemplo, después de guardar)
+// - recargar(): vuelve a pedir los datos (por ejemplo, después de guardar, o "Reintentar" tras un error:
+//   en ese caso vuelve a cargando mientras llega la respuesta)
 // - setDatos(): para actualizar la lista en el momento sin volver a pedirla
 export function useCarga(pedir, clave, mensaje) {
   const [estado, setEstado] = useState({ datos: null, error: "" });
@@ -26,7 +27,10 @@ export function useCarga(pedir, clave, mensaje) {
     datos: estado.datos,
     error: estado.error,
     cargando: estado.datos === null && !estado.error,
-    recargar: () => setVersion((v) => v + 1),
+    recargar: () => {
+      setEstado((e) => (e.error ? { datos: null, error: "" } : e));
+      setVersion((v) => v + 1);
+    },
     setDatos: (cambio) => setEstado((e) => ({ ...e, datos: typeof cambio === "function" ? cambio(e.datos) : cambio }))
   };
 }
