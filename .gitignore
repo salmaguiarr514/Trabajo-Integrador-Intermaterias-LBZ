@@ -2,3 +2,6 @@ node_modules/
 .env
 .vercel/
 dist/
+.claude/settings.local.json
+# Grafo de graphify: se genera en cada PC (caché y rutas locales)
+graphify-out/
