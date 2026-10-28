@@ -107,11 +107,12 @@ Las rutas con candado necesitan el header `Authorization: Bearer <token>` (el to
 | GET | `/api/public/eventos/:id` | todos | Detalle: jornadas, line-up, tarifas activas con `disponibles` y `en_venta`, `cargo_servicio_pct` y el `plano` del lugar (o `null`) | 200 / 404 |
 | GET | `/api/public/artistas/:id` | todos | Artista y sus próximas presentaciones (solo si toca en un evento de la cartelera) | 200 / 404 |
 | POST | `/api/cliente/compras/cotizar` | 🔒 cliente | `{ id_evento, items: [{ id_tarifa, cantidad }] }` → detalle, subtotal, service charge y total | 200 / 400 / 404 / 409 |
-| POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` y `tarjeta` (`numero`, `nombre`, `vencimiento`, `cvv`). Pago simulado: termina en 0000 → `rechazada`. Si se aprueba, manda las entradas por mail con sus QR; `correo` dice cómo salió (`enviado`, `sin_configurar` o `error`) | 201 / 400 / 404 / 409 |
+| POST | `/api/cliente/compras` | 🔒 cliente | Lo mismo más `medio_pago` y `tarjeta` (`numero`, `nombre`, `vencimiento`, `cvv`). Pago simulado: termina en 0000 → `rechazada`. Si se aprueba, manda las entradas por mail con sus QR y un PDF adjunto por entrada; `correo` dice cómo salió (`enviado`, `sin_configurar` o `error`) | 201 / 400 / 404 / 409 |
 | GET | `/api/cliente/compras` | 🔒 cliente | Mis compras (también las rechazadas) | 200 |
 | GET | `/api/cliente/compras/:id` | 🔒 cliente | Una compra con sus entradas | 200 / 404 |
 | GET | `/api/cliente/entradas` | 🔒 cliente | Mis entradas de compras pagadas: `qr` (un JWT firmado con el código, es lo que va en el QR) y `codigo` (UUID, para escribirlo a mano) | 200 |
-| POST | `/api/cliente/entradas/enviar` | 🔒 cliente | `{ id_evento }` → manda por mail las entradas válidas de ese evento, con sus QR | 200 / 404 / 503 |
+| POST | `/api/cliente/entradas/enviar` | 🔒 cliente | `{ id_evento }` → manda por mail las entradas válidas de ese evento, con sus QR y un PDF por entrada | 200 / 404 / 503 |
+| GET | `/api/cliente/entradas/:id/pdf` | 🔒 cliente | La entrada en PDF (para imprimir o guardar), con el QR firmado | 200 / 404 |
 | GET | `/api/cliente/perfil` | 🔒 cliente | Mis datos | 200 |
 | PUT | `/api/cliente/perfil` | 🔒 cliente | `nombre`, `apellido`, `dni`, `telefono`. Para cambiar la contraseña: `password_actual` y `password_nueva` | 200 / 400 |
 | GET | `/api/salud` | todos | `{ ok, instancia }`, para ver qué réplica respondió | 200 |

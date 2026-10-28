@@ -17,7 +17,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const INSTANCIA = process.env.INSTANCIA || hostname();
 
-app.use(cors({ origin: process.env.FRONTEND_URL }));
+// exposedHeaders: el front (otro dominio) lee el nombre del PDF de una entrada y qué réplica respondió
+app.use(cors({ origin: process.env.FRONTEND_URL, exposedHeaders: ["Content-Disposition", "X-Instancia"] }));
 app.use(express.json());
 
 // Cada réplica se identifica en las respuestas (sirve para ver el balanceo de Nginx)
