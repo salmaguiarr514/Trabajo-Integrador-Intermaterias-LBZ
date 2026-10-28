@@ -1,3 +1,4 @@
+
 # PC 2 y PC 3: solo una réplica de la API, conectada a la base de la PC de acceso.
 # En el .env de cada PC: INSTANCIA=api2 (PC 2) o api3 (PC 3), IP_PC1 con la IP de la PC de acceso
 # y el mismo JWT_SECRET que en las demás.
