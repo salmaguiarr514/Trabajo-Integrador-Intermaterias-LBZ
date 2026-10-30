@@ -8,7 +8,7 @@ Cada profesor pide algo distinto, así que la documentación está ordenada **po
 | Programación 2 | El software: arquitectura, API, front | Código en este repo | [docs/programacion-2/](docs/programacion-2/plan-desarrollo.md) |
 | Base de Datos | Modelo de datos y scripts SQL | DER + [api-eventos/database/](api-eventos/database/) | [docs/base-de-datos/](docs/base-de-datos/der.md) |
 | Sistemas de Información | Relevamiento, análisis y diseño (DDD) | Avances en clase y un **documento formal escrito** | [docs/sistemas-de-informacion/](docs/sistemas-de-informacion/plan.md) |
-| Sistemas Operativos | Despliegue con réplicas, Docker y Nginx, en Linux y 3 PCs | Demo + `docker-compose.acceso.yml`, `docker-compose.nodo.yml` y `nginx/` | [docs/sistemas-operativos/](docs/sistemas-operativos/plan.md) |
+| Sistemas Operativos | Despliegue con réplicas, Docker y Nginx, en Linux y 3 PCs | Demo + `docker-compose.app.yml` (front y back), `docker-compose.servidores.yml` (nginx y base) y `nginx/nginx.conf.template` | [docs/sistemas-operativos/](docs/sistemas-operativos/plan.md) |
 
 > **Antes de seguir, ver [Alcance a resolver entre materias](docs/comun/alcance-entre-materias.md).**
 > El alcance que fija Sistemas de Información no coincide con el del plan de desarrollo.

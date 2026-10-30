@@ -1,13 +1,13 @@
-# Análisis — Versión 1
+# Análisis, versión 1
 
-**Estado:** versión 1, en revisión. **Fuente:** [entrevista del 13/10/2026](../relevamiento/entrevista-1-2026-10-13.md).
-**Alcance de referencia:** [Objetivo y alcance del software](../consigna.md#2-objetivo-y-alcance-del-software).
+Estado: versión 1, en revisión. Fuente: [entrevista del 13/10/2026](../relevamiento/entrevista-1-2026-10-13.md).
+Alcance de referencia: [Objetivo y alcance del software](../consigna.md#2-objetivo-y-alcance-del-software).
 
 Cómo leerlo:
 
-- **[F#]** remite a un hecho relevado (sección 1). Todo lo que se afirma del negocio tiene un F detrás.
-- **[D#]** es una duda abierta (sección 5): algo que el cliente no dijo o dejó ambiguo. No se resuelve suponiendo.
-- **(interpretación)** marca una decisión nuestra como analistas, que se apoya en los hechos pero no la dijo el cliente.
+- [F#] remite a un hecho relevado (sección 1). Todo lo que se afirma del negocio tiene un F detrás.
+- [D#] es una duda abierta (sección 5): algo que el cliente no dijo o dejó ambiguo. No se resuelve suponiendo.
+- (interpretación) marca una decisión nuestra como analistas, que se apoya en los hechos pero no la dijo el cliente.
 
 ---
 
@@ -15,23 +15,23 @@ Cómo leerlo:
 
 | # | Hecho | Pregunta de origen |
 | --- | --- | --- |
-| F01 | Backstage organiza conciertos y espectáculos musicales en vivo **por encargo de clientes** | A qué se dedica |
+| F01 | Backstage organiza conciertos y espectáculos musicales en vivo por encargo de clientes | A qué se dedica |
 | F02 | Los eventos son de escala pequeña o mediana y de una sola jornada | A qué se dedica |
 | F03 | Los clientes pueden ser empresas, instituciones o particulares | A qué se dedica |
 | F04 | La disponibilidad de los proveedores se consulta directamente con ellos; Backstage registra lo que le informan | A qué se dedica |
-| F05 | **Coordinación de eventos:** recibe los pedidos, arma la propuesta, coordina los servicios y hace el seguimiento general | Quiénes trabajan |
-| F06 | **Producción:** prepara el evento, coordina con los proveedores y controla que compromisos y tareas estén encaminados | Quiénes trabajan |
-| F07 | **Administración:** mantiene los datos de clientes y proveedores y sigue la información acordada, en especial presupuestos y confirmaciones | Quiénes trabajan |
+| F05 | Coordinación de eventos: recibe los pedidos, arma la propuesta, coordina los servicios y hace el seguimiento general | Quiénes trabajan |
+| F06 | Producción: prepara el evento, coordina con los proveedores y controla que compromisos y tareas estén encaminados | Quiénes trabajan |
+| F07 | Administración: mantiene los datos de clientes y proveedores y sigue la información acordada, en especial presupuestos y confirmaciones | Quiénes trabajan |
 | F08 | Todos pueden necesitar consultar información de los eventos, pero cada uno se ocupa de su área | Quiénes trabajan |
 | F09 | Clientes y proveedores no usan el sistema: la comunicación es por fuera y se registra lo acordado | Quiénes trabajan |
 | F10 | Del pedido se registra: contacto del cliente (nombre y medios), tipo de evento, fecha prevista, sede prevista si ya la tiene, asistentes estimados, necesidades y preferencias | Trato con el cliente |
 | F11 | No hay formulario rígido: los datos faltantes se completan en conversaciones posteriores | Trato con el cliente |
 | F12 | La propuesta se arma con los servicios que responden al pedido; cada servicio tiene un importe y se calcula el total | Armado de la propuesta |
-| F13 | Durante la negociación el cliente puede pedir agregar, quitar o modificar servicios; se ajusta la **propuesta vigente** y se vuelven a comunicar los importes | Armado de la propuesta |
+| F13 | Durante la negociación el cliente puede pedir agregar, quitar o modificar servicios; se ajusta la propuesta vigente y se vuelven a comunicar los importes | Armado de la propuesta |
 | F14 | Se registra si el cliente acepta o rechaza. Si rechaza, se registra el motivo cuando lo comunica | Si no acepta |
 | F15 | La propuesta se considera rechazada cuando el cliente comunica que no la acepta. Si pide cambios, se sigue negociando | Validación ⚠ |
 | F16 | Si no hay acuerdo, la solicitud queda sin confirmación y se conserva lo registrado | Si no acepta |
-| F17 | Cuando el cliente acepta la propuesta, el **encargo** queda confirmado y se registra lo acordado. Lo registra el personal; no hay contratación electrónica | Recorrido, validación ⚠ |
+| F17 | Cuando el cliente acepta la propuesta, el encargo queda confirmado y se registra lo acordado. Lo registra el personal; no hay contratación electrónica | Recorrido, validación ⚠ |
 | F18 | Las condiciones acordadas son: fecha, sede, cantidad de asistentes, servicios contratados, sus importes y cualquier condición o necesidad particular | Validación ⚠ |
 | F19 | Que el encargo esté confirmado no significa que los proveedores lo estén: eso se verifica y registra después | Validación ⚠ |
 | F20 | Para cada servicio se contacta a un proveedor y se le consulta si puede en la fecha. Si puede, su participación queda confirmada; si no, se busca otro. Mientras no haya uno confirmado, el servicio queda pendiente | Proveedores |
@@ -44,12 +44,12 @@ Cómo leerlo:
 | F27 | La cancelación puede ocurrir en cualquier momento antes de que el evento se realice. La comunica el cliente; se registra con su motivo y se conserva la información | Cancelación |
 | F28 | Las consecuencias económicas de una cancelación no se gestionan | Cancelación |
 | F29 | Al realizarse el concierto se registra que fue realizado y se dejan observaciones. No hay cierre económico ni evaluación | Cierre |
-| F30 | Estados del evento: **En solicitud** (hay pedido, se trabaja en la propuesta), **En negociación** (se ajusta la propuesta, todavía no aceptada), **Confirmado** (aceptada; empieza la preparación), **Realizado**, **Cancelado** | Situaciones del evento |
+| F30 | Estados del evento: En solicitud (hay pedido, se trabaja en la propuesta), En negociación (se ajusta la propuesta, todavía no aceptada), Confirmado (aceptada; empieza la preparación), Realizado, Cancelado | Situaciones del evento |
 | F31 | No todos pueden modificar todo. Coordinación trabaja con solicitudes, propuestas y confirmaciones; Producción, con tareas y seguimiento de proveedores. Los permisos tienen que ser sencillos | Permisos |
 | F32 | Problemas actuales: la información está repartida; ante un cambio cuesta saber qué compromisos se afectan y avisar a los responsables; cuesta ver tareas pendientes y vencidas y servicios sin confirmar; con varios eventos a la vez hay olvidos | Dificultades |
-| F33 | Lo más importante para el cliente: que después de un cambio quede claro **qué se acordó, qué cambió y qué queda pendiente**, y poder consultar eventos por fecha o estado | Cierre de la entrevista |
+| F33 | Lo más importante para el cliente: que después de un cambio quede claro qué se acordó, qué cambió y qué queda pendiente, y poder consultar eventos por fecha o estado | Cierre de la entrevista |
 
-> ⚠ Estos intercambios se hicieron en el chat pero **no están en la [transcripción](../relevamiento/entrevista-1-2026-10-13.md#validación-falta-pegar)**. Hay que pegarlos para que el hecho tenga respaldo.
+> ⚠ Estos intercambios se hicieron en el chat pero no están en la [transcripción](../relevamiento/entrevista-1-2026-10-13.md#validación-falta-pegar). Hay que pegarlos para que el hecho tenga respaldo.
 
 ---
 
@@ -57,19 +57,19 @@ Cómo leerlo:
 
 ### 2.1 Sistema observado y propósito
 
-**Sistema:** la organización de conciertos por encargo en Backstage, desde que llega un pedido hasta que el evento se realiza o se cancela (interpretación, a partir de F01 y del recorrido).
+Sistema: la organización de conciertos por encargo en Backstage, desde que llega un pedido hasta que el evento se realiza o se cancela (interpretación, a partir de F01 y del recorrido).
 
-**Propósito:** que cada concierto encargado se realice según lo acordado con el cliente, con todos los servicios cubiertos y las tareas resueltas a tiempo [F01, F22].
+Propósito: que cada concierto encargado se realice según lo acordado con el cliente, con todos los servicios cubiertos y las tareas resueltas a tiempo [F01, F22].
 
 ### 2.2 Límite y entorno
 
 | Dentro del sistema | En el entorno |
 | --- | --- |
-| Coordinación, Producción y Administración [F05–F07] | **Clientes:** encargan, negocian, aceptan, rechazan, piden cambios y cancelan [F03, F13, F27] |
-| Pedidos, propuestas, encargos confirmados, tareas y el registro de proveedores | **Proveedores:** informan si pueden participar y prestan el servicio [F04, F20] |
-| | **Sede** del evento: es un dato que trae el cliente [F10] |
+| Coordinación, Producción y Administración [F05 a F07] | Clientes: encargan, negocian, aceptan, rechazan, piden cambios y cancelan [F03, F13, F27] |
+| Pedidos, propuestas, encargos confirmados, tareas y el registro de proveedores | Proveedores: informan si pueden participar y prestan el servicio [F04, F20] |
+| | Sede del evento: es un dato que trae el cliente [F10] |
 
-El límite pasa por la comunicación: clientes y proveedores **no entran** al sistema; lo que entra es el resultado de hablar con ellos [F09] (interpretación).
+El límite pasa por la comunicación: clientes y proveedores no entran al sistema; lo que entra es el resultado de hablar con ellos [F09] (interpretación).
 
 Quedan afuera, porque el cliente lo dijo: consecuencias económicas de la cancelación [F28], cierre económico y evaluación del evento [F29].
 
@@ -87,12 +87,12 @@ Pendiente: quién registra la confirmación, la cancelación y el cierre, porque
 
 ### 2.4 Elementos y relaciones
 
-- Un **cliente** hace un **pedido** [F10].
-- Para un pedido se arma una **propuesta**, compuesta por **servicios** con importe [F12].
-- La propuesta aceptada define el **encargo confirmado** y sus condiciones [F17, F18].
-- Cada servicio del evento necesita un **proveedor** con participación confirmada [F20].
-- La preparación se organiza en **tareas** con responsable y fecha prevista [F23, F24].
-- Un **cambio** afecta tareas y servicios ya coordinados [F26].
+- Un cliente hace un pedido [F10].
+- Para un pedido se arma una propuesta, compuesta por servicios con importe [F12].
+- La propuesta aceptada define el encargo confirmado y sus condiciones [F17, F18].
+- Cada servicio del evento necesita un proveedor con participación confirmada [F20].
+- La preparación se organiza en tareas con responsable y fecha prevista [F23, F24].
+- Un cambio afecta tareas y servicios ya coordinados [F26].
 
 ### 2.5 Entradas, procesos y salidas
 
@@ -108,11 +108,11 @@ Pendiente: quién registra la confirmación, la cancelación y el cierre, porque
 
 ### 2.6 Subsistemas
 
-(interpretación, según cómo el cliente reparte el trabajo en F05–F07)
+(interpretación, según cómo el cliente reparte el trabajo en F05 a F07)
 
-- **Comercial:** del pedido a la propuesta aceptada o rechazada. Lo lleva Coordinación.
-- **Preparación:** del encargo confirmado al evento realizado: proveedores, tareas y cambios. Participan Producción y Coordinación.
-- **Soporte administrativo:** datos de clientes y proveedores. Lo lleva Administración.
+- Comercial: del pedido a la propuesta aceptada o rechazada. Lo lleva Coordinación.
+- Preparación: del encargo confirmado al evento realizado: proveedores, tareas y cambios. Participan Producción y Coordinación.
+- Soporte administrativo: datos de clientes y proveedores. Lo lleva Administración.
 
 ### 2.7 Restricciones e interdependencias
 
@@ -124,18 +124,18 @@ Pendiente: quién registra la confirmación, la cancelación y el cierre, porque
 
 ### 2.8 Reservas, bucles y demoras
 
-**Reservas** (lo que se acumula y hay que vigilar):
+Reservas (lo que se acumula y hay que vigilar):
 - Eventos en preparación al mismo tiempo [F32].
 - Tareas pendientes y vencidas de cada evento [F25].
 - Servicios sin proveedor confirmado [F20].
 
-**Bucles:**
-- **Negociación:** propuesta → pedido de cambios → ajuste → nueva presentación. Se corta con la aceptación o el rechazo [F13, F15].
-- **Búsqueda de proveedor:** consulta → no puede → se busca otro. Se corta cuando uno confirma [F20].
-- **Control de pendientes:** revisar pendientes → actuar → quedan menos. Es el bucle que hoy falla, porque los pendientes no se ven a tiempo [F32].
-- **Cambio:** un cambio reabre compromisos que estaban resueltos y los devuelve al control de pendientes [F26].
+Bucles:
+- Negociación: propuesta → pedido de cambios → ajuste → nueva presentación. Se corta con la aceptación o el rechazo [F13, F15].
+- Búsqueda de proveedor: consulta → no puede → se busca otro. Se corta cuando uno confirma [F20].
+- Control de pendientes: revisar pendientes → actuar → quedan menos. Es el bucle que hoy falla, porque los pendientes no se ven a tiempo [F32].
+- Cambio: un cambio reabre compromisos que estaban resueltos y los devuelve al control de pendientes [F26].
 
-**Demoras:**
+Demoras:
 - Entre presentar la propuesta y la respuesta del cliente [F13].
 - Entre consultar a un proveedor y su respuesta [F20].
 - Entre el primer contacto y tener todos los datos del pedido [F11].
@@ -160,18 +160,18 @@ Pendiente: quién registra la confirmación, la cancelación y el cierre, porque
 | Cambios de fecha o servicio | Cliente | Quien coordina el evento [F26] | Responsables de las tareas y servicios afectados | Controlar |
 | Cancelación y motivo | Cliente | Personal de Backstage [D7] | Todos | Dejar constancia |
 | Realización y observaciones | Personal de Backstage | Personal de Backstage [D7] | Todos | Dejar constancia |
-| Estado del evento | Se desprende de lo anterior | — | Todos, para ver qué requiere atención [F33] | Controlar y decidir prioridades |
+| Estado del evento | Se desprende de lo anterior | Nadie (se desprende) | Todos, para ver qué requiere atención [F33] | Controlar y decidir prioridades |
 
 Falta precisar qué modifica Administración [D2].
 
 ### 3.2 Canales y destinatarios
 
-- **Con clientes y proveedores:** conversaciones por fuera del sistema [F09]. El cliente no dijo por qué medios.
-- **Dentro de Backstage:** hoy la información está repartida [F32]. El cliente no dijo dónde la guarda cada uno.
+- Con clientes y proveedores: conversaciones por fuera del sistema [F09]. El cliente no dijo por qué medios.
+- Dentro de Backstage: hoy la información está repartida [F32]. El cliente no dijo dónde la guarda cada uno.
 
 ### 3.3 Problemas de calidad de la información y controles
 
-Los problemas son los que contó el cliente. Los controles son **propuestas nuestras para validar** (interpretación).
+Los problemas son los que contó el cliente. Los controles son propuestas nuestras para validar (interpretación).
 
 | Problema relevado | Qué falla | Control propuesto |
 | --- | --- | --- |
@@ -180,7 +180,7 @@ Los problemas son los que contó el cliente. Los controles son **propuestas nues
 | No queda claro qué se acordó y qué cambió [F33] | Se pierde el dato anterior | Registrar cada cambio con qué cambió y cuándo [D6] |
 | Cuesta ver pendientes y vencidos [F32] | La situación de las tareas no se ve de un vistazo | Lista de tareas pendientes y vencidas, y de servicios sin confirmar |
 | Olvidos con varios eventos a la vez [F32] | No hay vista del conjunto | Consulta de eventos por fecha y por estado [F33] |
-| Preparar algo que no se acordó | — | No permitir tareas ni proveedores en un evento que no está confirmado [F30] |
+| Preparar algo que no se acordó | Sin dato | No permitir tareas ni proveedores en un evento que no está confirmado [F30] |
 | Datos incompletos del pedido [F11] | Los datos llegan de a poco | Permitir completar después, y definir qué es obligatorio para avanzar [D4] |
 
 ### 3.4 Qué cubre el software y qué queda afuera
@@ -195,7 +195,7 @@ Los problemas son los que contó el cliente. Los controles son **propuestas nues
 | Analizar qué afecta un cambio [F26] | El cambio y la situación actualizada de los compromisos |
 | Realizar el concierto | Que se realizó, con observaciones; o que se canceló, con motivo |
 
-El software **no decide ni resuelve nada por su cuenta**: no cotiza, no asigna y no reprograma [F23, F24, F26]. Centraliza lo acordado y muestra qué falta [F33].
+El software no decide ni resuelve nada por su cuenta: no cotiza, no asigna y no reprograma [F23, F24, F26]. Centraliza lo acordado y muestra qué falta [F33].
 
 ---
 
@@ -205,24 +205,24 @@ El software **no decide ni resuelve nada por su cuenta**: no cotiza, no asigna y
 
 | Término | Significado para Backstage | Respaldo |
 | --- | --- | --- |
-| **Pedido / Solicitud** | Lo que el cliente pide para organizar un concierto. Son sinónimos | Validación ⚠ |
-| **Evento** | El concierto que se organiza a partir de una solicitud | Validación ⚠ |
-| **Encargo** | El evento una vez que el cliente aceptó la propuesta | F17 |
-| **Propuesta** | Servicios ofrecidos con sus importes y el total | F12 |
-| **Propuesta vigente** | La versión actual de la propuesta, que se ajusta al negociar | F13 |
-| **Servicio** | Lo que se ofrece y se presta en el evento: sonido, iluminación, etc. | F12, F20 |
-| **Condiciones acordadas** | Fecha, sede, asistentes, servicios, importes y condiciones particulares | F18 |
-| **Proveedor** | Quien presta un servicio en un evento | F20, F21 |
-| **Participación** | La intervención de un proveedor en un evento: pendiente o confirmada | F20 |
-| **Tarea** | Trabajo interno de preparación, con responsable y fecha prevista | F22–F24 |
-| **Compromiso** | Lo que tiene que cumplirse para el evento: tareas y servicios con proveedores | F26, F33 |
-| **Cambio** | Modificación de la fecha o de un servicio después de confirmar | F26 |
+| Pedido / Solicitud | Lo que el cliente pide para organizar un concierto. Son sinónimos | Validación ⚠ |
+| Evento | El concierto que se organiza a partir de una solicitud | Validación ⚠ |
+| Encargo | El evento una vez que el cliente aceptó la propuesta | F17 |
+| Propuesta | Servicios ofrecidos con sus importes y el total | F12 |
+| Propuesta vigente | La versión actual de la propuesta, que se ajusta al negociar | F13 |
+| Servicio | Lo que se ofrece y se presta en el evento: sonido, iluminación, etc. | F12, F20 |
+| Condiciones acordadas | Fecha, sede, asistentes, servicios, importes y condiciones particulares | F18 |
+| Proveedor | Quien presta un servicio en un evento | F20, F21 |
+| Participación | La intervención de un proveedor en un evento: pendiente o confirmada | F20 |
+| Tarea | Trabajo interno de preparación, con responsable y fecha prevista | F22 a F24 |
+| Compromiso | Lo que tiene que cumplirse para el evento: tareas y servicios con proveedores | F26, F33 |
+| Cambio | Modificación de la fecha o de un servicio después de confirmar | F26 |
 
-**Términos ambiguos que hay que cuidar:**
+Términos ambiguos que hay que cuidar:
 
-- **"Confirmado"** se usa con dos significados. Un *evento confirmado* es uno cuya propuesta aceptó el cliente. Una *participación confirmada* es un proveedor que dijo que puede. El cliente mismo lo aclara: una cosa no implica la otra [F19].
-- **"Pendiente"** se usa para un servicio sin proveedor confirmado [F20] y para una tarea sin terminar [F25].
-- **"Evento"** se usa desde que hay un pedido: el primer estado del evento es "En solicitud" [F30]. Falta saber si un pedido rechazado también cuenta como evento [D1].
+- "Confirmado" se usa con dos significados. Un *evento confirmado* es uno cuya propuesta aceptó el cliente. Una *participación confirmada* es un proveedor que dijo que puede. El cliente mismo lo aclara: una cosa no implica la otra [F19].
+- "Pendiente" se usa para un servicio sin proveedor confirmado [F20] y para una tarea sin terminar [F25].
+- "Evento" se usa desde que hay un pedido: el primer estado del evento es "En solicitud" [F30]. Falta saber si un pedido rechazado también cuenta como evento [D1].
 
 ### 4.2 Modelo conceptual
 
@@ -283,11 +283,11 @@ Propuesta inicial del grupo (interpretación), para discutir en la devolución.
 
 | Contexto | Qué resuelve | Subdominio | Por qué se separa |
 | --- | --- | --- | --- |
-| **Propuestas** | Del pedido a la propuesta aceptada o rechazada | De soporte | Acá "servicio" es **lo que se ofrece, con un importe**. Lo trabaja Coordinación [F31] |
-| **Preparación** | Proveedores, tareas, cambios, pendientes y cierre | **Central** | Acá "servicio" es **un compromiso a cubrir**, con un proveedor pendiente o confirmado. Lo trabaja Producción [F31]. Es donde están los problemas que el cliente quiere resolver [F32, F33] |
-| **Acceso del personal** | Identificar a cada persona y qué puede modificar | Genérico | No es particular de Backstage |
+| Propuestas | Del pedido a la propuesta aceptada o rechazada | De soporte | Acá "servicio" es lo que se ofrece, con un importe. Lo trabaja Coordinación [F31] |
+| Preparación | Proveedores, tareas, cambios, pendientes y cierre | Central | Acá "servicio" es un compromiso a cubrir, con un proveedor pendiente o confirmado. Lo trabaja Producción [F31]. Es donde están los problemas que el cliente quiere resolver [F32, F33] |
+| Acceso del personal | Identificar a cada persona y qué puede modificar | Genérico | No es particular de Backstage |
 
-La separación entre Propuestas y Preparación responde a tres cosas del relevamiento: el término **"servicio" cambia de significado**, cambia **quién modifica la información** [F31], y el propio cliente marca la **confirmación** como el punto donde empieza otra etapa [F30].
+La separación entre Propuestas y Preparación responde a tres cosas del relevamiento: el término "servicio" cambia de significado, cambia quién modifica la información [F31], y el propio cliente marca la confirmación como el punto donde empieza otra etapa [F30].
 
 La relación entre los dos contextos es la aceptación: lo que en Propuestas es la propuesta aceptada, en Preparación son las condiciones acordadas [F17, F18].
 
@@ -320,7 +320,7 @@ Cada una tiene su pregunta en la [guía de la segunda entrevista](../relevamient
 | Propuesta y presupuesto | Relevado | D5 |
 | Aceptación y rechazo | Relevado a medias | D1 |
 | Confirmación del encargo | Relevado | D7 |
-| Servicios y proveedores | Relevado | — |
+| Servicios y proveedores | Relevado | Nada |
 | Preparación y seguimiento | Relevado a medias | D3, D10 |
 | Cambios relevantes | Relevado a medias | D6 |
 | Cancelación | Relevado | D9 |

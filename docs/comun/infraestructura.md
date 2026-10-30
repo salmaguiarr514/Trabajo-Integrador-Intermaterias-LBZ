@@ -10,7 +10,7 @@ la consigna de Sistemas Operativos no lo pide y era la parte más riesgosa. Ahor
 | | Sitio público | Demo de Sistemas Operativos |
 | --- | --- | --- |
 | Para qué | Que el sitio esté online | Cumplir la consigna de SO |
-| Front | Vercel (proyecto 1, build de Vite) | Dentro de la imagen de nginx |
+| Front | Vercel (proyecto 1, build de Vite) | 3 réplicas en contenedores, una por PC |
 | API | Vercel (proyecto 2, Express como función serverless) | 3 réplicas en contenedores, una por PC |
 | Base | **Supabase** (vía web) | **Postgres dockerizado** en la PC de acceso |
 | Balanceo | Lo hace Vercel | **nginx** en la PC de acceso |
@@ -25,9 +25,9 @@ flowchart LR
     end
     subgraph Demo [Demo de SO - 3 PCs con Linux]
         N[Navegador] --> NG[nginx - PC 1]
-        NG --> A1[api1 - PC 1]
-        NG --> A2[api2 - PC 2]
-        NG --> A3[api3 - PC 3]
+        NG --> A1[front + api1 - PC 1]
+        NG --> A2[front + api2 - PC 2]
+        NG --> A3[front + api3 - PC 3]
         A1 --> DB[(Postgres - PC 1)]
         A2 --> DB
         A3 --> DB
@@ -55,10 +55,10 @@ El front necesita un `vercel.json` con un *rewrite* de todo a `index.html`, porq
 
 ## 3. Variables en la demo de SO
 
-Van en el `.env` de la raíz de cada PC (ver [.env.example](../../.env.example)): datos de la base, `JWT_SECRET` (**el mismo en las 3 PCs**),
-`IP_PC1`, `IP_PC2`, `IP_PC3` e `INSTANCIA` (`api2` o `api3` en los nodos).
+Van en el `.env` de la raíz de cada PC (ver [.env.example](../../.env.example)): datos de la base y `JWT_SECRET` (**el mismo en las 3 PCs**).
+`IP_PC1`, `IP_PC2`, `IP_PC3` e `INSTANCIA` tienen un valor por defecto escrito en los compose; se cambian en el `.env` o en el comando (`INSTANCIA=api2 docker compose …`).
 
 ## 4. Decisiones pendientes
 
-1. **Cuál es la PC de acceso** (nginx + base + api1): la VM de Salma con Linux, según el plan de SO.
+1. **Cuál es la PC de acceso** (nginx + base, además de su front y api1): la VM de Salma con Linux, según el plan de SO.
 2. **Cuenta de Vercel:** ¿la del grupo o la de una persona?

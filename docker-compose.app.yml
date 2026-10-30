@@ -1,0 +1,42 @@
+# Front + back. Corre en las 3 PCs (las tres son réplicas iguales).
+# La base y nginx están en la PC 1, en docker-compose.servidores.yml.
+#
+#   nginx (PC 1) ─┬─ /     → front :8080 de la PC 1, 2 y 3
+#                 └─ /api/ → api   :3000 de la PC 1, 2 y 3 ──► db :5432 (PC 1)
+#
+# Las IPs y el nombre de la réplica tienen un valor por defecto acá mismo (${VAR:-valor}). Para cambiarlos sin tocar el archivo:
+#   en el .env de la raíz, o en el comando: INSTANCIA=api2 docker compose -f docker-compose.app.yml up -d --build
+# JWT_SECRET y la contraseña de la base van siempre en el .env (el mismo en las 3 PCs).
+# Levantar:   docker compose -f docker-compose.app.yml up -d --build
+# Ver estado: docker compose -f docker-compose.app.yml ps
+
+name: backstage-app
+
+services:
+  front:
+    build: ./front-eventos
+    container_name: eventos-front
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+
+  api:
+    build: ./api-eventos
+    container_name: eventos-${INSTANCIA:-api1}
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      INSTANCIA: ${INSTANCIA:-api1}
+      # Sin DATABASE_URL: db.js usa las DB_*. La base está en la PC 1 (también para la api de la PC 1,
+      # porque vive en el otro compose y llega por el puerto publicado)
+      DB_HOST: ${IP_PC1:-192.168.0.10}
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRA: ${JWT_EXPIRA:-8h}
+      GMAIL_USUARIO: ${GMAIL_USUARIO:-}
+      GMAIL_CLAVE_APP: ${GMAIL_CLAVE_APP:-}
+    ports:
+      - "3000:3000"

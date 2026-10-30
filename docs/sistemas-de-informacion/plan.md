@@ -22,7 +22,8 @@ Todos los integrantes tienen que poder explicar las decisiones. Texto completo d
 | **analisis/** | |
 | [comparacion-dominio-alcance.md](analisis/comparacion-dominio-alcance.md) | Versión 0: el dominio que mandamos, la devolución de la profesora (09/10) y qué sobraba, faltaba o era hipótesis |
 | [analisis-v1.md](analisis/analisis-v1.md) | Versión 1 del análisis, a partir de la entrevista 1: hechos F01–F33, sistema organizacional, SI, dominio, dudas |
-| [notas-entrevista-2.md](analisis/notas-entrevista-2.md) | Qué aporta cada respuesta de la entrevista 2; se vuelca en la v2 |
+| [notas-entrevista-2.md](analisis/notas-entrevista-2.md) | Qué aporta cada respuesta de la entrevista 2; se volcó en la v2 |
+| [analisis-v2.md](analisis/analisis-v2.md) | Versión 2 del análisis (28/10): cambios respecto de la v1, hechos F34 a F68, sistema organizacional, sistema de información, dominio, recorridos, permisos, coherencia, hipótesis y dudas D11 a D15 |
 
 **Convención de versiones:** cada versión nueva del análisis es un archivo nuevo (`analisis-v2.md`, …) que empieza con
 "Cambios respecto de la versión anterior" y el porqué de cada uno. Las anteriores no se editan: son la evidencia de la evolución.
@@ -31,6 +32,8 @@ Cada entrevista se guarda textual en `relevamiento/entrevista-N-AAAA-MM-DD.md`.
 ---
 
 ## 2. Qué hay que cumplir y cómo vamos
+
+> Las tablas de esta sección se escribieron antes de la v2. Al 28/10 la [v2](analisis/analisis-v2.md) cubre los puntos marcados parcial o pendiente; su [§6.1](analisis/analisis-v2.md#61-cobertura-contra-el-alcance-del-software) muestra la cobertura. Quedan las dudas D11 a D15 y la revisión de la profesora.
 
 ✅ hecho · 🟡 parcial · ⬜ falta
 
@@ -131,13 +134,13 @@ Cada vuelta tiene la misma forma: **preguntar → registrar → analizar → det
 | # | Paso | Resultado | Estado |
 | --- | --- | --- | --- |
 | 1 | Recuperar del chat los intercambios de validación que faltan y pegarlos en la entrevista 1 | F15, F17–F19, F21 con respaldo | ✅ |
-| 2 | Hacer la [entrevista 2](relevamiento/preguntas-entrevista-2.md): dudas, excepciones y validación de propuestas | `entrevista-2-….md` | 🟡 Faltan 2, 3, 21b, 22, 24, 28, 29 y 30 |
+| 2 | Hacer la [entrevista 2](relevamiento/preguntas-entrevista-2.md): dudas, excepciones y validación de propuestas | `entrevista-2-….md` | ✅ Terminada el 28/10, con transcripción ordenada |
 | 3 | Volcar las respuestas: hechos nuevos (F34…), dudas cerradas, propuestas confirmadas o descartadas | [Notas de la entrevista 2](analisis/notas-entrevista-2.md) | 🟡 Al día con lo respondido |
-| 4 | Escribir `analisis-v2.md` con "Cambios respecto de la v1" | Versión 2 | ⬜ |
-| 5 | Completar lo que falta en v2: vista por actor, diagrama de flujos, datos obligatorios y transiciones, estados de la tarea, escenarios de los recorridos, relación entre contextos, atributos del modelo | Los 🟡 de la sección 2 pasan a ✅ | ⬜ |
-| 6 | Si aparecen dudas nuevas, entrevista 3 y versión 3 (repetir 2–5) | — | ⬜ |
+| 4 | Escribir `analisis-v2.md` con "Cambios respecto de la v1" | [Versión 2](analisis/analisis-v2.md) | ✅ |
+| 5 | Completar lo que falta en v2: vista por actor, diagrama de flujos, datos obligatorios y transiciones, estados de la tarea, escenarios de los recorridos, relación entre contextos, atributos del modelo | Cubierto en la v2. La cobertura contra el alcance está en su §6.1 | ✅ |
+| 6 | Si aparecen dudas nuevas, entrevista 3 y versión 3 (repetir 2–5) | La v2 deja cinco dudas, D11 a D15. No bloquean el informe | ⬜ A decidir |
 | 7 | Revisión de coherencia completa (propósito ↔ límite ↔ componentes ↔ modelo ↔ alcance) | — | ⬜ |
-| 8 | Escribir el [informe final](#5-informe-final) a partir de la última versión del análisis | Entregable final | ⬜ |
+| 8 | Escribir el [informe final](#5-informe-final) a partir de la última versión del análisis | [Informe final (docx)](Informe%20final%20-%20Sistemas%20de%20Información%20-%20Backstage.docx), con la carátula y el índice de la plantilla. Falta revisarlo con el grupo y actualizar el índice en Word | 🟡 Primera versión del 28/10 |
 
 **Pendientes del grupo:** la fecha de entrega del informe todavía no está definida.
 
@@ -147,11 +150,11 @@ Meta: **terminar las entrevistas y completar la consigna** sin abrir alcance nue
 
 | # | Qué se hace | Cómo | Resultado |
 | --- | --- | --- | --- |
-| 1 | Terminar la entrevista 2 | 8 preguntas, en el orden de [preguntas-entrevista-2.md](relevamiento/preguntas-entrevista-2.md#qué-falta-preguntar-en-este-orden): 30, 3, 2, 21b, 22, 24, 28 y el cierre (29). Una por mensaje, pegando cada respuesta textual en la [transcripción](relevamiento/entrevista-2-2026-10-14.md) | Contradicción de la cancelación resuelta, estados cerrados, sede ubicada, "servicio" validado |
-| 2 | Volcar las respuestas | Agregar cada una a las [notas](analisis/notas-entrevista-2.md), cerrar el ⚠ y marcar ✅ | Notas al día |
-| 3 | Escribir `analisis-v2.md` | Con "Cambios respecto de la v1" a partir de la tabla de la [§6](#6-revisión-general-14102026) y las 12 reglas nuevas | Versión 2 |
-| 4 | Completar las partes 🟡 y ⬜ de la §2 dentro de v2 | Ver abajo | Consigna cubierta |
-| 5 | Revisión de coherencia | Propósito ↔ límite ↔ componentes ↔ modelo, y que cada afirmación tenga respaldo o esté marcada como hipótesis | Lista para el informe |
+| 1 | Terminar la entrevista 2 | Hecho el 28/10: cierre (29) y pregunta 31 respondidas. Transcripción con el formato de la entrevista 1 | Cancelación resuelta, estados cerrados, sede ubicada, "servicio" validado |
+| 2 | Volcar las respuestas | Hecho: [notas](analisis/notas-entrevista-2.md) al día | Notas al día |
+| 3 | Escribir `analisis-v2.md` | Hecho: [v2](analisis/analisis-v2.md), con "Cambios respecto de la v1" | Versión 2 |
+| 4 | Completar las partes 🟡 y ⬜ de la §2 dentro de v2 | Hecho: vista por actor, flujos, controles, recorridos, permisos, estados y modelo | Consigna cubierta |
+| 5 | Revisión de coherencia | Hecha en la v2 §6. Falta releerla con el grupo y decidir qué hacer con D11 a D15 | Lista para el informe |
 | 6 | Informe final | Artifact con gráficos, a partir de v2 (§5) | Entregable |
 
 **Qué parte de la consigna resuelve cada pregunta que falta:**
