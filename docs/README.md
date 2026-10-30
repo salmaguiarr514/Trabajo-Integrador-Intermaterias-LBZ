@@ -17,6 +17,7 @@ Cada carpeta corresponde a una materia. Lo que usan varias materias está en `co
 | | [relevamiento/](sistemas-de-informacion/relevamiento/) | Guía de preguntas, transcripciones de las entrevistas y preguntas de la próxima | Sistemas de Información |
 | | [analisis/](sistemas-de-informacion/analisis/) | Versiones del análisis (v0: comparación con el alcance; v1: después de la entrevista 1) | Sistemas de Información |
 | `sistemas-operativos/` | [plan.md](sistemas-operativos/plan.md) | Cómo entendemos la consigna, Linux en 3 PCs, Supabase vs. base dockerizada, archivos Docker, pasos, guion de la demo, dudas y riesgos | Sistemas Operativos |
+| | [paso-a-paso.md](sistemas-operativos/paso-a-paso.md) | Guía detallada: VirtualBox en Windows, Ubuntu desde cero, Docker, IPs, levantar y verificar | Sistemas Operativos |
 | | [consigna.md](sistemas-operativos/consigna.md) | Texto original de la cátedra | Sistemas Operativos |
 
 Los scripts SQL no están acá sino junto al código, en [api-eventos/database/](../api-eventos/database/).

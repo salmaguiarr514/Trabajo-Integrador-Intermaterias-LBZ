@@ -1,0 +1,52 @@
+# nginx (balanceador, único punto de entrada) + Postgres (base única). Corre solo en la PC 1.
+# El front y la api de cada PC están en docker-compose.app.yml.
+#
+# Las IPs de las 3 PCs tienen un valor por defecto acá (${VAR:-valor}); se cambian en el .env o en el comando.
+#
+# Levantar primero este y después el de la app:
+#   docker compose -f docker-compose.servidores.yml up -d
+# Ver estado: docker compose -f docker-compose.servidores.yml ps
+# Nunca usar "down -v": borra el volumen con los datos.
+
+name: backstage-servidores
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: eventos-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # Publicado a la red local para que lleguen las api de las 3 PCs
+    ports:
+      - "5432:5432"
+    volumes:
+      # Volumen: los datos sobreviven a borrar o recrear el contenedor
+      - datos-postgres:/var/lib/postgresql/data
+      # Corren solos la primera vez (volumen vacío), en orden alfabético.
+      # 00_reset.sql también corre, pero en una base vacía no hace nada
+      - ./api-eventos/database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  nginx:
+    image: nginx:alpine
+    container_name: eventos-nginx
+    restart: unless-stopped
+    environment:
+      IP_PC1: ${IP_PC1:-192.168.0.10}
+      IP_PC2: ${IP_PC2:-192.168.0.11}
+      IP_PC3: ${IP_PC3:-192.168.0.12}
+    volumes:
+      # La imagen reemplaza las ${IP_PC*} del template al arrancar y lo deja en /etc/nginx/conf.d/nginx.conf
+      - ./nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+    ports:
+      - "80:80"
+
+volumes:
+  datos-postgres:

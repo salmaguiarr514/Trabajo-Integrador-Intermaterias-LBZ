@@ -40,7 +40,7 @@ Qué cambia entre entornos, y solo eso, se controla con variables de entorno. El
 
 | Herramienta | Para qué | Cómo instalar |
 | --- | --- | --- |
-| **VirtualBox + Ubuntu Server** | La demo de SO corre en Linux: una VM por PC, con la red en **"Adaptador puente"** | virtualbox.org y ubuntu.com/download/server |
+| **VirtualBox + Ubuntu Desktop** | La demo de SO corre en Linux con interfaz gráfica: una VM por PC, con la red en **"Adaptador puente"** | virtualbox.org y ubuntu.com/download/desktop |
 | **Docker Engine** (dentro de la VM) | Correr los contenedores de la demo de SO | docs.docker.com/engine/install/ubuntu |
 | **Docker Desktop** (opcional, en Windows) | Probar la base en local sin la VM | docker.com |
 | **DBeaver Community** | Ver y consultar la base (local, Supabase o la de producción) | dbeaver.io |
@@ -60,13 +60,13 @@ Antes de empezar, en la PC de cada uno:
 | # | Fase | Depende de | Qué se entrega | Estado |
 | --- | --- | --- | --- | --- |
 | F0 | Preparar el entorno | — | Herramientas de la sección 2 instaladas en cada PC | ⬜ |
-| F1 | Postgres en Docker | F0 | `docker-compose.acceso.yml` (o solo su servicio `db`), scripts `01`–`12` cargados | 🟡 archivos listos, sin probar |
+| F1 | Postgres en Docker | F0 | `docker-compose.servidores.yml` (o solo su servicio `db`), scripts `01`–`12` cargados | 🟡 archivos listos, sin probar |
 | F2 | App local contra la base local | F1 | API y front funcionando en la PC contra el Postgres del contenedor | ⬜ |
 | F3 | Preparar el código para Vercel | F2 | Commits con los cambios de la sección 5 | ✅ 2026-10-26 (probado en local simulando la función; F2 no hizo falta porque el sitio público usa Supabase) |
 | F4 | Desplegar la API en Vercel | F3 | `/api/salud` responde desde internet, contra Supabase | ✅ 2026-10-27 |
 | F5 | Desplegar el front en Vercel | F4 | Front público que habla con la API pública | ✅ 2026-10-27 |
 | F6 | Verificación en producción | F5 | Lista de humo completa en el sitio público | 🟡 probados 1, 2, 3, 9 y login de superadmin; faltan compra, control de acceso y mails |
-| F9 | Demo de Sistemas Operativos | F1 | En 3 PCs con Linux: nginx y base en la PC de acceso, una réplica de la API en cada PC | 🟡 archivos listos, sin probar |
+| F9 | Demo de Sistemas Operativos | F1 | En 3 PCs con Linux: nginx y base en la PC de acceso, una réplica del front y de la API en cada PC | 🟡 archivos listos, sin probar |
 | F10 | Data warehouse | F1 | Esquema `dw` cargado en la base local (ver [data-warehouse.md](../base-de-datos/data-warehouse.md)) | ⬜ |
 
 **Orden:** F0 → F1 → F2 → F3 → F4 → F5 → F6 primero. El sitio público queda online con Supabase, que ya anda, antes de tocar la base.
@@ -87,18 +87,18 @@ F9 y F10 son independientes del sitio público y pueden ir en paralelo. (Las fas
 
 ### F1. Postgres en Docker
 
-El Postgres está en [docker-compose.acceso.yml](../../docker-compose.acceso.yml), en la **raíz del repo** (se commitea: no tiene secretos, las claves salen del `.env`).
+El Postgres está en [docker-compose.servidores.yml](../../docker-compose.servidores.yml), en la **raíz del repo** (se commitea: no tiene secretos, las claves salen del `.env`).
 Monta la carpeta `api-eventos/database/` entera en `/docker-entrypoint-initdb.d`: Postgres corre los `.sql` solo la primera vez (volumen vacío), en orden alfabético.
-Para probar solo la base en la PC de cada uno: copiar `.env.example` a `.env` y correr `docker compose -f docker-compose.acceso.yml up -d db`.
+Para probar solo la base en la PC de cada uno: copiar `.env.example` a `.env` y correr `docker compose -f docker-compose.servidores.yml up -d db`.
 
 Levantar y verificar:
 
 ```
-docker compose -f docker-compose.acceso.yml up -d db
-docker compose -f docker-compose.acceso.yml ps
-docker compose -f docker-compose.acceso.yml logs db
-docker compose -f docker-compose.acceso.yml exec db psql -U postgres -d backstage -c "\dt"
-docker compose -f docker-compose.acceso.yml exec db psql -U postgres -d backstage -c "\dv"
+docker compose -f docker-compose.servidores.yml up -d db
+docker compose -f docker-compose.servidores.yml ps
+docker compose -f docker-compose.servidores.yml logs db
+docker compose -f docker-compose.servidores.yml exec db psql -U postgres -d backstage -c "\dt"
+docker compose -f docker-compose.servidores.yml exec db psql -U postgres -d backstage -c "\dv"
 ```
 
 - En los logs, cada script aparece como `running /docker-entrypoint-initdb.d/…`, y al final `database system is ready to accept connections`.
@@ -106,7 +106,7 @@ docker compose -f docker-compose.acceso.yml exec db psql -U postgres -d backstag
 - `\dv` lista **5 vistas** (`v_lugares`, `v_disponibilidad`, `v_cartelera`, `v_asistencia`, `v_recaudacion`).
 - En DBeaver: nueva conexión PostgreSQL, host `localhost`, puerto `5432`, base `backstage`, usuario y contraseña del `.env`. Consulta de prueba: `SELECT count(*) FROM eventos;`.
 
-Si un script falla: el log dice cuál y por qué. Se corrige el script, se borra el volumen **de la base de desarrollo** (`docker compose -f docker-compose.acceso.yml down -v`) y se vuelve a levantar. Esto solo vale en desarrollo.
+Si un script falla: el log dice cuál y por qué. Se corrige el script, se borra el volumen **de la base de desarrollo** (`docker compose -f docker-compose.servidores.yml down -v`) y se vuelve a levantar. Esto solo vale en desarrollo.
 
 Persistencia: `docker compose down` conserva los datos; `down -v` los borra. Probarlo una vez para entenderlo.
 
@@ -323,11 +323,11 @@ Se descartó el 2026-10-27: la consigna de SO no lo pide y era lo más riesgoso.
 
 Independiente del sitio público. Todo en **Linux** (una VM por PC, red en "Adaptador puente"). Detalle, guion y riesgos en el [plan de SO](../sistemas-operativos/plan.md).
 
-1. En cada VM: instalar Docker Engine, clonar el repo y copiar `.env.example` a `.env`. Mismo `JWT_SECRET` en las 3; `IP_PC1`, `IP_PC2` e `IP_PC3` con las IPs de las VMs; `INSTANCIA=api2` en la PC 2 y `api3` en la PC 3.
-2. **PC 1 (acceso):** `docker compose -f docker-compose.acceso.yml up -d --build` levanta Postgres (con los scripts `01`–`12`), api1 y nginx.
-3. **PC 2 y PC 3:** `docker compose -f docker-compose.nodo.yml up -d --build`.
+1. En cada VM: instalar Docker Engine, clonar el repo y copiar `.env.example` a `.env`. Mismo `JWT_SECRET` en las 3. Las IPs reales van en los valores por defecto de los compose (o en el `.env`); `INSTANCIA=api2` en la PC 2 y `api3` en la PC 3.
+2. **PC 1 (acceso):** `docker compose -f docker-compose.servidores.yml up -d` levanta Postgres (con los scripts `01`–`12`) y nginx.
+3. **Las 3 PCs:** `docker compose -f docker-compose.app.yml up -d --build` levanta el front y la api de cada una.
 4. Probar el balanceo: `curl http://IP_PC1/api/salud` repetido seis veces alterna `api1`, `api2`, `api3`.
-5. Probar tolerancia: `docker compose -f docker-compose.nodo.yml stop` en la PC 2, repetir el `curl`, y verificar que la app sigue andando. Después `start`.
+5. Probar tolerancia: `docker compose -f docker-compose.app.yml stop` en la PC 2, repetir el `curl`, y verificar que la app sigue andando. Después `start`.
 6. Correr la lista de humo (sección 8) en `http://IP_PC1`.
 
 **Listo cuando:** el balanceo se ve, la app anda con una réplica caída, y la lista de humo pasa.
@@ -362,8 +362,8 @@ Se cargan a mano con `psql`, en orden, y solo en bases de desarrollo. En producc
 | --- | --- |
 | Servicios en Docker, todos corriendo | F9 (todos los contenedores en las 3 PCs), `docker compose ps` |
 | Réplicas en contenedores | F9, paso 2 y `docker compose ps` |
-| Docker Compose con la infraestructura, las réplicas y la red | F9: `docker-compose.acceso.yml` y `docker-compose.nodo.yml` |
-| Nginx como balanceador | F9, pasos 4 y 5, y `nginx/default.conf.template` |
+| Docker Compose con la infraestructura, las réplicas y la red | F9: `docker-compose.app.yml` y `docker-compose.servidores.yml` |
+| Nginx como balanceador | F9, pasos 4 y 5, y `nginx/nginx.conf.template` |
 | Una única base dockerizada | F1; en F9 un dato cargado desde una réplica se ve desde todas |
 
 ---
